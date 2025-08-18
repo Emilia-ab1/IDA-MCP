@@ -135,7 +135,7 @@ IDA-MCP/
       "command": "path of python",
       "args": ["path of ida_mcp_proxy.py"],
       "env": {},
-      "description": "Process MCP proxy that forwards to running IDA SSE server (list_functions)."
+      "description": "Process MCP proxy that forwards to running IDA SSE server."
     }
   },
   "version": "1.0.0",
