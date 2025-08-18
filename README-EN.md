@@ -189,4 +189,3 @@ Contributions & incremental extensions welcome.
 ## Quick Summary
 
 IDA-MCP provides a minimal, multi‑instance aware MCP surface over IDA Pro with rich parameter metadata and optional proxy consolidation — enabling automated reverse‑engineering assistant workflows without complex setup.
-
