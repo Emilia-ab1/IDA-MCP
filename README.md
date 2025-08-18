@@ -1,4 +1,8 @@
-# IDA-MCP (FastMCP SSE + 多实例协调器)
+# IDA-MCP
+
+[readme-en](README-EN.md)
+
+## IDA-MCP (FastMCP SSE + 多实例协调器)
 
 * 每个 IDA 实例启动一个 **SSE FastMCP** 服务器 (`/mcp`)
 * 第一个实例占用 `127.0.0.1:11337` 作为 **协调器(coordinator)**，维持内存注册表并支持工具转发
@@ -144,38 +148,13 @@ IDA-MCP/
 
 ```
 
-任何将其复制到 claude 客户端的 mcp 工具配置文件或者其他 MCP 客户端的配置文件中。
-
-## 设计要点
-
-| 关注点 | 说明 |
-|--------|------|
-| 线程安全 | 所有 IDA API 调用通过 `execute_sync` 在主线程执行 |
-| 多实例发现 | 内存协调器 + HTTP (11337)，不写磁盘 |
-| 端口冲突 | 自动向上扫描空闲端口 |
-| 转发机制 | 协调器 `/call` 内部使用 fastmcp Client 发起工具调用并返回 JSON 序列化结果 |
-
-## 可扩展方向
-
-* 添加更多原生工具：反编译、交叉引用、搜索、patch 等
-* 在协调器中实现心跳/超时清理 stale 实例
-* 在代理中增加通用 `call(tool, params, port)` 工具
-* Resource / Streaming 支持（MCP resources 与 progress）
-* 安全：白名单工具 / 认证 / 只读模式
+将其复制到 claude 客户端的 mcp 工具配置文件或者其他 MCP 客户端的配置文件中。
 
 ## 依赖
 
 ```bash
 python -m pip install -r requirements.txt
 ```
-
-## 问题排查
-
-| 现象 | 可能原因 | 处理 |
-|------|----------|------|
-| 代理 `list_instances` 为空 | 插件未启动或协调器端口被占用 | 启动至少一个实例；确认 11337 未被防火墙阻断 |
-| 工具调用超时 | 目标实例卡住/长时间分析 | 等待 IDA 完成分析或重启实例 |
-| `call failed` 错误 | 实例下线但未注销 | 重新触发插件关闭、再开启使其重新注册 |
 
 ---
 需要新增或修改的功能继续提出。欢迎增量扩展。
