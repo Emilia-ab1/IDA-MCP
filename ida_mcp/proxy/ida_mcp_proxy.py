@@ -44,7 +44,11 @@
 from __future__ import annotations
 import json
 import urllib.request
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Annotated
+try:
+    from pydantic import Field  # Pydantic v2
+except Exception:  # pragma: no cover
+    Field = lambda **kwargs: None  # type: ignore
 from fastmcp import FastMCP
 
 COORD_URL = "http://127.0.0.1:11337"
@@ -109,7 +113,9 @@ def list_instances() -> list[dict]:  # type: ignore
     return _instances()
 
 @server.tool(description="Select default target instance. Param port(optional int). If omitted auto-picks: prefer 8765 else earliest started. Returns { selected_port } or { error }. Subsequent calls without explicit port use this.")
-def select_instance(port: int | None = None) -> dict:  # type: ignore
+def select_instance(
+    port: Annotated[int | None, Field(description="Target instance port to select; if omitted auto-picks preferred (8765 or earliest)")] = None
+) -> dict:  # type: ignore
     global _current_port
     if port is None:
         port = _choose_default_port()
@@ -129,7 +135,9 @@ def list_functions() -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get IDB metadata. Param port(optional) overrides current selection. Returns underlying get_metadata dict { input_file,arch,bits,hash,... } or { error }. Auto-selects instance if needed.")
-def get_metadata(port: int | None = None) -> Any:  # type: ignore
+def get_metadata(
+    port: Annotated[int | None, Field(description="Override target instance port; defaults to selected/auto-chosen")]= None
+) -> Any:  # type: ignore
     """获取某个实例的元数据 (默认使用当前选中实例)。
 
     参数:
@@ -144,7 +152,10 @@ def get_metadata(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Incoming xrefs: params address(int), port(optional). Returns underlying { address,total,xrefs } or { error }. Passes address through unchanged.")
-def get_xrefs_to(address: int, port: int | None = None) -> Any:  # type: ignore
+def get_xrefs_to(
+    address: Annotated[int, Field(description="Target address inside backend IDB")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -154,7 +165,11 @@ def get_xrefs_to(address: int, port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Heuristic struct field refs: params struct_name, field_name, port(optional). Returns underlying { struct,field,offset,matches,... } or { error }. Same limitations as backend (heuristic, truncated at 500).")
-def get_xrefs_to_field(struct_name: str, field_name: str, port: int | None = None) -> Any:  # type: ignore
+def get_xrefs_to_field(
+    struct_name: Annotated[str, Field(description="Struct name (as defined in Local Types)")],
+    field_name: Annotated[str, Field(description="Exact field name within the struct")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if not struct_name or not field_name:
         return {"error": "empty struct_name or field_name"}
     target = port if port is not None else _ensure_port()
@@ -164,7 +179,11 @@ def get_xrefs_to_field(struct_name: str, field_name: str, port: int | None = Non
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Set/clear comment: params address(int), comment(str, empty => clear), port(optional). Returns backend { address,old,new,changed } or { error }. Non-repeatable comment.")
-def set_comment(address: int, comment: str, port: int | None = None) -> Any:  # type: ignore
+def set_comment(
+    address: Annotated[int, Field(description="Address to set or clear non-repeatable comment")],
+    comment: Annotated[str, Field(description="Comment text; empty string clears (max 1024 chars in backend)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     if comment is None:
@@ -176,7 +195,12 @@ def set_comment(address: int, comment: str, port: int | None = None) -> Any:  # 
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Rename local variable (Hex-Rays): params function_address, old_name, new_name, port(optional). Returns backend { function,start_ea,old_name,new_name,changed } or { error }. Auto-select instance.")
-def rename_local_variable(function_address: int, old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
+def rename_local_variable(
+    function_address: Annotated[int, Field(description="Function start or any internal address")],
+    old_name: Annotated[str, Field(description="Existing local variable name (exact match)")],
+    new_name: Annotated[str, Field(description="New local variable name (valid C identifier)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
     if not old_name:
@@ -190,7 +214,11 @@ def rename_local_variable(function_address: int, old_name: str, new_name: str, p
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Rename global variable: params old_name,new_name, port(optional). Returns backend { ea,old_name,new_name,changed } or { error }. Rejects function starts.")
-def rename_global_variable(old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
+def rename_global_variable(
+    old_name: Annotated[str, Field(description="Existing global symbol name")],
+    new_name: Annotated[str, Field(description="New symbol name (valid C identifier)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if not old_name:
         return {"error": "empty old_name"}
     if not new_name:
@@ -202,7 +230,11 @@ def rename_global_variable(old_name: str, new_name: str, port: int | None = None
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Rename function: params function_address(start or inside), new_name, port(optional). Returns backend { start_ea,old_name,new_name,changed } or { error }.")
-def rename_function(function_address: int, new_name: str, port: int | None = None) -> Any:  # type: ignore
+def rename_function(
+    function_address: Annotated[int, Field(description="Function start or internal address")],
+    new_name: Annotated[str, Field(description="New function name (valid C identifier)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
     if not new_name:
@@ -214,7 +246,11 @@ def rename_function(function_address: int, new_name: str, port: int | None = Non
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Set function prototype: params function_address, prototype(C decl), port(optional). Returns backend { start_ea,applied,old_type,new_type,parsed_name? } or { error }.")
-def set_function_prototype(function_address: int, prototype: str, port: int | None = None) -> Any:  # type: ignore
+def set_function_prototype(
+    function_address: Annotated[int, Field(description="Function start or internal address")],
+    prototype: Annotated[str, Field(description="Full C function declaration text")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
     if not prototype:
@@ -226,7 +262,12 @@ def set_function_prototype(function_address: int, prototype: str, port: int | No
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Set local variable type (Hex-Rays): params function_address, variable_name, new_type(C fragment), port(optional). Returns backend { function,start_ea,variable_name,old_type,new_type,applied } or { error }.")
-def set_local_variable_type(function_address: int, variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
+def set_local_variable_type(
+    function_address: Annotated[int, Field(description="Function start or internal address")],
+    variable_name: Annotated[str, Field(description="Local variable name (exact match)")],
+    new_type: Annotated[str, Field(description="C type fragment (e.g. int, MyStruct *)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
     if not variable_name:
@@ -240,7 +281,10 @@ def set_local_variable_type(function_address: int, variable_name: str, new_type:
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get function by name: params name(str), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Exact case-sensitive match.")
-def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ignore
+def get_function_by_name(
+    name: Annotated[str, Field(description="Exact function name (case-sensitive)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if not name:
         return {"error": "empty name"}
     target = port if port is not None else _ensure_port()
@@ -250,7 +294,10 @@ def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ig
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Formats: 1234, 0x401000, 401000h, 0x40_10_00 (underscores). param port(optional). Forwards to backend get_function_by_address. Returns backend { name,start_ea,end_ea,input,address } or { error }. Inside-function addresses allowed. Parse/validation occurs in backend; proxy just forwards raw value.")
-def get_function_by_address(address: int | str, port: int | None = None) -> Any:  # type: ignore
+def get_function_by_address(
+    address: Annotated[int | str, Field(description="Function start or internal address (int or string: decimal/0x.../....h)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -260,7 +307,9 @@ def get_function_by_address(address: int | str, port: int | None = None) -> Any:
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get current cursor address: param port(optional). Returns backend { address } or { error }. Depends on GUI focus in target instance.")
-def get_current_address(port: int | None = None) -> Any:  # type: ignore
+def get_current_address(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -268,7 +317,9 @@ def get_current_address(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get current function at cursor: param port(optional). Returns backend { name,start_ea,end_ea } or { error }. Uses screen EA in target instance.")
-def get_current_function(port: int | None = None) -> Any:  # type: ignore
+def get_current_function(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -276,7 +327,11 @@ def get_current_function(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Convert number representations: params text(str), size(8|16|32|64), port(optional). Returns backend multi-format dict or { error }. Supports 0x / 0b / trailing h / underscores / sign.")
-def convert_number(text: str, size: int, port: int | None = None) -> Any:  # type: ignore
+def convert_number(
+    text: Annotated[str, Field(description="Numeric text to parse (decimal, 0x, 0b, trailing h, underscores, sign)")],
+    size: Annotated[int, Field(description="Bit width: 8|16|32|64")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -284,7 +339,12 @@ def convert_number(text: str, size: int, port: int | None = None) -> Any:  # typ
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List global symbols (filtered): params offset>=0, count(1..1000), filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Skips function starts.")
-def list_globals_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
+def list_globals_filter(
+    offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+    count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    filter: Annotated[str | None, Field(description="Optional case-insensitive name substring")]= None,
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -292,7 +352,11 @@ def list_globals_filter(offset: int, count: int, filter: str | None = None, port
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List global symbols: params offset,count, port(optional). Returns backend { total,offset,count,items }. Unfiltered.")
-def list_globals(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
+def list_globals(
+    offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+    count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -300,7 +364,12 @@ def list_globals(offset: int, count: int, port: int | None = None) -> Any:  # ty
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List strings (filtered): params offset,count, filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Auto-inits Strings.")
-def list_strings_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
+def list_strings_filter(
+    offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+    count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    filter: Annotated[str | None, Field(description="Optional case-insensitive substring")]= None,
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -308,7 +377,11 @@ def list_strings_filter(offset: int, count: int, filter: str | None = None, port
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List strings: params offset,count, port(optional). Returns backend { total,offset,count,items }. No filtering.")
-def list_strings(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
+def list_strings(
+    offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+    count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -316,7 +389,9 @@ def list_strings(offset: int, count: int, port: int | None = None) -> Any:  # ty
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List local types: param port(optional). Returns backend { total,items:[{ ordinal,name,decl }] }. decl truncated per backend logic.")
-def list_local_types(port: int | None = None) -> Any:  # type: ignore
+def list_local_types(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -324,7 +399,10 @@ def list_local_types(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Decompile function (Hex-Rays): params address(int), port(optional). Returns backend { name,start_ea,end_ea,address,decompiled } or { error }. Large text untruncated.")
-def decompile_function(address: int, port: int | None = None) -> Any:  # type: ignore
+def decompile_function(
+    address: Annotated[int, Field(description="Function start or internal address to decompile")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -334,7 +412,10 @@ def decompile_function(address: int, port: int | None = None) -> Any:  # type: i
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Disassemble function: params start_address(int), port(optional). Returns backend { name,start_ea,end_ea,instructions:[...]} or { error }. Bytes truncated after 16 bytes.")
-def disassemble_function(start_address: int, port: int | None = None) -> Any:  # type: ignore
+def disassemble_function(
+    start_address: Annotated[int, Field(description="Function start (internal address allowed)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if start_address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -344,7 +425,9 @@ def disassemble_function(start_address: int, port: int | None = None) -> Any:  #
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List entry points: param port(optional). Returns backend { total,items:[{ ordinal,ea,name }] } or { error }. Name fallback logic done in backend.")
-def get_entry_points(port: int | None = None) -> Any:  # type: ignore
+def get_entry_points(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -352,7 +435,11 @@ def get_entry_points(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Set global variable type: params variable_name,new_type(C fragment), port(optional). Returns backend { ea,variable_name,old_type,new_type,applied } or { error }. Rejects function starts.")
-def set_global_variable_type(variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
+def set_global_variable_type(
+    variable_name: Annotated[str, Field(description="Existing global variable name (not a function start)")],
+    new_type: Annotated[str, Field(description="C type fragment (e.g. int, char *, MyStruct)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if not variable_name:
         return {"error": "empty variable_name"}
     if not new_type:
@@ -364,7 +451,10 @@ def set_global_variable_type(variable_name: str, new_type: str, port: int | None
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Declare/update local type: params c_declaration(single struct/union/enum/typedef), port(optional). Returns backend { name,kind,replaced,success } or { error }. Replaces existing by name.")
-def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type: ignore
+def declare_c_type(
+    c_declaration: Annotated[str, Field(description="Single struct/union/enum/typedef declaration text")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if not c_declaration:
         return {"error": "empty declaration"}
     target = port if port is not None else _ensure_port()
@@ -374,7 +464,9 @@ def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type:
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Debugger registers: param port(optional). Returns backend { ok,registers:[{ name,value,int? }],note? } or { error }. ok=false if debugger inactive.")
-def dbg_get_registers(port: int | None = None) -> Any:  # type: ignore
+def dbg_get_registers(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -382,7 +474,9 @@ def dbg_get_registers(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Debugger call stack: param port(optional). Returns backend { ok,frames:[{ index,ea,func }],note? } or { error }. Inactive => ok=false.")
-def dbg_get_call_stack(port: int | None = None) -> Any:  # type: ignore
+def dbg_get_call_stack(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -390,7 +484,9 @@ def dbg_get_call_stack(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List breakpoints: param port(optional). Returns backend { ok,total,breakpoints:[...] } or { error }. ok=false if debugger inactive.")
-def dbg_list_breakpoints(port: int | None = None) -> Any:  # type: ignore
+def dbg_list_breakpoints(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -398,7 +494,9 @@ def dbg_list_breakpoints(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Start debugger: param port(optional). Returns backend { ok,started,pid?,note? } or { error }. If already running started=false with note.")
-def dbg_start_process(port: int | None = None) -> Any:  # type: ignore
+def dbg_start_process(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -406,7 +504,9 @@ def dbg_start_process(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Terminate debug process: param port(optional). Returns backend { ok,exited,note? } or { error }. Inactive => ok:false,exited:false.")
-def dbg_exit_process(port: int | None = None) -> Any:  # type: ignore
+def dbg_exit_process(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -414,7 +514,9 @@ def dbg_exit_process(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Continue execution: param port(optional). Returns backend { ok,continued,note? } or { error }. Inactive => ok:false.")
-def dbg_continue_process(port: int | None = None) -> Any:  # type: ignore
+def dbg_continue_process(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
         return {"error": "No instances"}
@@ -422,7 +524,10 @@ def dbg_continue_process(port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Run to address: params address,int port(optional). Returns backend { ok,requested,continued,used_temp_bpt,note? } or { error }. Non-blocking.")
-def dbg_run_to(address: int, port: int | None = None) -> Any:  # type: ignore
+def dbg_run_to(
+    address: Annotated[int, Field(description="Target address to run to")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -432,7 +537,10 @@ def dbg_run_to(address: int, port: int | None = None) -> Any:  # type: ignore
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Set breakpoint: params address,int port(optional). Returns backend { ok,ea,existed,added,note? } or { error }. Can be used pre-debugger.")
-def dbg_set_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
+def dbg_set_breakpoint(
+    address: Annotated[int, Field(description="Address where breakpoint should be set")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -442,7 +550,10 @@ def dbg_set_breakpoint(address: int, port: int | None = None) -> Any:  # type: i
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Delete breakpoint: params address,int port(optional). Idempotent. Returns backend { ok,ea,existed,deleted,note? } or { error }.")
-def dbg_delete_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
+def dbg_delete_breakpoint(
+    address: Annotated[int, Field(description="Address of breakpoint to delete")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
@@ -452,7 +563,11 @@ def dbg_delete_breakpoint(address: int, port: int | None = None) -> Any:  # type
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Enable/disable breakpoint: params address,int enable(bool), port(optional). Enabling creates if missing. Returns backend { ok,ea,existed,enabled,changed,note? } or { error }.")
-def dbg_enable_breakpoint(address: int, enable: bool, port: int | None = None) -> Any:  # type: ignore
+def dbg_enable_breakpoint(
+    address: Annotated[int, Field(description="Breakpoint address")],
+    enable: Annotated[bool, Field(description="True = enable (creates if missing), False = disable")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()

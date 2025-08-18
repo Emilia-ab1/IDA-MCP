@@ -14,10 +14,10 @@ from __future__ import annotations
 
 import os
 import hashlib
-from typing import Callable, Any, List
+from typing import Callable, Any, List, Annotated
 
 try:
-    from pydantic import BaseModel
+    from pydantic import BaseModel, Field
 except Exception:  # pragma: no cover
     BaseModel = object  # type: ignore
 
@@ -283,7 +283,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Get function by name: param name (str, exact case‑sensitive IDA display name). Returns { name,start_ea,end_ea } or { error }. If multiple (rare) returns first. No fuzzy search.")
-    def get_function_by_name(name: str) -> dict:  # type: ignore
+    def get_function_by_name(
+        name: Annotated[str, Field(description="Exact function name (case-sensitive, matches IDA display name)")]
+    ) -> dict:  # type: ignore
         """按函数名称精确查找并返回函数的基本信息。
 
         参数:
@@ -314,7 +316,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Supported formats: 1234 (dec), 0x401000 / 0X401000, 401000h (trailing h), optional underscores (0x40_10_00). Address may be any EA inside the function. Returns { name,start_ea,end_ea,input,address } or { error }. Uses ida_funcs.get_func to resolve owning function. Errors: invalid address (parse failure), not found (no containing function).")
-    def get_function_by_address(address: int) -> dict:  # type: ignore
+    def get_function_by_address(
+        address: Annotated[int, Field(description="Function start or any address inside; also accepts decimal / 0x hex / trailing 'h' / underscores when passed as string")]
+    ) -> dict:  # type: ignore
         """按地址获取函数信息 (兼容十进制 / 十六进制多种输入形式)。
 
         参数 address 支持:
@@ -452,7 +456,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Numeric conversion: params text(str) & size(8|16|32|64). Supports 0x / 0b / trailing 'h' / sign / underscores. Returns multi‑representation { hex,dec,unsigned,signed,bin,bytes_le,bytes_be } or { error }.")
-    def convert_number(text: str, size: int) -> dict:  # type: ignore
+    def convert_number(
+        text: Annotated[str, Field(description="Numeric text: supports decimal, 0x..., 0b..., trailing 'h' hex, underscores, optional +/- sign")],
+        size: Annotated[int, Field(description="Bit width: one of 8,16,32,64")],
+    ) -> dict:  # type: ignore
         """数字格式转换工具。
 
         参数:
@@ -530,7 +537,11 @@ def create_mcp_server() -> FastMCP:
         }
 
     @mcp.tool(description="List global (non‑function) symbols with optional substring filter: params offset>=0, count(1..1000), filter(optional case‑insensitive). Returns { total,offset,count,items:[{ name,ea,size }] }. Skips function start addresses. size from ida_bytes.get_item_size or None.")
-    def list_globals_filter(offset: int, count: int, filter: str | None = None) -> dict:  # type: ignore
+    def list_globals_filter(
+        offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+        count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+        filter: Annotated[str | None, Field(description="Optional case-insensitive name substring filter")] = None,
+    ) -> dict:  # type: ignore
         """分页/过滤列出全局符号(非函数)。
 
         参数:
@@ -605,7 +616,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="List all global (non‑function) symbols: params offset,count. Returns { total,offset,count,items }. Same as list_globals_filter without filtering.")
-    def list_globals(offset: int, count: int) -> dict:  # type: ignore
+    def list_globals(
+        offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+        count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    ) -> dict:  # type: ignore
         """分页列出所有全局符号 (不区分名称, 不带过滤)。
 
         参数:
@@ -659,7 +673,11 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="List extracted strings with optional filter: params offset,count,filter(optional substring, case‑insensitive). Returns { total,offset,count,items:[{ ea,length,type,text }] }. Auto‑initializes idautils.Strings if needed.")
-    def list_strings_filter(offset: int, count: int, filter: str | None = None) -> dict:  # type: ignore
+    def list_strings_filter(
+        offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+        count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+        filter: Annotated[str | None, Field(description="Optional case-insensitive substring filter")]= None,
+    ) -> dict:  # type: ignore
         """分页 / 过滤列出程序中提取到的字符串。
 
         参数:
@@ -730,7 +748,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="List all extracted strings (no filter): params offset,count. Returns same structure as list_strings_filter minus filter handling.")
-    def list_strings(offset: int, count: int) -> dict:  # type: ignore
+    def list_strings(
+        offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+        count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    ) -> dict:  # type: ignore
         """分页列出所有已提取字符串 (不做内容过滤)。
 
         参数:
@@ -839,7 +860,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Decompile function (Hex‑Rays): param address (function start or inside). Returns { name,start_ea,end_ea,address,decompiled } or { error }. Output untruncated; caller may truncate. Fails if Hex‑Rays unavailable/init fails.")
-    def decompile_function(address: int) -> dict:  # type: ignore
+    def decompile_function(
+        address: Annotated[int, Field(description="Function start address or any address inside it")]
+    ) -> dict:  # type: ignore
         """反编译指定地址所在函数 (需要安装 Hex-Rays)。
 
         参数:
@@ -896,7 +919,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Disassemble function: param start_address (function start or inside). Returns { name,start_ea,end_ea,instructions:[{ ea,bytes,text,comment }] } or { error }. bytes truncated after 16 bytes (..). Code items only.")
-    def disassemble_function(start_address: int) -> dict:  # type: ignore
+    def disassemble_function(
+        start_address: Annotated[int, Field(description="Function start (internal address auto-normalized)")]
+    ) -> dict:  # type: ignore
         """获取指定函数的反汇编指令列表。
 
         参数:
@@ -996,7 +1021,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="List incoming xrefs: param address(int). Returns { address,total,xrefs:[{ frm,type,iscode }] } or { error }. type is raw xref_t.type; iscode indicates code reference.")
-    def get_xrefs_to(address: int) -> dict:  # type: ignore
+    def get_xrefs_to(
+        address: Annotated[int, Field(description="Target address (instruction or data item)")]
+    ) -> dict:  # type: ignore
         """列出指向指定地址的所有交叉引用 (incoming xrefs)。
 
         参数:
@@ -1036,7 +1063,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Heuristic struct field reference search: params struct_name, field_name. Returns { struct,field,offset,matches:[{ ea,line }],truncated?,note? } or { error }. Uses name substring + offset literal match. Max 500 results; may contain false positives/negatives.")
-    def get_xrefs_to_field(struct_name: str, field_name: str) -> dict:  # type: ignore
+    def get_xrefs_to_field(
+        struct_name: Annotated[str, Field(description="Struct name (as in Local Types)")],
+        field_name: Annotated[str, Field(description="Exact struct field name")],
+    ) -> dict:  # type: ignore
         """获取对结构体成员的 (启发式) 引用位置列表。
 
         说明 / 局限:
@@ -1142,7 +1172,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Set/clear non‑repeatable comment: params address(int), comment(str, empty => clear). Returns { address,old,new,changed } or { error }. Non‑repeatable shows in pseudocode. Comment truncated to 1024 chars.")
-    def set_comment(address: int, comment: str) -> dict:  # type: ignore
+    def set_comment(
+        address: Annotated[int, Field(description="Target address (instruction or data item)")],
+        comment: Annotated[str, Field(description="Comment text; empty string clears (max 1024 chars)")],
+    ) -> dict:  # type: ignore
         """为指定地址设置(或清除)普通注释。
 
         参数:
@@ -1186,7 +1219,11 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Rename local variable (Hex‑Rays): params function_address, old_name, new_name(C identifier). Returns { function,start_ea,old_name,new_name,changed } or { error }. Only first matching lvar changed.")
-    def rename_local_variable(function_address: int, old_name: str, new_name: str) -> dict:  # type: ignore
+    def rename_local_variable(
+        function_address: Annotated[int, Field(description="Function start or internal address")],
+        old_name: Annotated[str, Field(description="Old local variable name (exact match)")],
+        new_name: Annotated[str, Field(description="New variable name (valid C identifier, <=255)")],
+    ) -> dict:  # type: ignore
         """重命名函数中的本地变量 (依赖 Hex-Rays)。
 
         参数:
@@ -1270,7 +1307,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Rename global variable: params old_name,new_name. Returns { ea,old_name,new_name,changed } or { error }. Rejects if address is function start (use function rename). New name must be C identifier.")
-    def rename_global_variable(old_name: str, new_name: str) -> dict:  # type: ignore
+    def rename_global_variable(
+        old_name: Annotated[str, Field(description="Existing global symbol name (exact match)")],
+        new_name: Annotated[str, Field(description="New name (valid C identifier, <=255)")],
+    ) -> dict:  # type: ignore
         """重命名全局变量。
 
         参数:
@@ -1324,7 +1364,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Rename function: params function_address(start or inside), new_name(C identifier). Returns { start_ea,old_name,new_name,changed } or { error }. Internal address auto‑normalized to start.")
-    def rename_function(function_address: int, new_name: str) -> dict:  # type: ignore
+    def rename_function(
+        function_address: Annotated[int, Field(description="Function start or internal address")],
+        new_name: Annotated[str, Field(description="New function name (valid C identifier, <=255)")],
+    ) -> dict:  # type: ignore
         """重命名函数。
 
         参数:
@@ -1375,7 +1418,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Set function prototype: params function_address, prototype(full C decl, may include name). Returns { start_ea,applied,old_type,new_type,parsed_name? } or { error,details? }. Does NOT auto‑rename function.")
-    def set_function_prototype(function_address: int, prototype: str) -> dict:  # type: ignore
+    def set_function_prototype(
+        function_address: Annotated[int, Field(description="Function start or internal address")],
+        prototype: Annotated[str, Field(description="Full C function declaration (may include name)")],
+    ) -> dict:  # type: ignore
         """设置函数原型 (类型签名)。
 
         参数:
@@ -1481,7 +1527,11 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Set local variable type (Hex‑Rays): params function_address, variable_name, new_type(C fragment). Returns { function,start_ea,variable_name,old_type,new_type,applied } or { error }. Parsing wrapper '<type> tmp;'.")
-    def set_local_variable_type(function_address: int, variable_name: str, new_type: str) -> dict:  # type: ignore
+    def set_local_variable_type(
+        function_address: Annotated[int, Field(description="Function start or internal address")],
+        variable_name: Annotated[str, Field(description="Local variable original name (exact match)")],
+        new_type: Annotated[str, Field(description="C type fragment (e.g. int, char *, MyStruct *)")],
+    ) -> dict:  # type: ignore
         """为函数内局部变量设置类型。
 
         参数:
@@ -1655,7 +1705,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Set global variable type: params variable_name, new_type(C fragment). Returns { ea,variable_name,old_type,new_type,applied } or { error,details? }. Rejects function starts. Parsing wrapper '<type> __tmp_var;'.")
-    def set_global_variable_type(variable_name: str, new_type: str) -> dict:  # type: ignore
+    def set_global_variable_type(
+        variable_name: Annotated[str, Field(description="Global symbol name (must exist and not be a function start)")],
+        new_type: Annotated[str, Field(description="C type fragment (e.g. int, char *, MyStruct)")],
+    ) -> dict:  # type: ignore
         """设置全局变量类型。
 
         参数:
@@ -1753,7 +1806,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Declare / update a local type: param c_declaration(single struct/union/enum/typedef). Returns { name,kind,replaced,success } or { error,details? }. Existing name replaced (NTF_REPLACE). kind derived from tinfo.")
-    def declare_c_type(c_declaration: str) -> dict:  # type: ignore
+    def declare_c_type(
+        c_declaration: Annotated[str, Field(description="Single struct/union/enum/typedef declaration (ending with semicolon)")]
+    ) -> dict:  # type: ignore
         """创建或更新本地类型 (Local Types)。
 
         参数:
@@ -2194,7 +2249,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Run to address: param address. Prefers request_run_to; fallback creates temp breakpoint then continue. Returns { ok,requested,continued,used_temp_bpt,note? } or { error }. Non‑blocking (does not wait for hit).")
-    def dbg_run_to(address: int) -> dict:  # type: ignore
+    def dbg_run_to(
+        address: Annotated[int, Field(description="Target address to run to (may be inside a function)")]
+    ) -> dict:  # type: ignore
         """运行到指定地址。
 
         参数:
@@ -2299,7 +2356,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Set / ensure breakpoint: param address. If already present returns existed=true. Tries add_bpt variants / set_bpt. Returns { ok,ea,existed,added,note? } or { error }. Can be used before debugger starts.")
-    def dbg_set_breakpoint(address: int) -> dict:  # type: ignore
+    def dbg_set_breakpoint(
+        address: Annotated[int, Field(description="Address where the breakpoint should be set")]
+    ) -> dict:  # type: ignore
         """设置指定地址的断点 (若已存在则返回 existed=True)。
 
         参数:
@@ -2382,7 +2441,9 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Delete breakpoint: param address. Idempotent (missing still ok). Returns { ok,ea,existed,deleted,note? } or { error }. Works pre‑debugger too.")
-    def dbg_delete_breakpoint(address: int) -> dict:  # type: ignore
+    def dbg_delete_breakpoint(
+        address: Annotated[int, Field(description="Address of the breakpoint to delete")]
+    ) -> dict:  # type: ignore
         """删除指定地址的断点。
 
         参数:
@@ -2454,7 +2515,10 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
     @mcp.tool(description="Enable/disable breakpoint: params address, enable(bool). Enabling a missing breakpoint attempts creation. Returns { ok,ea,existed,enabled,changed,note? } or { error }. changed indicates state/existence modified.")
-    def dbg_enable_breakpoint(address: int, enable: bool) -> dict:  # type: ignore
+    def dbg_enable_breakpoint(
+        address: Annotated[int, Field(description="Breakpoint address")],
+        enable: Annotated[bool, Field(description="True=enable, False=disable; enabling creates if absent")],
+    ) -> dict:  # type: ignore
         """启用/禁用指定地址的断点 (若启用且不存在则自动创建)。
 
         参数:
