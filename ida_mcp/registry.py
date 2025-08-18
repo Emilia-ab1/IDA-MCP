@@ -227,6 +227,13 @@ def init_and_register(port: int, input_file: str | None, idb_path: str | None):
     _post_json('/register', payload)
     atexit.register(deregister)
 
+def is_coordinator() -> bool:
+    """返回当前进程是否为协调器 (第一个绑定 11337 的实例).
+
+    供外部在完成 init_and_register 调用后输出额外日志。
+    """
+    return _is_coordinator
+
 def _post_json(path: str, obj: Any):
     data = json.dumps(obj).encode('utf-8')
     req = urllib.request.Request(f'http://{COORD_HOST}:{COORD_PORT}{path}', data=data, method='POST', headers={'Content-Type': 'application/json'})

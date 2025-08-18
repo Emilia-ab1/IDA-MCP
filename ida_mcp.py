@@ -144,6 +144,12 @@ def _register_with_coordinator(port: int):
     try:
         registry.init_and_register(port, input_file, idb_path)
         _info(f"Registered instance at port={port} pid={os.getpid()} input='{input_file}' idb='{idb_path}'")
+        # 若本实例成为协调器, 追加一条提示日志 (用户需求)
+        try:
+            if getattr(registry, 'is_coordinator', lambda: False)():  # type: ignore[attr-defined]
+                _info("This instance is COORDINATOR (registry listening on 127.0.0.1:11337)")
+        except Exception:
+            pass
     except Exception as e:  # pragma: no cover
         _error(f"Coordinator registration failed: {e}")
         traceback.print_exc()
