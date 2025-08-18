@@ -9,6 +9,8 @@
 
 ### 插件内置 (`server.py`)
 
+#### reverse-tools (server)
+
 * `check_connection` – 快速检测插件与协调器健康 (ok/count)
 * `list_instances` – 返回已注册实例原始列表
 * `list_functions` – 返回当前 IDA 数据库中全部函数 (name, start_ea, end_ea)
@@ -34,9 +36,14 @@
 * `set_function_prototype(function_address, prototype)` – 设置函数原型
 * `set_local_variable_type(function_address, variable_name, new_type)` – 设置局部变量类型 (Hex-Rays)
 * `declare_c_type(c_declaration)` – 解析并声明/更新一个本地类型 (struct/union/enum/typedef)
-* `dbg_get_registers()` – (调试中) 获取所有寄存器当前值
-* `dbg_get_call_stack()` – (调试中) 获取当前调用栈
-* `dbg_list_breakpoints()` – (调试中) 列出所有断点
+* `get_entry_points()` – 获取所有入口点 (ordinal + 地址 + 名称)
+* `get_metadata` - 获取指定或当前实例基础元数据（hash/arch/bits 等）
+
+#### dbg-tools (server)
+
+* `dbg_get_registers()` – 获取所有寄存器当前值
+* `dbg_get_call_stack()` – 获取当前调用栈
+* `dbg_list_breakpoints()` – 列出所有断点
 * `dbg_start_process()` – 启动调试 (若尚未启动)
 * `dbg_exit_process()` – 结束调试进程
 * `dbg_continue_process()` – 继续运行 (Resume)
@@ -44,12 +51,12 @@
 * `dbg_set_breakpoint(address)` – 设置断点
 * `dbg_delete_breakpoint(address)` – 删除断点 (幂等)
 * `dbg_enable_breakpoint(address, enable)` – 启用/禁用断点 (不存在且启用则创建)
-* `get_entry_points()` – 获取所有入口点 (ordinal + 地址 + 名称)
-* `get_metadata` - 获取指定或当前实例基础元数据（hash/arch/bits 等）
 
 ### 代理 (`ida_mcp_proxy.py`)
 
 * `select_instance(port?)` - 选择要使用的 IDA 实例
+
+#### reverse-tools (proxy)
 
 * `check_connection` - 检测是否存在活跃实例
 * `list_instances` - 返回原始实例列表
@@ -77,9 +84,13 @@
 * `set_function_prototype(function_address, prototype, port?)` - 转发设置函数原型
 * `set_local_variable_type(function_address, variable_name, new_type, port?)` - 转发设置局部变量类型
 * `declare_c_type(c_declaration, port?)` - 转发声明/更新本地类型
-* `dbg_get_registers(port?)` - (调试中) 转发获取寄存器当前值
-* `dbg_get_call_stack(port?)` - (调试中) 转发获取当前调用栈
-* `dbg_list_breakpoints(port?)` - (调试中) 转发列出所有断点
+* `get_entry_points(port?)` - 转发获取入口点列表
+
+#### dbg-tools (proxy)
+
+* `dbg_get_registers(port?)` - 转发获取寄存器当前值
+* `dbg_get_call_stack(port?)` - 转发获取当前调用栈
+* `dbg_list_breakpoints(port?)` - 转发列出所有断点
 * `dbg_start_process(port?)` - 转发启动调试
 * `dbg_exit_process(port?)` - 转发结束调试进程
 * `dbg_continue_process(port?)` - 转发继续运行
@@ -87,7 +98,6 @@
 * `dbg_set_breakpoint(address, port?)` - 转发设置断点
 * `dbg_delete_breakpoint(address, port?)` - 转发删除断点
 * `dbg_enable_breakpoint(address, enable, port?)` - 转发启用/禁用断点
-* `get_entry_points(port?)` - 转发获取入口点列表
 
 ## 目录结构
 
