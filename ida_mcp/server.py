@@ -87,6 +87,15 @@ def create_mcp_server() -> FastMCP:
         except Exception as e:  # pragma: no cover
             return [{"error": str(e)}]
 
+    @mcp.tool(description="Search registered instances by input file or IDB name (case-insensitive substring).")
+    def search_instances(keyword: str) -> list[dict]:  # type: ignore
+        if registry is None:
+            return []
+        try:
+            return registry.search_instances(keyword)  # type: ignore
+        except Exception as e:  # pragma: no cover
+            return [{"error": str(e)}]
+
     @mcp.tool(description="List functions (returns list of FunctionItem objects).")
     def list_functions() -> List[FunctionItem]:  # type: ignore
         def logic():

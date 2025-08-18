@@ -274,3 +274,30 @@ def check_connection() -> dict:
     """
     inst = get_instances()
     return {"ok": bool(inst), "count": len(inst)}
+
+
+def search_instances(keyword: str) -> list[dict]:
+    """按文件名(输入文件或 IDB 文件名)模糊匹配实例。
+
+    参数:
+        keyword: 关键字（大小写不敏感）。若为空字符串则返回全部。
+    返回:
+        匹配的实例列表（浅拷贝）。
+    说明:
+        * 仅在本地获取的实例列表上过滤，不进行网络额外往返。
+        * 匹配规则: 取实例 input_file 与 idb 的 basename，再做不区分大小写的 substring 判断。
+    """
+    kw = (keyword or "").strip()
+    all_inst = get_instances()
+    if not kw:
+        return all_inst
+    kw_lower = kw.lower()
+    out: list[dict] = []
+    for e in all_inst:
+        inp = e.get("input_file") or ""
+        idb = e.get("idb") or ""
+        base_inp = inp.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+        base_idb = idb.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+        if kw_lower in base_inp.lower() or kw_lower in base_idb.lower():
+            out.append(e)
+    return out

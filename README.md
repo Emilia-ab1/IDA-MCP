@@ -14,14 +14,15 @@
 * `list_functions` – 返回当前 IDA 数据库中全部函数 (name, start_ea, end_ea)
 * `instances` – 返回所有已注册的 IDA 实例（来自协调器）
 * `check_connection` – 快速检测插件与协调器健康 (ok/count)
+* `search_instances(keyword)` – 按输入文件或 IDB 文件名子串（不区分大小写）筛选实例
 
 代理 (`ida_mcp_proxy.py`):
 
-* `ping`
 * `list_instances`
 * `select_instance(port?)`
 * `list_functions` (针对选中或自动选中实例；经协调器转发)
 * `check_connection` (检测是否存在活跃实例)
+* `search_instances(keyword)` (文件/IDB 名称子串匹配实例)
 
 ## 目录结构
 

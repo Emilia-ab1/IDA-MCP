@@ -129,7 +129,15 @@ def list_functions() -> Any:  # type: ignore
     res = _call('list_functions', {}, port=p)
     return res.get('data') if isinstance(res, dict) else res
 
-## 已移除 list_all_functions：按需求仅保留单实例查询，如需聚合可再恢复。
+@server.tool(description="Search instances by input file or IDB name (case-insensitive substring).")
+def search_instances(keyword: str) -> list[dict]:  # type: ignore
+    # 协调器端实现直接返回列表
+    res = _call('search_instances', {"keyword": keyword}, port=None)
+    if isinstance(res, dict) and 'data' in res:
+        return res['data']  # 当通过 /call 转发时
+    if isinstance(res, list):
+        return res
+    return []
 
 if __name__ == "__main__":
     # 直接运行: fastmcp 会自动选择 stdio/sse 传输方式 (默认 stdio)
