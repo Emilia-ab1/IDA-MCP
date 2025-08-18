@@ -117,7 +117,7 @@ def create_mcp_server() -> FastMCP:
         except Exception as e:  # pragma: no cover
             return [{"error": str(e)}]
 
-    @mcp.tool(description="Get current IDB metadata. No params. Returns { input_file, arch, bits, hash } or includes note if not inside IDA. hash is SHA256 of input file if readable; otherwise None.")
+    @mcp.tool(description="Get current IDB metadata. No params. Returns { input_file, arch, arch_raw, arch_normalized, bits, endian, hash }.\narch_raw = value from IDA (procname / processor module); arch_normalized = heuristic normalized form (x86/x86_64/arm/arm64/mips/mips64/ppc/ppc64/...). endian = 'little' or 'big'. hash = SHA256 of input file if readable; may be None. If outside IDA returns note.")
     def get_metadata() -> dict:  # type: ignore
         """返回当前 IDA 会话 / IDB 的基础元数据 (轻量查询)。
 
@@ -163,6 +163,43 @@ def create_mcp_server() -> FastMCP:
                 bits = 64 if is_64 else 32
             except Exception:
                 pass
+            # 额外回退: 若 arch 仍为空, 尝试使用处理器模块名称 API
+            if not arch:
+                for fn_name in ('ph_get_idp_name', 'get_idp_name', 'ph_get_id', 'ph_get_idp_desc'):
+                    try:
+                        fn = getattr(idaapi, fn_name, None)  # type: ignore
+                        if callable(fn):
+                            cand = fn()
+                            if isinstance(cand, bytes):
+                                cand = cand.decode(errors='ignore')
+                            if cand:
+                                arch = cand
+                                break
+                    except Exception:
+                        continue
+            # 若 bits 仍未确定 (极端情况返回 0), 做简单启发
+            if not bits:
+                try:
+                    # 尝试再次获取 inf 判定
+                    inf2 = idaapi.get_inf_structure()  # type: ignore
+                    try:
+                        if hasattr(inf2, 'is_64bit') and inf2.is_64bit():  # type: ignore
+                            bits = 64
+                        elif hasattr(inf2, 'is_32bit') and inf2.is_32bit():  # type: ignore
+                            bits = 32
+                    except Exception:
+                        pass
+                except Exception:
+                    pass
+            # 仍未知则根据 Python 宏 (在某些版本 __EA64__) 做最终推断
+            if not bits:
+                try:
+                    if getattr(idaapi, '__EA64__', False):  # type: ignore
+                        bits = 64
+                    else:
+                        bits = 32  # 默认回退
+                except Exception:
+                    bits = 0
             # 计算输入文件 SHA256 (若可读取; 避免大文件阻塞, 使用流式读)
             file_hash: str | None = None
             if input_file and os.path.isfile(input_file):
@@ -174,10 +211,57 @@ def create_mcp_server() -> FastMCP:
                     file_hash = h.hexdigest()
                 except Exception:
                     file_hash = None
+            # 归一化架构名称
+            def _normalize_arch(raw: str | None, bits_val: int) -> str | None:
+                if not raw:
+                    return None
+                r = raw.lower()
+                # x86 family
+                if r in ("pc", "metapc", "i386", "x86"):
+                    return "x86_64" if bits_val == 64 else "x86"
+                if r in ("amd64", "x86_64", "x64"):
+                    return "x86_64"
+                # ARM family
+                if r in ("aarch64", "arm64") or r.startswith("arm64"):
+                    return "arm64"
+                if r.startswith("arm"):
+                    return "arm"
+                # MIPS
+                if r in ("mips64", "mips64el"):
+                    return "mips64"
+                if r.startswith("mips"):
+                    return "mips"
+                # PowerPC
+                if r in ("powerpc64", "ppc64") or r.startswith("ppc64"):
+                    return "ppc64"
+                if r.startswith("ppc") or r.startswith("powerpc"):
+                    return "ppc"
+                return raw
+
+            arch_for_norm: str | None = arch if isinstance(arch, str) else None
+            arch_normalized = _normalize_arch(arch_for_norm, bits)
+
+            # 端序 (endianness)
+            endian = None
+            try:
+                inf3 = idaapi.get_inf_structure()  # type: ignore
+                try:
+                    if hasattr(inf3, 'is_be') and inf3.is_be():  # type: ignore
+                        endian = 'big'
+                    else:
+                        endian = 'little'
+                except Exception:
+                    endian = None
+            except Exception:
+                endian = None
+
             return {
                 "input_file": input_file,
-                "arch": arch,
+                "arch": arch_normalized or arch,  # 保持向后兼容 (arch 字段给出更友好值)
+                "arch_raw": arch,
+                "arch_normalized": arch_normalized,
                 "bits": bits,
+                "endian": endian,
                 "hash": file_hash,
             }
 
@@ -229,27 +313,61 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get function by address: param address (int; may be any address inside). Returns { name,start_ea,end_ea } or { error }. Uses ida_funcs.get_func to resolve owning function.")
+    @mcp.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Supported formats: 1234 (dec), 0x401000 / 0X401000, 401000h (trailing h), optional underscores (0x40_10_00). Address may be any EA inside the function. Returns { name,start_ea,end_ea,input,address } or { error }. Uses ida_funcs.get_func to resolve owning function. Errors: invalid address (parse failure), not found (no containing function).")
     def get_function_by_address(address: int) -> dict:  # type: ignore
-        """按地址获取函数信息。
+        """按地址获取函数信息 (兼容十进制 / 十六进制多种输入形式)。
 
-        参数:
-            address: 目标地址 (函数起始地址或函数内部任意地址)。
+        参数 address 支持:
+            * 直接的整数 (JSON number) —— 视为十进制数值;
+            * 字符串十进制: "123456";
+            * 字符串十六进制: "0x401000" / "0X401000";
+            * 末尾 h 形式: "401000h";
+            * 允许下划线分隔: "0x40_10_00";
+        若解析失败返回 { error: "invalid address" }。
+        若地址处于某函数内部, 也返回该函数 (依赖 ida_funcs.get_func)。
         返回:
-            { name, start_ea, end_ea } 若找到; 否则 { error: "not found" }。
-        注意:
-            若地址位于函数内部也会返回该函数 (依赖 ida_funcs.get_func)。
+            { name, start_ea, end_ea, input, address } 或 { error }。
         """
         if address is None:
             return {"error": "invalid address"}
 
+        original_input = address
+
+        # 解析输入地址 (容忍字符串形式)
+        if isinstance(address, str):
+            txt = address.strip().replace('_', '')
+            # trailing h hex (e.g., 401000h, -1Ah)
+            try:
+                if txt.lower().endswith('h') and len(txt) > 1:
+                    core = txt[:-1]
+                    sign = ''
+                    if core.startswith(('+', '-')):
+                        sign = core[0]
+                        core = core[1:]
+                    if core and all(c in '0123456789abcdefABCDEF' for c in core):
+                        address = int(sign + '0x' + core, 0)
+                    else:
+                        return {"error": "invalid address"}
+                else:
+                    # int with base=0 supports 0x / 0X / 0b / decimal
+                    address = int(txt, 0)
+            except Exception:
+                return {"error": "invalid address"}
+        elif not isinstance(address, int):
+            return {"error": "invalid address"}
+
+        if address < 0:
+            return {"error": "invalid address"}
+
+        ea_int = int(address)
+
         def logic():
             try:
-                f = ida_funcs.get_func(address)  # type: ignore
+                f = ida_funcs.get_func(ea_int)  # type: ignore
             except Exception:
                 f = None
             if not f:
-                return {"error": "not found"}
+                return {"error": "not found", "input": original_input}
             try:
                 name = idaapi.get_func_name(f.start_ea)  # type: ignore
             except Exception:
@@ -258,6 +376,8 @@ def create_mcp_server() -> FastMCP:
                 "name": name,
                 "start_ea": int(f.start_ea),
                 "end_ea": int(f.end_ea),
+                "input": original_input,
+                "address": ea_int,
             }
 
         return _run_in_ida(logic)

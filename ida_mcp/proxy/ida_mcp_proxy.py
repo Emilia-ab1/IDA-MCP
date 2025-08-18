@@ -249,8 +249,8 @@ def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ig
     res = _call('get_function_by_name', {"name": name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get function by address: params address(int), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Accepts inside-function address.")
-def get_function_by_address(address: int, port: int | None = None) -> Any:  # type: ignore
+@server.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Formats: 1234, 0x401000, 401000h, 0x40_10_00 (underscores). param port(optional). Forwards to backend get_function_by_address. Returns backend { name,start_ea,end_ea,input,address } or { error }. Inside-function addresses allowed. Parse/validation occurs in backend; proxy just forwards raw value.")
+def get_function_by_address(address: int | str, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
     target = port if port is not None else _ensure_port()
