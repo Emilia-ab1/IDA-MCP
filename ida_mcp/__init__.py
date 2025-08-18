@@ -23,3 +23,4 @@
 如需新增公共导出 (例如统一的版本号 `__version__`) 可在此增加变量；目前刻意保持最小。"""
 
 from .server import create_mcp_server  # noqa: F401
+__version__ = "0.1.0"

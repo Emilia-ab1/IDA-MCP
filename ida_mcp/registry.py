@@ -262,7 +262,6 @@ def call_tool(pid: int | None = None, port: int | None = None, tool: str = '', p
     except Exception as e:
         return {"error": str(e)}
 
-
 def check_connection() -> dict:
     """检查当前是否存在至少一个已注册的 IDA MCP 实例。
 

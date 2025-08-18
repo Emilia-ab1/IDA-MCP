@@ -8,8 +8,8 @@
 --------------------
     list_instances         – 获取当前所有已注册 IDA 实例 (由协调器返回)
     select_instance(port)  – 设置后续默认使用的实例端口 (若不指定自动选一个)
-    list_functions         – 在当前选中实例上调用其 list_functions 工具
     check_connection       – 快速检测是否存在至少一个活跃实例
+    ......
 
 端口选择策略
 --------------------
@@ -126,6 +126,251 @@ def list_functions() -> Any:  # type: ignore
     if p is None:
         return {"error": "No instances"}
     res = _call('list_functions', {}, port=p)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get metadata via selected or specified instance (forwarded through coordinator).")
+def get_metadata(port: int | None = None) -> Any:  # type: ignore
+    """获取某个实例的元数据 (默认使用当前选中实例)。
+
+    参数:
+        port: 可选指定实例端口; 未提供则使用已选端口或自动选择。
+    返回:
+        get_metadata 工具返回的字典; 若实例不可用返回错误字典。
+    """
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_metadata', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get cross references TO a given address (forwarded).")
+def get_xrefs_to(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_xrefs_to', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Heuristically find code references mentioning a struct field (forwarded).")
+def get_xrefs_to_field(struct_name: str, field_name: str, port: int | None = None) -> Any:  # type: ignore
+    if not struct_name or not field_name:
+        return {"error": "empty struct_name or field_name"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_xrefs_to_field', {"struct_name": struct_name, "field_name": field_name}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Set a comment for a given address (forwarded).")
+def set_comment(address: int, comment: str, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    if comment is None:
+        return {"error": "comment is None"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('set_comment', {"address": address, "comment": comment}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Rename a local variable in a function (forwarded, requires Hex-Rays).")
+def rename_local_variable(function_address: int, old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
+    if function_address is None:
+        return {"error": "invalid function_address"}
+    if not old_name:
+        return {"error": "empty old_name"}
+    if not new_name:
+        return {"error": "empty new_name"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('rename_local_variable', {"function_address": function_address, "old_name": old_name, "new_name": new_name}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Rename a global variable (forwarded).")
+def rename_global_variable(old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
+    if not old_name:
+        return {"error": "empty old_name"}
+    if not new_name:
+        return {"error": "empty new_name"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('rename_global_variable', {"old_name": old_name, "new_name": new_name}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Rename a function by address (forwarded).")
+def rename_function(function_address: int, new_name: str, port: int | None = None) -> Any:  # type: ignore
+    if function_address is None:
+        return {"error": "invalid function_address"}
+    if not new_name:
+        return {"error": "empty new_name"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('rename_function', {"function_address": function_address, "new_name": new_name}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Set a function prototype (forwarded).")
+def set_function_prototype(function_address: int, prototype: str, port: int | None = None) -> Any:  # type: ignore
+    if function_address is None:
+        return {"error": "invalid function_address"}
+    if not prototype:
+        return {"error": "empty prototype"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('set_function_prototype', {"function_address": function_address, "prototype": prototype}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Set the type of a local variable in a function (forwarded, requires Hex-Rays).")
+def set_local_variable_type(function_address: int, variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
+    if function_address is None:
+        return {"error": "invalid function_address"}
+    if not variable_name:
+        return {"error": "empty variable_name"}
+    if not new_type:
+        return {"error": "empty new_type"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('set_local_variable_type', {"function_address": function_address, "variable_name": variable_name, "new_type": new_type}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get a function by its name (forwarded through coordinator).")
+def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ignore
+    if not name:
+        return {"error": "empty name"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_function_by_name', {"name": name}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get a function by its address (forwarded through coordinator).")
+def get_function_by_address(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_function_by_address', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get the address currently selected by the user (forwarded through coordinator).")
+def get_current_address(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_current_address', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get the function currently selected by the user (forwarded through coordinator).")
+def get_current_function(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_current_function', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Convert a number (decimal/hex/binary) into multiple representations (forwarded through coordinator).")
+def convert_number(text: str, size: int, port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('convert_number', {"text": text, "size": size}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List matching global symbols (non-function names) with pagination and optional substring filter (forwarded).")
+def list_globals_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('list_globals_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List global symbols (non-function names) with pagination (forwarded).")
+def list_globals(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('list_globals', {"offset": offset, "count": count}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List matching strings with pagination and optional substring filter (forwarded).")
+def list_strings_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('list_strings_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List strings with pagination (forwarded).")
+def list_strings(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('list_strings', {"offset": offset, "count": count}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List all local types defined in the IDB (forwarded).")
+def list_local_types(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('list_local_types', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Decompile a function at the given address (forwarded, requires Hex-Rays).")
+def decompile_function(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('decompile_function', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Disassemble a function and return list of instructions (forwarded).")
+def disassemble_function(start_address: int, port: int | None = None) -> Any:  # type: ignore
+    if start_address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('disassemble_function', {"start_address": start_address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get all entry points (forwarded).")
+def get_entry_points(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('get_entry_points', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Set a global variable's type (forwarded).")
+def set_global_variable_type(variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
+    if not variable_name:
+        return {"error": "empty variable_name"}
+    if not new_type:
+        return {"error": "empty new_type"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('set_global_variable_type', {"variable_name": variable_name, "new_type": new_type}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Declare or update a local type from a C declaration (forwarded).")
+def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type: ignore
+    if not c_declaration:
+        return {"error": "empty declaration"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('declare_c_type', {"c_declaration": c_declaration}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
 if __name__ == "__main__":
