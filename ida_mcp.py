@@ -71,6 +71,7 @@ import threading
 import os
 import traceback
 import socket
+import time
 
 try:  # IDA imports (only available inside IDA)
     import idaapi  # type: ignore
@@ -87,6 +88,24 @@ _uv_server = None  # type: ignore
 _stop_lock = threading.Lock()
 _active_port: int | None = None
 
+# ---------------- Logging Helpers (INFO/WARN/ERROR) -----------------
+
+def _now_ts() -> str:
+    return time.strftime("%H:%M:%S") + f".{int(time.time()*1000)%1000:03d}"
+
+def _log(level: str, msg: str):
+    """Unified log output with timestamp (HH:MM:SS.mmm)."""
+    print(f"[IDA-MCP][{level}][{_now_ts()}] {msg}")
+
+def _info(msg: str):
+    _log("INFO", msg)
+
+def _warn(msg: str):
+    _log("WARN", msg)
+
+def _error(msg: str):
+    _log("ERROR", msg)
+
 
 def _find_free_port(preferred: int, max_scan: int = 50) -> int:
     """端口扫描: 从 preferred 起向上尝试绑定, 返回第一个可用端口;
@@ -100,6 +119,7 @@ def _find_free_port(preferred: int, max_scan: int = 50) -> int:
             except OSError:
                 continue
             return p
+    _warn(f"Port scan exhausted; falling back to preferred {preferred}")
     return preferred
 
 
@@ -121,7 +141,12 @@ def _register_with_coordinator(port: int):
             idb_path = idaapi.get_path(idaapi.PATH_TYPE_IDB)  # type: ignore
         except Exception:
             idb_path = None
-    registry.init_and_register(port, input_file, idb_path)
+    try:
+        registry.init_and_register(port, input_file, idb_path)
+        _info(f"Registered instance at port={port} pid={os.getpid()} input='{input_file}' idb='{idb_path}'")
+    except Exception as e:  # pragma: no cover
+        _error(f"Coordinator registration failed: {e}")
+        traceback.print_exc()
 
 
 def is_running() -> bool:
@@ -141,23 +166,27 @@ def stop_server():
     global _uv_server, _server_thread
     with _stop_lock:
         if _uv_server is None:
-            print("[IDA-MCP] Server not running.")
+            _info("Stop requested, but server not running.")
             return
         try:
             # Graceful shutdown
             _uv_server.should_exit = True  # type: ignore[attr-defined]
-            print("[IDA-MCP] Shutdown signal sent.")
+            _info("Shutdown signal sent to uvicorn server.")
         except Exception as e:  # pragma: no cover
-            print("[IDA-MCP] Failed to signal shutdown:", e)
+            _error(f"Failed to signal shutdown: {e}")
         if _server_thread:
+            # Join server thread with timeout
             _server_thread.join(timeout=5)
         global _active_port
         _server_thread = None
         _uv_server = None
         if _active_port is not None:
-            registry.deregister()
+            try:
+                registry.deregister()
+            except Exception as e:  # pragma: no cover
+                _warn(f"Deregister failed: {e}")
         _active_port = None
-        print("[IDA-MCP] Server stopped.")
+        _info("Server stopped.")
 
 
 def PLUGIN_ENTRY():  # IDA looks for this symbol
@@ -173,19 +202,19 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
 
     def init(self):  # type: ignore
         if idaapi is None:
-            print("[IDA-MCP] Outside IDA environment; plugin inactive.")
+            _warn("Outside IDA environment; plugin inactive.")
             return idaapi.PLUGIN_SKIP if idaapi else 0
         # 不自动启动, 等待用户菜单/快捷方式显式触发。
-        print("[IDA-MCP] Ready. ")
+        _info("Plugin initialized and ready (not auto-starting).")
         return idaapi.PLUGIN_KEEP  # type: ignore
 
     def run(self, arg):  # type: ignore
         # 切换行为: 运行中 -> 停止; 否则启动。仅打印日志, 不弹出对话框。
         if not idaapi:
-            print("[IDA-MCP] Not inside IDA.")
+            _warn("Run invoked but not inside IDA.")
             return
         if is_running():
-            print("[IDA-MCP] Stopping server (toggle)...")
+            _info("Server running -> toggling to stop.")
             stop_server()
             return
         # 端口选择: 优先使用环境变量; 否则自动扫描以支持多实例。
@@ -195,11 +224,11 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
         else:
             port = _find_free_port(DEFAULT_PORT)
         host = os.getenv("IDA_MCP_HOST", "127.0.0.1")
-        print(f"[IDA-MCP] Starting SSE server http://{host}:{port}/mcp/ (toggle to stop).")
+        _info(f"Starting SSE server http://{host}:{port}/mcp/ (toggle to stop)")
         start_server_async(host, port)
 
     def term(self):  # type: ignore
-        print("[IDA-MCP] Plugin terminating.")
+        _info("Plugin terminating.")
         if is_running():
             stop_server()
 
@@ -214,7 +243,7 @@ def start_server_async(host: str, port: int):
     """
     global _server_thread, _uv_server
     if is_running():
-        print("[IDA-MCP] Server already running.")
+        _info("Server already running; start request ignored.")
         return
 
     def worker():
@@ -229,11 +258,11 @@ def start_server_async(host: str, port: int):
             _uv_server = uvicorn.Server(config)
             _uv_server.run()
         except Exception as e:  # pragma: no cover
-            print("[IDA-MCP] Server crashed:", e)
+            _error(f"Server crashed: {e}")
             traceback.print_exc()
         finally:
             _uv_server = None
-            print("[IDA-MCP] Server thread exit.")
+            _info("Server thread exit.")
 
     _server_thread = threading.Thread(target=worker, name="IDA-MCP-Server", daemon=True)
     _server_thread.start()
@@ -243,7 +272,7 @@ def start_server_async(host: str, port: int):
     _register_with_coordinator(port)
 
 if __name__ == "__main__":
-    print("[IDA-MCP] Standalone mode: starting server.")
+    _info("Standalone mode: starting server.")
     start_server_async("127.0.0.1", DEFAULT_PORT)
     if _server_thread:
         _server_thread.join()
