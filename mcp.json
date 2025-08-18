@@ -4,7 +4,7 @@
       "command": "D:\\safetools\\IDAPro-9.1\\ida-python\\python.exe",
       "args": ["D:\\safetools\\IDAPro-9.1\\plugins\\ida_mcp\\proxy\\ida_mcp_proxy.py"],
       "env": {},
-      "description": "Process MCP proxy that forwards to running IDA SSE server (list_functions)."
+      "description": "Process MCP proxy that forwards to running IDA SSE server."
     }
   },
   "version": "1.0.0",
