@@ -186,14 +186,7 @@ Missing Hex‑Rays functions | Hex‑Rays not installed / not initialized | Inst
 
 Contributions & incremental extensions welcome.
 
----
-
-## License
-
-Add your chosen license (e.g. MIT) here if distributing publicly.
-
----
-
 ## Quick Summary
 
 IDA-MCP provides a minimal, multi‑instance aware MCP surface over IDA Pro with rich parameter metadata and optional proxy consolidation — enabling automated reverse‑engineering assistant workflows without complex setup.
+
