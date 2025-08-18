@@ -1,4 +1,4 @@
-"""IDA MCP 代理 (协调器客户端)  —— 中文文档
+"""IDA MCP 代理 (协调器客户端)
 
 目的
 ====================
@@ -6,7 +6,6 @@
 
 暴露工具
 --------------------
-    ping                   – 健康检查
     list_instances         – 获取当前所有已注册 IDA 实例 (由协调器返回)
     select_instance(port)  – 设置后续默认使用的实例端口 (若不指定自动选一个)
     list_functions         – 在当前选中实例上调用其 list_functions 工具
@@ -105,7 +104,7 @@ def check_connection() -> dict:  # type: ignore
         return {"ok": False, "count": 0}
     return {"ok": bool(data), "count": len(data)}
 
-@server.tool(description="List currently registered IDA MCP instances (coordinator view)")
+@server.tool(description="List registered IDA MCP instances (raw list, no filtering).")
 def list_instances() -> list[dict]:  # type: ignore
     return _instances()
 
@@ -128,16 +127,6 @@ def list_functions() -> Any:  # type: ignore
         return {"error": "No instances"}
     res = _call('list_functions', {}, port=p)
     return res.get('data') if isinstance(res, dict) else res
-
-@server.tool(description="Search instances by input file or IDB name (case-insensitive substring).")
-def search_instances(keyword: str) -> list[dict]:  # type: ignore
-    # 协调器端实现直接返回列表
-    res = _call('search_instances', {"keyword": keyword}, port=None)
-    if isinstance(res, dict) and 'data' in res:
-        return res['data']  # 当通过 /call 转发时
-    if isinstance(res, list):
-        return res
-    return []
 
 if __name__ == "__main__":
     # 直接运行: fastmcp 会自动选择 stdio/sse 传输方式 (默认 stdio)

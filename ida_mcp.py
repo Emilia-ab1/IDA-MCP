@@ -1,4 +1,4 @@
-"""IDA Pro MCP 插件 (SSE + 多实例协调器注册)  —— 中文文档
+"""IDA Pro MCP 插件 (SSE + 多实例协调器注册)
 
 功能综述
 ====================
@@ -242,7 +242,7 @@ def start_server_async(host: str, port: int):
     _active_port = port
     _register_with_coordinator(port)
 
-if __name__ == "__main__":  # 允许在非 IDA 环境下手动调试运行
+if __name__ == "__main__":
     print("[IDA-MCP] Standalone mode: starting server.")
     start_server_async("127.0.0.1", DEFAULT_PORT)
     if _server_thread:

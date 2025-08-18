@@ -12,17 +12,15 @@
 插件内置 (`server.py`):
 
 * `list_functions` – 返回当前 IDA 数据库中全部函数 (name, start_ea, end_ea)
-* `instances` – 返回所有已注册的 IDA 实例（来自协调器）
+* `list_instances` – 返回已注册实例原始列表
 * `check_connection` – 快速检测插件与协调器健康 (ok/count)
-* `search_instances(keyword)` – 按输入文件或 IDB 文件名子串（不区分大小写）筛选实例
 
 代理 (`ida_mcp_proxy.py`):
 
-* `list_instances`
-* `select_instance(port?)`
-* `list_functions` (针对选中或自动选中实例；经协调器转发)
-* `check_connection` (检测是否存在活跃实例)
-* `search_instances(keyword)` (文件/IDB 名称子串匹配实例)
+* `list_instances` - 返回原始实例列表
+* `select_instance(port)` - 选择要使用的 IDA 实例
+* `list_functions` - 针对选中或自动选中实例；经协调器转发
+* `check_connection` - 检测是否存在活跃实例
 
 ## 目录结构
 
@@ -32,8 +30,9 @@ IDA-MCP/
   ida_mcp/
     server.py             # FastMCP server 定义 (最小工具集)
     registry.py           # 协调器实现 / 多实例注册 & /call 转发
-    __init__.py
-  ida_mcp_proxy.py        # 进程型代理（附加 MCP server）
+    __init__.py           # 包初始化, 导出 create_mcp_server 并说明子模块结构
+    proxy/
+      ida_mcp_proxy.py    # 进程型代理（附加 MCP server, 通过协调器 /call 转发）
   mcp.json                # MCP 客户端配置 (含 proxy / sse)
   README.md
   requirements.txt        # fastmcp 依赖（若外部环境需要）
@@ -50,25 +49,25 @@ IDA-MCP/
 
 ## 代理使用
 
-在 `mcp.json` 中选择 `ida-mcp-proxy`：
+在 `mcp.json` 中替换 `command` 和 `args`：
 
-1. 启动若干 IDA 实例并开启插件。
-2. 启动代理进程（由客户端自动执行)。
-3. 调用 `list_instances` / `select_instance` / `list_functions`。
+```text
+{
+  "mcpServers": {
+    "ida-mcp-proxy": {
+      "command": "path of python",
+      "args": ["path of ida_mcp_proxy.py"],
+      "env": {},
+      "description": "Process MCP proxy that forwards to running IDA SSE server (list_functions)."
+    }
+  },
+  "version": "1.0.0",
+  "description": "Configuration for IDA-MCP SSE server"
+}
 
-## Python 客户端示例（直连某一实例 SSE）
-
-```python
-import asyncio
-from fastmcp import Client
-
-async def main():
-    async with Client("http://127.0.0.1:8765/mcp/") as c:
-        r = await c.call_tool("list_functions", {})
-        print(len(r.data), "functions")
-
-asyncio.run(main())
 ```
+
+任何将其复制到 claude 客户端的 mcp 工具配置文件或者其他 MCP 客户端的配置文件中。
 
 ## 设计要点
 
@@ -78,7 +77,6 @@ asyncio.run(main())
 | 多实例发现 | 内存协调器 + HTTP (11337)，不写磁盘 |
 | 端口冲突 | 自动向上扫描空闲端口 |
 | 转发机制 | 协调器 `/call` 内部使用 fastmcp Client 发起工具调用并返回 JSON 序列化结果 |
-| 最小化 | 只保留核心工具，便于逐步扩展 |
 
 ## 可扩展方向
 
@@ -90,10 +88,8 @@ asyncio.run(main())
 
 ## 依赖
 
-仅需安装 `fastmcp`（如果当前 Python 环境未安装）：
-
 ```bash
-python -m pip install fastmcp
+python -m pip install -r requirements.txt
 ```
 
 ## 问题排查
