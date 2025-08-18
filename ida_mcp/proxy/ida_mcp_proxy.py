@@ -97,18 +97,18 @@ def _call(tool: str, params: dict | None = None, port: int | None = None) -> Any
 
 server = FastMCP(name="IDA-MCP-Proxy", instructions="Coordinator-based proxy forwarding tool calls via /call endpoint.")
 
-@server.tool(description="Check if any IDA MCP instance is alive (ok/count).")
+@server.tool(description="Health check: no params. Queries coordinator /instances. Returns { ok:bool, count:int }. ok=true only if list retrieval succeeded (count may be 0).")
 def check_connection() -> dict:  # type: ignore
     data = _http_get('/instances')
     if not isinstance(data, list):
         return {"ok": False, "count": 0}
     return {"ok": bool(data), "count": len(data)}
 
-@server.tool(description="List registered IDA MCP instances (raw list, no filtering).")
+@server.tool(description="List all registered backend instances (raw). No params. Returns array of instance dicts as provided by coordinator: [{ id,name,port,started,last_seen,meta?... }]. Empty array if none or fetch failed.")
 def list_instances() -> list[dict]:  # type: ignore
     return _instances()
 
-@server.tool(description="Select active backend instance port (auto-pick if omitted).")
+@server.tool(description="Select default target instance. Param port(optional int). If omitted auto-picks: prefer 8765 else earliest started. Returns { selected_port } or { error }. Subsequent calls without explicit port use this.")
 def select_instance(port: int | None = None) -> dict:  # type: ignore
     global _current_port
     if port is None:
@@ -120,7 +120,7 @@ def select_instance(port: int | None = None) -> dict:  # type: ignore
     _current_port = port
     return {"selected_port": port}
 
-@server.tool(description="List functions via selected instance (forwarded through coordinator).")
+@server.tool(description="List functions. No params. Forwards to selected instance list_functions; auto-selects instance if none chosen. Returns underlying tool data or { error } if no instances.")
 def list_functions() -> Any:  # type: ignore
     p = _ensure_port()
     if p is None:
@@ -128,7 +128,7 @@ def list_functions() -> Any:  # type: ignore
     res = _call('list_functions', {}, port=p)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get metadata via selected or specified instance (forwarded through coordinator).")
+@server.tool(description="Get IDB metadata. Param port(optional) overrides current selection. Returns underlying get_metadata dict { input_file,arch,bits,hash,... } or { error }. Auto-selects instance if needed.")
 def get_metadata(port: int | None = None) -> Any:  # type: ignore
     """获取某个实例的元数据 (默认使用当前选中实例)。
 
@@ -143,7 +143,7 @@ def get_metadata(port: int | None = None) -> Any:  # type: ignore
     res = _call('get_metadata', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get cross references TO a given address (forwarded).")
+@server.tool(description="Incoming xrefs: params address(int), port(optional). Returns underlying { address,total,xrefs } or { error }. Passes address through unchanged.")
 def get_xrefs_to(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -153,7 +153,7 @@ def get_xrefs_to(address: int, port: int | None = None) -> Any:  # type: ignore
     res = _call('get_xrefs_to', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Heuristically find code references mentioning a struct field (forwarded).")
+@server.tool(description="Heuristic struct field refs: params struct_name, field_name, port(optional). Returns underlying { struct,field,offset,matches,... } or { error }. Same limitations as backend (heuristic, truncated at 500).")
 def get_xrefs_to_field(struct_name: str, field_name: str, port: int | None = None) -> Any:  # type: ignore
     if not struct_name or not field_name:
         return {"error": "empty struct_name or field_name"}
@@ -163,7 +163,7 @@ def get_xrefs_to_field(struct_name: str, field_name: str, port: int | None = Non
     res = _call('get_xrefs_to_field', {"struct_name": struct_name, "field_name": field_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set a comment for a given address (forwarded).")
+@server.tool(description="Set/clear comment: params address(int), comment(str, empty => clear), port(optional). Returns backend { address,old,new,changed } or { error }. Non-repeatable comment.")
 def set_comment(address: int, comment: str, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -175,7 +175,7 @@ def set_comment(address: int, comment: str, port: int | None = None) -> Any:  # 
     res = _call('set_comment', {"address": address, "comment": comment}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename a local variable in a function (forwarded, requires Hex-Rays).")
+@server.tool(description="Rename local variable (Hex-Rays): params function_address, old_name, new_name, port(optional). Returns backend { function,start_ea,old_name,new_name,changed } or { error }. Auto-select instance.")
 def rename_local_variable(function_address: int, old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
@@ -189,7 +189,7 @@ def rename_local_variable(function_address: int, old_name: str, new_name: str, p
     res = _call('rename_local_variable', {"function_address": function_address, "old_name": old_name, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename a global variable (forwarded).")
+@server.tool(description="Rename global variable: params old_name,new_name, port(optional). Returns backend { ea,old_name,new_name,changed } or { error }. Rejects function starts.")
 def rename_global_variable(old_name: str, new_name: str, port: int | None = None) -> Any:  # type: ignore
     if not old_name:
         return {"error": "empty old_name"}
@@ -201,7 +201,7 @@ def rename_global_variable(old_name: str, new_name: str, port: int | None = None
     res = _call('rename_global_variable', {"old_name": old_name, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename a function by address (forwarded).")
+@server.tool(description="Rename function: params function_address(start or inside), new_name, port(optional). Returns backend { start_ea,old_name,new_name,changed } or { error }.")
 def rename_function(function_address: int, new_name: str, port: int | None = None) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
@@ -213,7 +213,7 @@ def rename_function(function_address: int, new_name: str, port: int | None = Non
     res = _call('rename_function', {"function_address": function_address, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set a function prototype (forwarded).")
+@server.tool(description="Set function prototype: params function_address, prototype(C decl), port(optional). Returns backend { start_ea,applied,old_type,new_type,parsed_name? } or { error }.")
 def set_function_prototype(function_address: int, prototype: str, port: int | None = None) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
@@ -225,7 +225,7 @@ def set_function_prototype(function_address: int, prototype: str, port: int | No
     res = _call('set_function_prototype', {"function_address": function_address, "prototype": prototype}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set the type of a local variable in a function (forwarded, requires Hex-Rays).")
+@server.tool(description="Set local variable type (Hex-Rays): params function_address, variable_name, new_type(C fragment), port(optional). Returns backend { function,start_ea,variable_name,old_type,new_type,applied } or { error }.")
 def set_local_variable_type(function_address: int, variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
     if function_address is None:
         return {"error": "invalid function_address"}
@@ -239,7 +239,7 @@ def set_local_variable_type(function_address: int, variable_name: str, new_type:
     res = _call('set_local_variable_type', {"function_address": function_address, "variable_name": variable_name, "new_type": new_type}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get a function by its name (forwarded through coordinator).")
+@server.tool(description="Get function by name: params name(str), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Exact case-sensitive match.")
 def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ignore
     if not name:
         return {"error": "empty name"}
@@ -249,7 +249,7 @@ def get_function_by_name(name: str, port: int | None = None) -> Any:  # type: ig
     res = _call('get_function_by_name', {"name": name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get a function by its address (forwarded through coordinator).")
+@server.tool(description="Get function by address: params address(int), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Accepts inside-function address.")
 def get_function_by_address(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -259,7 +259,7 @@ def get_function_by_address(address: int, port: int | None = None) -> Any:  # ty
     res = _call('get_function_by_address', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get the address currently selected by the user (forwarded through coordinator).")
+@server.tool(description="Get current cursor address: param port(optional). Returns backend { address } or { error }. Depends on GUI focus in target instance.")
 def get_current_address(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -267,7 +267,7 @@ def get_current_address(port: int | None = None) -> Any:  # type: ignore
     res = _call('get_current_address', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get the function currently selected by the user (forwarded through coordinator).")
+@server.tool(description="Get current function at cursor: param port(optional). Returns backend { name,start_ea,end_ea } or { error }. Uses screen EA in target instance.")
 def get_current_function(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -275,7 +275,7 @@ def get_current_function(port: int | None = None) -> Any:  # type: ignore
     res = _call('get_current_function', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Convert a number (decimal/hex/binary) into multiple representations (forwarded through coordinator).")
+@server.tool(description="Convert number representations: params text(str), size(8|16|32|64), port(optional). Returns backend multi-format dict or { error }. Supports 0x / 0b / trailing h / underscores / sign.")
 def convert_number(text: str, size: int, port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -283,7 +283,7 @@ def convert_number(text: str, size: int, port: int | None = None) -> Any:  # typ
     res = _call('convert_number', {"text": text, "size": size}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List matching global symbols (non-function names) with pagination and optional substring filter (forwarded).")
+@server.tool(description="List global symbols (filtered): params offset>=0, count(1..1000), filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Skips function starts.")
 def list_globals_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -291,7 +291,7 @@ def list_globals_filter(offset: int, count: int, filter: str | None = None, port
     res = _call('list_globals_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List global symbols (non-function names) with pagination (forwarded).")
+@server.tool(description="List global symbols: params offset,count, port(optional). Returns backend { total,offset,count,items }. Unfiltered.")
 def list_globals(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -299,7 +299,7 @@ def list_globals(offset: int, count: int, port: int | None = None) -> Any:  # ty
     res = _call('list_globals', {"offset": offset, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List matching strings with pagination and optional substring filter (forwarded).")
+@server.tool(description="List strings (filtered): params offset,count, filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Auto-inits Strings.")
 def list_strings_filter(offset: int, count: int, filter: str | None = None, port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -307,7 +307,7 @@ def list_strings_filter(offset: int, count: int, filter: str | None = None, port
     res = _call('list_strings_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List strings with pagination (forwarded).")
+@server.tool(description="List strings: params offset,count, port(optional). Returns backend { total,offset,count,items }. No filtering.")
 def list_strings(offset: int, count: int, port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -315,7 +315,7 @@ def list_strings(offset: int, count: int, port: int | None = None) -> Any:  # ty
     res = _call('list_strings', {"offset": offset, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List all local types defined in the IDB (forwarded).")
+@server.tool(description="List local types: param port(optional). Returns backend { total,items:[{ ordinal,name,decl }] }. decl truncated per backend logic.")
 def list_local_types(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -323,7 +323,7 @@ def list_local_types(port: int | None = None) -> Any:  # type: ignore
     res = _call('list_local_types', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Decompile a function at the given address (forwarded, requires Hex-Rays).")
+@server.tool(description="Decompile function (Hex-Rays): params address(int), port(optional). Returns backend { name,start_ea,end_ea,address,decompiled } or { error }. Large text untruncated.")
 def decompile_function(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -333,7 +333,7 @@ def decompile_function(address: int, port: int | None = None) -> Any:  # type: i
     res = _call('decompile_function', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Disassemble a function and return list of instructions (forwarded).")
+@server.tool(description="Disassemble function: params start_address(int), port(optional). Returns backend { name,start_ea,end_ea,instructions:[...]} or { error }. Bytes truncated after 16 bytes.")
 def disassemble_function(start_address: int, port: int | None = None) -> Any:  # type: ignore
     if start_address is None:
         return {"error": "invalid address"}
@@ -343,7 +343,7 @@ def disassemble_function(start_address: int, port: int | None = None) -> Any:  #
     res = _call('disassemble_function', {"start_address": start_address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get all entry points (forwarded).")
+@server.tool(description="List entry points: param port(optional). Returns backend { total,items:[{ ordinal,ea,name }] } or { error }. Name fallback logic done in backend.")
 def get_entry_points(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -351,7 +351,7 @@ def get_entry_points(port: int | None = None) -> Any:  # type: ignore
     res = _call('get_entry_points', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set a global variable's type (forwarded).")
+@server.tool(description="Set global variable type: params variable_name,new_type(C fragment), port(optional). Returns backend { ea,variable_name,old_type,new_type,applied } or { error }. Rejects function starts.")
 def set_global_variable_type(variable_name: str, new_type: str, port: int | None = None) -> Any:  # type: ignore
     if not variable_name:
         return {"error": "empty variable_name"}
@@ -363,7 +363,7 @@ def set_global_variable_type(variable_name: str, new_type: str, port: int | None
     res = _call('set_global_variable_type', {"variable_name": variable_name, "new_type": new_type}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Declare or update a local type from a C declaration (forwarded).")
+@server.tool(description="Declare/update local type: params c_declaration(single struct/union/enum/typedef), port(optional). Returns backend { name,kind,replaced,success } or { error }. Replaces existing by name.")
 def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type: ignore
     if not c_declaration:
         return {"error": "empty declaration"}
@@ -373,7 +373,7 @@ def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type:
     res = _call('declare_c_type', {"c_declaration": c_declaration}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get all registers and their values when debugging (forwarded).")
+@server.tool(description="Debugger registers: param port(optional). Returns backend { ok,registers:[{ name,value,int? }],note? } or { error }. ok=false if debugger inactive.")
 def dbg_get_registers(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -381,7 +381,7 @@ def dbg_get_registers(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_get_registers', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get the current call stack when debugging (forwarded).")
+@server.tool(description="Debugger call stack: param port(optional). Returns backend { ok,frames:[{ index,ea,func }],note? } or { error }. Inactive => ok=false.")
 def dbg_get_call_stack(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -389,7 +389,7 @@ def dbg_get_call_stack(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_get_call_stack', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List all breakpoints (forwarded).")
+@server.tool(description="List breakpoints: param port(optional). Returns backend { ok,total,breakpoints:[...] } or { error }. ok=false if debugger inactive.")
 def dbg_list_breakpoints(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -397,7 +397,7 @@ def dbg_list_breakpoints(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_list_breakpoints', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Start the debugger (forwarded).")
+@server.tool(description="Start debugger: param port(optional). Returns backend { ok,started,pid?,note? } or { error }. If already running started=false with note.")
 def dbg_start_process(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -405,7 +405,7 @@ def dbg_start_process(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_start_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Exit the debugger (forwarded).")
+@server.tool(description="Terminate debug process: param port(optional). Returns backend { ok,exited,note? } or { error }. Inactive => ok:false,exited:false.")
 def dbg_exit_process(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -413,7 +413,7 @@ def dbg_exit_process(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_exit_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Continue the debugger (forwarded).")
+@server.tool(description="Continue execution: param port(optional). Returns backend { ok,continued,note? } or { error }. Inactive => ok:false.")
 def dbg_continue_process(port: int | None = None) -> Any:  # type: ignore
     target = port if port is not None else _ensure_port()
     if target is None:
@@ -421,7 +421,7 @@ def dbg_continue_process(port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_continue_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Run to address (forwarded).")
+@server.tool(description="Run to address: params address,int port(optional). Returns backend { ok,requested,continued,used_temp_bpt,note? } or { error }. Non-blocking.")
 def dbg_run_to(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -431,7 +431,7 @@ def dbg_run_to(address: int, port: int | None = None) -> Any:  # type: ignore
     res = _call('dbg_run_to', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set a breakpoint (forwarded).")
+@server.tool(description="Set breakpoint: params address,int port(optional). Returns backend { ok,ea,existed,added,note? } or { error }. Can be used pre-debugger.")
 def dbg_set_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -441,7 +441,7 @@ def dbg_set_breakpoint(address: int, port: int | None = None) -> Any:  # type: i
     res = _call('dbg_set_breakpoint', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Delete a breakpoint (forwarded).")
+@server.tool(description="Delete breakpoint: params address,int port(optional). Idempotent. Returns backend { ok,ea,existed,deleted,note? } or { error }.")
 def dbg_delete_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}
@@ -451,7 +451,7 @@ def dbg_delete_breakpoint(address: int, port: int | None = None) -> Any:  # type
     res = _call('dbg_delete_breakpoint', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Enable or disable a breakpoint (forwarded).")
+@server.tool(description="Enable/disable breakpoint: params address,int enable(bool), port(optional). Enabling creates if missing. Returns backend { ok,ea,existed,enabled,changed,note? } or { error }.")
 def dbg_enable_breakpoint(address: int, enable: bool, port: int | None = None) -> Any:  # type: ignore
     if address is None:
         return {"error": "invalid address"}

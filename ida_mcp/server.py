@@ -98,7 +98,7 @@ def create_mcp_server() -> FastMCP:
     name = os.getenv("IDA_MCP_NAME", "IDA-MCP")
     mcp = FastMCP(name=name, instructions="通过 MCP 工具访问 IDA 反汇编/分析数据。")
 
-    @mcp.tool(description="Check if IDA MCP plugin/coordinator connection is alive (returns ok/count).")
+    @mcp.tool(description="Health check: no parameters. Returns { ok: bool, count: int }. ok indicates coordinator reachable; count is number of registered instances (may be 0). On failure returns { ok:false, count:0 }.")
     def check_connection() -> dict:  # type: ignore
         if registry is None:
             return {"ok": False, "count": 0}
@@ -107,7 +107,7 @@ def create_mcp_server() -> FastMCP:
         except Exception:
             return {"ok": False, "count": 0}
 
-    @mcp.tool(description="Get registered IDA MCP instances (raw list, no filtering).")
+    @mcp.tool(description="List ALL instances registered in the coordinator (raw). No params. Returns array of { id, name, port, last_seen, meta?... }. No filtering/dedup; just forwards coordinator state. Returns [] if coordinator unavailable.")
     def list_instances() -> list[dict]:  # type: ignore
         """获取所有已注册实例原始列表 (不进行任何过滤)。"""
         if registry is None:
@@ -117,7 +117,7 @@ def create_mcp_server() -> FastMCP:
         except Exception as e:  # pragma: no cover
             return [{"error": str(e)}]
 
-    @mcp.tool(description="Get metadata about the current IDB.")
+    @mcp.tool(description="Get current IDB metadata. No params. Returns { input_file, arch, bits, hash } or includes note if not inside IDA. hash is SHA256 of input file if readable; otherwise None.")
     def get_metadata() -> dict:  # type: ignore
         """返回当前 IDA 会话 / IDB 的基础元数据 (轻量查询)。
 
@@ -184,7 +184,7 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
 
-    @mcp.tool(description="List functions (returns list of FunctionItem objects).")
+    @mcp.tool(description="List all functions. No params. Returns [ { name, start_ea, end_ea } ]. Iterates idautils.Functions; no pagination (caller truncates if needed).")
     def list_functions() -> List[FunctionItem]:  # type: ignore
         def logic():
             out: list[FunctionItem] = []
@@ -198,7 +198,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get a function by its name.")
+    @mcp.tool(description="Get function by name: param name (str, exact case‑sensitive IDA display name). Returns { name,start_ea,end_ea } or { error }. If multiple (rare) returns first. No fuzzy search.")
     def get_function_by_name(name: str) -> dict:  # type: ignore
         """按函数名称精确查找并返回函数的基本信息。
 
@@ -229,7 +229,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get a function by its address.")
+    @mcp.tool(description="Get function by address: param address (int; may be any address inside). Returns { name,start_ea,end_ea } or { error }. Uses ida_funcs.get_func to resolve owning function.")
     def get_function_by_address(address: int) -> dict:  # type: ignore
         """按地址获取函数信息。
 
@@ -262,7 +262,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get the address currently selected by the user.")
+    @mcp.tool(description="Get current caret address: no params. Returns { address } or { error }. Uses get_screen_ea; invalid view focus yields error.")
     def get_current_address() -> dict:  # type: ignore
         """获取当前 IDA 界面上光标所在(或选中)的地址。
 
@@ -288,7 +288,7 @@ def create_mcp_server() -> FastMCP:
             return {"address": int(ea)}
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get the function currently selected by the user.")
+    @mcp.tool(description="Get function at caret: no params. If caret inside a function returns { name,start_ea,end_ea }; else { error }. Provides quick context discovery.")
     def get_current_function() -> dict:  # type: ignore
         """获取当前光标所在地址所属的函数信息。
 
@@ -331,7 +331,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Convert a number (decimal/hex/binary) into multiple representations for a given bit size.")
+    @mcp.tool(description="Numeric conversion: params text(str) & size(8|16|32|64). Supports 0x / 0b / trailing 'h' / sign / underscores. Returns multi‑representation { hex,dec,unsigned,signed,bin,bytes_le,bytes_be } or { error }.")
     def convert_number(text: str, size: int) -> dict:  # type: ignore
         """数字格式转换工具。
 
@@ -409,7 +409,7 @@ def create_mcp_server() -> FastMCP:
             "bytes_be": bytes_be,
         }
 
-    @mcp.tool(description="List matching global symbols (non-function names) with pagination and optional substring filter.")
+    @mcp.tool(description="List global (non‑function) symbols with optional substring filter: params offset>=0, count(1..1000), filter(optional case‑insensitive). Returns { total,offset,count,items:[{ name,ea,size }] }. Skips function start addresses. size from ida_bytes.get_item_size or None.")
     def list_globals_filter(offset: int, count: int, filter: str | None = None) -> dict:  # type: ignore
         """分页/过滤列出全局符号(非函数)。
 
@@ -484,7 +484,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="List global symbols (non-function names) with pagination.")
+    @mcp.tool(description="List all global (non‑function) symbols: params offset,count. Returns { total,offset,count,items }. Same as list_globals_filter without filtering.")
     def list_globals(offset: int, count: int) -> dict:  # type: ignore
         """分页列出所有全局符号 (不区分名称, 不带过滤)。
 
@@ -538,7 +538,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="List matching strings with pagination and optional substring filter.")
+    @mcp.tool(description="List extracted strings with optional filter: params offset,count,filter(optional substring, case‑insensitive). Returns { total,offset,count,items:[{ ea,length,type,text }] }. Auto‑initializes idautils.Strings if needed.")
     def list_strings_filter(offset: int, count: int, filter: str | None = None) -> dict:  # type: ignore
         """分页 / 过滤列出程序中提取到的字符串。
 
@@ -609,7 +609,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="List strings with pagination (no filtering).")
+    @mcp.tool(description="List all extracted strings (no filter): params offset,count. Returns same structure as list_strings_filter minus filter handling.")
     def list_strings(offset: int, count: int) -> dict:  # type: ignore
         """分页列出所有已提取字符串 (不做内容过滤)。
 
@@ -666,7 +666,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="List all local types (name + ordinal + short decl) defined in the IDB.")
+    @mcp.tool(description="List local types: no params. Returns { total, items:[{ ordinal,name,decl }] }. decl is single‑line (<=512 chars). Requires ida_typeinf; returns empty with note otherwise.")
     def list_local_types() -> dict:  # type: ignore
         """列出当前 IDB 中的所有 Local Types (本地类型定义)。
 
@@ -718,7 +718,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Decompile a function at the given address (requires Hex-Rays).")
+    @mcp.tool(description="Decompile function (Hex‑Rays): param address (function start or inside). Returns { name,start_ea,end_ea,address,decompiled } or { error }. Output untruncated; caller may truncate. Fails if Hex‑Rays unavailable/init fails.")
     def decompile_function(address: int) -> dict:  # type: ignore
         """反编译指定地址所在函数 (需要安装 Hex-Rays)。
 
@@ -775,7 +775,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Disassemble a function and return list of instructions (ea, bytes, text, comment).")
+    @mcp.tool(description="Disassemble function: param start_address (function start or inside). Returns { name,start_ea,end_ea,instructions:[{ ea,bytes,text,comment }] } or { error }. bytes truncated after 16 bytes (..). Code items only.")
     def disassemble_function(start_address: int) -> dict:  # type: ignore
         """获取指定函数的反汇编指令列表。
 
@@ -875,7 +875,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get cross references TO a given address (incoming xrefs).")
+    @mcp.tool(description="List incoming xrefs: param address(int). Returns { address,total,xrefs:[{ frm,type,iscode }] } or { error }. type is raw xref_t.type; iscode indicates code reference.")
     def get_xrefs_to(address: int) -> dict:  # type: ignore
         """列出指向指定地址的所有交叉引用 (incoming xrefs)。
 
@@ -915,7 +915,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Heuristically find code references mentioning a struct field (by name substring).")
+    @mcp.tool(description="Heuristic struct field reference search: params struct_name, field_name. Returns { struct,field,offset,matches:[{ ea,line }],truncated?,note? } or { error }. Uses name substring + offset literal match. Max 500 results; may contain false positives/negatives.")
     def get_xrefs_to_field(struct_name: str, field_name: str) -> dict:  # type: ignore
         """获取对结构体成员的 (启发式) 引用位置列表。
 
@@ -1021,7 +1021,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set a comment for a given address (non-repeatable); shown in disassembly & pseudocode.")
+    @mcp.tool(description="Set/clear non‑repeatable comment: params address(int), comment(str, empty => clear). Returns { address,old,new,changed } or { error }. Non‑repeatable shows in pseudocode. Comment truncated to 1024 chars.")
     def set_comment(address: int, comment: str) -> dict:  # type: ignore
         """为指定地址设置(或清除)普通注释。
 
@@ -1065,7 +1065,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Rename a local variable in a function (requires Hex-Rays).")
+    @mcp.tool(description="Rename local variable (Hex‑Rays): params function_address, old_name, new_name(C identifier). Returns { function,start_ea,old_name,new_name,changed } or { error }. Only first matching lvar changed.")
     def rename_local_variable(function_address: int, old_name: str, new_name: str) -> dict:  # type: ignore
         """重命名函数中的本地变量 (依赖 Hex-Rays)。
 
@@ -1149,7 +1149,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Rename a global variable (address-based name) in the IDB.")
+    @mcp.tool(description="Rename global variable: params old_name,new_name. Returns { ea,old_name,new_name,changed } or { error }. Rejects if address is function start (use function rename). New name must be C identifier.")
     def rename_global_variable(old_name: str, new_name: str) -> dict:  # type: ignore
         """重命名全局变量。
 
@@ -1203,7 +1203,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Rename a function by address.")
+    @mcp.tool(description="Rename function: params function_address(start or inside), new_name(C identifier). Returns { start_ea,old_name,new_name,changed } or { error }. Internal address auto‑normalized to start.")
     def rename_function(function_address: int, new_name: str) -> dict:  # type: ignore
         """重命名函数。
 
@@ -1254,7 +1254,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set a function prototype (apply type) at given address.")
+    @mcp.tool(description="Set function prototype: params function_address, prototype(full C decl, may include name). Returns { start_ea,applied,old_type,new_type,parsed_name? } or { error,details? }. Does NOT auto‑rename function.")
     def set_function_prototype(function_address: int, prototype: str) -> dict:  # type: ignore
         """设置函数原型 (类型签名)。
 
@@ -1360,7 +1360,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set the type of a local variable in a function (requires Hex-Rays).")
+    @mcp.tool(description="Set local variable type (Hex‑Rays): params function_address, variable_name, new_type(C fragment). Returns { function,start_ea,variable_name,old_type,new_type,applied } or { error }. Parsing wrapper '<type> tmp;'.")
     def set_local_variable_type(function_address: int, variable_name: str, new_type: str) -> dict:  # type: ignore
         """为函数内局部变量设置类型。
 
@@ -1487,7 +1487,7 @@ def create_mcp_server() -> FastMCP:
             
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get all entry points (ordinal, ea, name) in the current database.")
+    @mcp.tool(description="List all entry points: no params. Returns { total, items:[{ ordinal,ea,name }] }. If entry name missing, attempts function name fallback. Outside IDA returns note.")
     def get_entry_points() -> dict:  # type: ignore
         """获取全部入口点 (entry points)。
 
@@ -1534,7 +1534,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set a global variable's type (apply tinfo).")
+    @mcp.tool(description="Set global variable type: params variable_name, new_type(C fragment). Returns { ea,variable_name,old_type,new_type,applied } or { error,details? }. Rejects function starts. Parsing wrapper '<type> __tmp_var;'.")
     def set_global_variable_type(variable_name: str, new_type: str) -> dict:  # type: ignore
         """设置全局变量类型。
 
@@ -1632,7 +1632,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Declare or update a local type from a C declaration (struct/union/enum/typedef).")
+    @mcp.tool(description="Declare / update a local type: param c_declaration(single struct/union/enum/typedef). Returns { name,kind,replaced,success } or { error,details? }. Existing name replaced (NTF_REPLACE). kind derived from tinfo.")
     def declare_c_type(c_declaration: str) -> dict:  # type: ignore
         """创建或更新本地类型 (Local Types)。
 
@@ -1714,7 +1714,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get all registers and their current values when debugging.")
+    @mcp.tool(description="Debugger registers snapshot: no params. If active returns { ok:true,registers:[{ name,value,int? }] }; inactive returns { ok:false,registers:[],note }. Values hex‑formatted; failures skipped.")
     def dbg_get_registers() -> dict:  # type: ignore
         """获取所有调试寄存器及其值 (仅在调试器附加/运行时有效)。
 
@@ -1767,7 +1767,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Get the current call stack frames when debugging.")
+    @mcp.tool(description="Get call stack: no params. Returns { ok,frames:[{ index,ea,func }],note? } or { error }. Prefers get_call_stack; falls back to walk_stack. Inactive debugger => ok:false.")
     def dbg_get_call_stack() -> dict:  # type: ignore
         """获取当前调用栈 (仅调试状态)。
 
@@ -1855,7 +1855,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="List all breakpoints (address, enabled, attributes) when debugging.")
+    @mcp.tool(description="List breakpoints: no params. Active debugger => { ok:true,total,breakpoints:[{ ea,enabled?,size?,type?,cond?,pass_count? }] }; inactive => ok:false with note. Only available attrs returned.")
     def dbg_list_breakpoints() -> dict:  # type: ignore
         """列出程序中当前设置的所有断点 (仅调试状态)。
 
@@ -1947,7 +1947,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Start the debugger for the current input file (no args).")
+    @mcp.tool(description="Start debugger: no params. If already running returns { ok:true,started:false,note }. Else attempts start_process with input file path; success returns pid. Some file types may fail to start.")
     def dbg_start_process() -> dict:  # type: ignore
         """启动调试会话 (若尚未启动)。
 
@@ -1994,7 +1994,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Exit/terminate the current debug process if running.")
+    @mcp.tool(description="Terminate debug process: no params. Inactive => { ok:false,exited:false,note }. Active => calls exit_process returning { ok:true,exited:true }. Non‑blocking.")
     def dbg_exit_process() -> dict:  # type: ignore
         """退出当前调试进程。
 
@@ -2025,7 +2025,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Continue/resume execution of the debugged process.")
+    @mcp.tool(description="Continue execution: no params. Calls continue_process or continue_execution. Returns { ok,continued,note? } or { error }. Inactive => ok:false. Non‑blocking.")
     def dbg_continue_process() -> dict:  # type: ignore
         """继续 (resume) 调试进程执行。
 
@@ -2073,7 +2073,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Run (continue) execution until reaching the specified address (temporary breakpoint).")
+    @mcp.tool(description="Run to address: param address. Prefers request_run_to; fallback creates temp breakpoint then continue. Returns { ok,requested,continued,used_temp_bpt,note? } or { error }. Non‑blocking (does not wait for hit).")
     def dbg_run_to(address: int) -> dict:  # type: ignore
         """运行到指定地址。
 
@@ -2178,7 +2178,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set (or ensure) a breakpoint at the given address.")
+    @mcp.tool(description="Set / ensure breakpoint: param address. If already present returns existed=true. Tries add_bpt variants / set_bpt. Returns { ok,ea,existed,added,note? } or { error }. Can be used before debugger starts.")
     def dbg_set_breakpoint(address: int) -> dict:  # type: ignore
         """设置指定地址的断点 (若已存在则返回 existed=True)。
 
@@ -2261,7 +2261,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Delete a breakpoint at the specified address (if present).")
+    @mcp.tool(description="Delete breakpoint: param address. Idempotent (missing still ok). Returns { ok,ea,existed,deleted,note? } or { error }. Works pre‑debugger too.")
     def dbg_delete_breakpoint(address: int) -> dict:  # type: ignore
         """删除指定地址的断点。
 
@@ -2333,7 +2333,7 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Enable or disable a breakpoint at the specified address (create if enabling and absent).")
+    @mcp.tool(description="Enable/disable breakpoint: params address, enable(bool). Enabling a missing breakpoint attempts creation. Returns { ok,ea,existed,enabled,changed,note? } or { error }. changed indicates state/existence modified.")
     def dbg_enable_breakpoint(address: int, enable: bool) -> dict:  # type: ignore
         """启用/禁用指定地址的断点 (若启用且不存在则自动创建)。
 
