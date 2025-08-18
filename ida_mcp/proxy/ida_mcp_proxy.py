@@ -373,6 +373,94 @@ def declare_c_type(c_declaration: str, port: int | None = None) -> Any:  # type:
     res = _call('declare_c_type', {"c_declaration": c_declaration}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
+@server.tool(description="Get all registers and their values when debugging (forwarded).")
+def dbg_get_registers(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_get_registers', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Get the current call stack when debugging (forwarded).")
+def dbg_get_call_stack(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_get_call_stack', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="List all breakpoints (forwarded).")
+def dbg_list_breakpoints(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_list_breakpoints', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Start the debugger (forwarded).")
+def dbg_start_process(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_start_process', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Exit the debugger (forwarded).")
+def dbg_exit_process(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_exit_process', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Continue the debugger (forwarded).")
+def dbg_continue_process(port: int | None = None) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_continue_process', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Run to address (forwarded).")
+def dbg_run_to(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_run_to', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Set a breakpoint (forwarded).")
+def dbg_set_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_set_breakpoint', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Delete a breakpoint (forwarded).")
+def dbg_delete_breakpoint(address: int, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_delete_breakpoint', {"address": address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Enable or disable a breakpoint (forwarded).")
+def dbg_enable_breakpoint(address: int, enable: bool, port: int | None = None) -> Any:  # type: ignore
+    if address is None:
+        return {"error": "invalid address"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_enable_breakpoint', {"address": address, "enable": bool(enable)}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
 if __name__ == "__main__":
     # 直接运行: fastmcp 会自动选择 stdio/sse 传输方式 (默认 stdio)
     server.run()

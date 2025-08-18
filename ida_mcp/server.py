@@ -53,6 +53,14 @@ try:  # Only the IDA bits actually needed for list_functions
         import ida_struct  # type: ignore
     except Exception:  # pragma: no cover
         ida_struct = None  # type: ignore
+    try:
+        import ida_dbg  # type: ignore
+    except Exception:  # pragma: no cover
+        ida_dbg = None  # type: ignore
+    try:
+        import ida_frame  # type: ignore
+    except Exception:  # pragma: no cover
+        ida_frame = None  # type: ignore
     HAVE_IDA = True
 except Exception:  # pragma: no cover
     HAVE_IDA = False
@@ -1704,6 +1712,764 @@ def create_mcp_server() -> FastMCP:
                 "replaced": bool(existed),
                 "success": bool(ok),
             }
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Get all registers and their current values when debugging.")
+    def dbg_get_registers() -> dict:  # type: ignore
+        """获取所有调试寄存器及其值 (仅在调试器附加/运行时有效)。
+
+        返回:
+            { ok: bool, registers: [ { name, value } ... ], note? } 或 { error }。
+        说明:
+            * 需要 ida_dbg 模块可用且调试器已启动 (is_debugger_on)。
+            * 通过 get_dbg_reg_names() 获取寄存器名列表, 再用 get_reg_val 读取。
+            * 读取失败的寄存器跳过; 返回十六进制字符串形式 (根据位宽格式化)。
+        限制:
+            * 不包含浮点 / SIMD 拆分字段的结构化解析, 仅原始值。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "registers": [], "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            regs: list[dict] = []
+            names: list[str] = []
+            try:
+                names = list(ida_dbg.get_dbg_reg_names())  # type: ignore
+            except Exception:
+                names = []
+            for n in names:
+                try:
+                    v = ida_dbg.get_reg_val(n)  # type: ignore
+                    # 尝试根据值大小格式化; IDA 可能返回 int 或 long
+                    if isinstance(v, int):
+                        # 选择最接近的宽度 (8/16/32/64) 用于零填充
+                        bits = 8
+                        if v > 0xFFFFFFFF:
+                            bits = 64
+                        elif v > 0xFFFF:
+                            bits = 32
+                        elif v > 0xFF:
+                            bits = 16
+                        width = bits // 4
+                        regs.append({"name": n, "value": f"0x{v:0{width}X}", "int": int(v)})
+                    else:
+                        regs.append({"name": n, "value": repr(v)})
+                except Exception:
+                    continue
+            return {"ok": True, "registers": regs}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Get the current call stack frames when debugging.")
+    def dbg_get_call_stack() -> dict:  # type: ignore
+        """获取当前调用栈 (仅调试状态)。
+
+        返回:
+            { ok: bool, frames: [ { index, ea, func, name? } ... ], note? } 或 { error }。
+        说明:
+            * 使用 ida_dbg.get_current_thread / get_process_state + get_dbg_reg_val / get_frame ea 方式存在架构差异。
+            * 这里采用 ida_dbg.get_call_stack / get_call_stack(invalidated) 不同版本兼容策略 (若可用)。
+            * 回退: 尝试 ida_dbg.get_frame(ea) 不同 API 组合；若失败返回 ok=False。
+        限制:
+            * 不解析参数, 仅地址与函数名。
+            * 某些架构或无调试符号时函数名可能为空。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "frames": [], "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            frames: list[dict] = []
+            collected = False
+            # 优先使用官方 call stack API (某些版本提供)
+            try:
+                if hasattr(ida_dbg, 'get_call_stack'):  # type: ignore
+                    stk = ida_dbg.get_call_stack()  # type: ignore
+                    # 可能返回 list[call_stack_item_t]
+                    for idx, item in enumerate(stk or []):  # type: ignore
+                        try:
+                            ea = int(getattr(item, 'ea', 0))
+                            func_name = None
+                            try:
+                                f = ida_funcs.get_func(ea)  # type: ignore
+                                if f:
+                                    func_name = idaapi.get_func_name(f.start_ea)  # type: ignore
+                            except Exception:
+                                func_name = None
+                            frames.append({
+                                'index': idx,
+                                'ea': ea,
+                                'func': func_name,
+                            })
+                        except Exception:
+                            continue
+                    if frames:
+                        collected = True
+            except Exception:
+                pass
+            # 回退: 尝试使用 ida_dbg.get_current_thread + walk_stack (有些版本)
+            if not collected:
+                try:
+                    if hasattr(ida_dbg, 'walk_stack'):  # type: ignore
+                        ws = []
+                        def _cb(entry):  # type: ignore
+                            try:
+                                ea = int(getattr(entry, 'ea', 0))
+                                func_name = None
+                                try:
+                                    f = ida_funcs.get_func(ea)  # type: ignore
+                                    if f:
+                                        func_name = idaapi.get_func_name(f.start_ea)  # type: ignore
+                                except Exception:
+                                    func_name = None
+                                ws.append(ea)
+                                frames.append({
+                                    'index': len(frames),
+                                    'ea': ea,
+                                    'func': func_name,
+                                })
+                            except Exception:
+                                return False
+                            return True
+                        ida_dbg.walk_stack(_cb)  # type: ignore
+                        if frames:
+                            collected = True
+                except Exception:
+                    pass
+            if not collected:
+                return {"ok": False, "frames": [], "note": "call stack API unavailable or empty"}
+            return {"ok": True, "frames": frames}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="List all breakpoints (address, enabled, attributes) when debugging.")
+    def dbg_list_breakpoints() -> dict:  # type: ignore
+        """列出程序中当前设置的所有断点 (仅调试状态)。
+
+        返回:
+            { ok: bool, total, breakpoints: [ { ea, enabled, size?, type?, cond?, pass_count?, hits? } ... ], note? } 或 { error }。
+        说明:
+            * 需要 ida_dbg 模块且调试器已启动。
+            * 使用 get_bpt_qty / get_bpt_ea / get_bpt_attr 收集信息; 某些字段若 API 不存在或获取失败则跳过。
+            * enabled 基于 flags & BPT_ENABLED。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "total": 0, "breakpoints": [], "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            bps: list[dict] = []
+            qty = 0
+            try:
+                qty = ida_dbg.get_bpt_qty()  # type: ignore
+            except Exception:
+                qty = 0
+            for i in range(qty):
+                try:
+                    ea = ida_dbg.get_bpt_ea(i)  # type: ignore
+                except Exception:
+                    continue
+                if ea in (None, idaapi.BADADDR):  # type: ignore
+                    continue
+                info: dict = { 'ea': int(ea) }
+                # flags / enabled
+                flags = None
+                try:
+                    if hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        flags = ida_dbg.get_bpt_attr(ea, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                    elif hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                        flags = ida_dbg.get_bpt_flags(ea)  # type: ignore
+                except Exception:
+                    flags = None
+                enabled = None
+                try:
+                    if flags is not None and hasattr(ida_dbg, 'BPT_ENABLED'):
+                        enabled = bool(flags & ida_dbg.BPT_ENABLED)  # type: ignore
+                except Exception:
+                    enabled = None
+                if enabled is not None:
+                    info['enabled'] = enabled
+                # size
+                try:
+                    if hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        sz = ida_dbg.get_bpt_attr(ea, ida_dbg.BPTATTR_SIZE)  # type: ignore
+                        if isinstance(sz, int) and sz > 0:
+                            info['size'] = int(sz)
+                except Exception:
+                    pass
+                # type
+                try:
+                    if hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        tp = ida_dbg.get_bpt_attr(ea, ida_dbg.BPTATTR_TYPE)  # type: ignore
+                        if isinstance(tp, int):
+                            info['type'] = int(tp)
+                except Exception:
+                    pass
+                # condition
+                try:
+                    if hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        cond = ida_dbg.get_bpt_attr(ea, ida_dbg.BPTATTR_COND)  # type: ignore
+                        if cond:
+                            info['cond'] = cond
+                except Exception:
+                    pass
+                # pass count
+                try:
+                    if hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        pc = ida_dbg.get_bpt_attr(ea, ida_dbg.BPTATTR_PASSCNT)  # type: ignore
+                        if isinstance(pc, int):
+                            info['pass_count'] = int(pc)
+                except Exception:
+                    pass
+                # hit count (IDA 有时无直接 API; 尝试 PASSCNT - remaining?)
+                # 暂不推断 hits, 仅保留 pass_count
+                bps.append(info)
+            return {"ok": True, "total": len(bps), "breakpoints": bps}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Start the debugger for the current input file (no args).")
+    def dbg_start_process() -> dict:  # type: ignore
+        """启动调试会话 (若尚未启动)。
+
+        行为:
+            * 若调试器已激活, 返回 { ok: True, started: False, note: 'already running' }。
+            * 否则尝试使用 idaapi.get_input_file_path() 作为可执行路径调用 ida_dbg.start_process。
+        返回:
+            { ok: bool, started: bool, pid?, note? } 或 { error }。
+        限制:
+            * 不设置自定义参数/工作目录/环境变量 (可后续扩展)。
+            * 某些文件类型 (如纯对象文件) 可能无法直接启动调试。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": True, "started": False, "note": "debugger already running"}
+            except Exception:
+                pass
+            # 取输入文件路径
+            try:
+                path = idaapi.get_input_file_path()  # type: ignore
+            except Exception:
+                path = None
+            if not path:
+                return {"error": "cannot determine input file path"}
+            # 启动
+            try:
+                started = ida_dbg.start_process(path, '', None)  # type: ignore
+            except Exception as e:
+                return {"error": f"start_process failed: {e}"}
+            ok = bool(started)
+            pid = None
+            if ok:
+                try:
+                    pid = ida_dbg.get_process_state().pid  # type: ignore
+                except Exception:
+                    pid = None
+            return {"ok": ok, "started": ok, "pid": pid}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Exit/terminate the current debug process if running.")
+    def dbg_exit_process() -> dict:  # type: ignore
+        """退出当前调试进程。
+
+        行为:
+            * 若调试器未激活 -> 返回 { ok: False, exited: False, note: 'debugger not active' }
+            * 否则调用 ida_dbg.exit_process。
+        返回:
+            { ok: bool, exited: bool, note? } 或 { error }。
+        限制:
+            * 不做强制等待; 若 API 报错返回 error。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "exited": False, "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            try:
+                ida_dbg.exit_process()  # type: ignore
+            except Exception as e:
+                return {"error": f"exit_process failed: {e}"}
+            return {"ok": True, "exited": True}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Continue/resume execution of the debugged process.")
+    def dbg_continue_process() -> dict:  # type: ignore
+        """继续 (resume) 调试进程执行。
+
+        行为:
+            * 若调试器未激活: 返回 ok=False, note。
+            * 调用 ida_dbg.continue_process() (若存在) 或 ida_dbg.continue_execution() 兼容不同版本。
+        返回:
+            { ok: bool, continued: bool, note? } 或 { error }。
+        限制:
+            * 不等待执行结果; 仅发出继续请求。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "continued": False, "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            # Attempt continue
+            cont_ok = False
+            errors: list[str] = []
+            tried = False
+            try:
+                if hasattr(ida_dbg, 'continue_process'):  # type: ignore
+                    tried = True
+                    cont_ok = bool(ida_dbg.continue_process())  # type: ignore
+            except Exception as e:
+                errors.append(f"continue_process: {e}")
+            if not cont_ok:
+                try:
+                    if hasattr(ida_dbg, 'continue_execution'):  # type: ignore
+                        tried = True
+                        cont_ok = bool(ida_dbg.continue_execution())  # type: ignore
+                except Exception as e:
+                    errors.append(f"continue_execution: {e}")
+            if not tried:
+                return {"error": "no continue API available"}
+            if not cont_ok and errors:
+                return {"ok": False, "continued": False, "note": "; ".join(errors)[:200]}
+            return {"ok": True, "continued": bool(cont_ok)}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Run (continue) execution until reaching the specified address (temporary breakpoint).")
+    def dbg_run_to(address: int) -> dict:  # type: ignore
+        """运行到指定地址。
+
+        参数:
+            address: 目标地址 (需要在当前程序地址空间内)。
+        行为:
+            1. 确认调试器已激活。
+            2. 优先调用 ida_dbg.request_run_to(address) (若可用)。
+            3. 若 API 不可用或失败, 设置一个临时断点 (set_bpt) 并记录 used_temp_bpt=True。
+            4. 继续执行 (continue_process / continue_execution)。
+        返回:
+            { ok, requested, continued, used_temp_bpt, note? } 或 { error }。
+        限制:
+            * 不等待实际到达; 只是发出请求。
+            * 若地址无效 (BADADDR) 返回错误。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+        if address is None:
+            return {"error": "invalid address"}
+
+        def logic():
+            # 验证调试器状态
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"error": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            if int(address) == idaapi.BADADDR:  # type: ignore
+                return {"error": "BADADDR"}
+            requested = False
+            used_temp_bpt = False
+            notes: list[str] = []
+            # 尝试 request_run_to
+            try:
+                if hasattr(ida_dbg, 'request_run_to'):  # type: ignore
+                    requested = bool(ida_dbg.request_run_to(address))  # type: ignore
+                    if not requested:
+                        notes.append('request_run_to returned False')
+                else:
+                    notes.append('request_run_to unavailable')
+            except Exception as e:
+                notes.append(f'request_run_to error: {e}')
+            # 退回设置临时断点
+            if not requested:
+                try:
+                    # 仅在不存在断点时设置, 避免重复
+                    has_bp = False
+                    try:
+                        if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                            has_bp = ida_dbg.get_bpt_flags(address) != -1  # type: ignore
+                        elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                            # 试探读取 flags
+                            _flags = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                            has_bp = _flags is not None
+                    except Exception:
+                        has_bp = False
+                    if not has_bp and hasattr(ida_dbg, 'add_bpt'):  # type: ignore
+                        # 有的版本是 add_bpt(ea, size, type) 或 set_bpt(ea)
+                        try:
+                            added = False
+                            if hasattr(ida_dbg, 'add_bpt'):  # type: ignore
+                                # 尝试 add_bpt(ea, 0, BPT_DEFAULT) 若存在 BPT_DEFAULT
+                                if hasattr(ida_dbg, 'BPT_DEFAULT'):
+                                    added = bool(ida_dbg.add_bpt(address, 0, ida_dbg.BPT_DEFAULT))  # type: ignore
+                                else:
+                                    added = bool(ida_dbg.add_bpt(address, 0))  # type: ignore
+                            if not added and hasattr(ida_dbg, 'add_bpt'):  # second try plain
+                                added = bool(ida_dbg.add_bpt(address))  # type: ignore
+                            if not added and hasattr(ida_dbg, 'set_bpt'):  # type: ignore
+                                added = bool(ida_dbg.set_bpt(address))  # type: ignore
+                            used_temp_bpt = bool(added)
+                            if not added:
+                                notes.append('failed to add temp breakpoint')
+                        except Exception as e:
+                            notes.append(f'add_bpt error: {e}')
+                except Exception:
+                    notes.append('temp breakpoint fallback failed')
+            # 继续执行
+            continued = False
+            try:
+                if hasattr(ida_dbg, 'continue_process'):  # type: ignore
+                    continued = bool(ida_dbg.continue_process())  # type: ignore
+                elif hasattr(ida_dbg, 'continue_execution'):  # type: ignore
+                    continued = bool(ida_dbg.continue_execution())  # type: ignore
+                else:
+                    notes.append('no continue API')
+            except Exception as e:
+                notes.append(f'continue error: {e}')
+            ok = requested or used_temp_bpt
+            result: dict[str, object] = {
+                'ok': ok,
+                'requested': requested,
+                'continued': continued,
+                'used_temp_bpt': used_temp_bpt,
+            }
+            if notes:
+                result['note'] = '; '.join(notes)[:300]
+            return result
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Set (or ensure) a breakpoint at the given address.")
+    def dbg_set_breakpoint(address: int) -> dict:  # type: ignore
+        """设置指定地址的断点 (若已存在则返回 existed=True)。
+
+        参数:
+            address: 目标地址 (指令地址)。
+        返回:
+            { ok, ea, existed, added, note? } 或 { error }。
+        说明:
+            * 允许在未启动调试器状态下预设断点。
+            * 优先使用 add_bpt(ea, 0, BPT_DEFAULT) 变体; 回退 add_bpt(ea) / set_bpt(ea)。
+            * existed 通过 get_bpt_flags / get_bpt_attr 判定。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+        if address is None:
+            return {"error": "invalid address"}
+
+        def logic():
+            if int(address) == idaapi.BADADDR:  # type: ignore
+                return {"error": "BADADDR"}
+            notes: list[str] = []
+            existed = False
+            # 检查是否存在断点
+            try:
+                if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                    existed = ida_dbg.get_bpt_flags(address) != -1  # type: ignore
+                elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                    _f = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                    existed = _f is not None
+            except Exception:
+                existed = False
+            added = False
+            if not existed:
+                try:
+                    if hasattr(ida_dbg, 'add_bpt'):  # type: ignore
+                        if hasattr(ida_dbg, 'BPT_DEFAULT'):
+                            added = bool(ida_dbg.add_bpt(address, 0, ida_dbg.BPT_DEFAULT))  # type: ignore
+                            if not added:
+                                notes.append('add_bpt default failed')
+                        if not added:
+                            # try add_bpt(ea,0)
+                            try:
+                                added = bool(ida_dbg.add_bpt(address, 0))  # type: ignore
+                            except Exception:
+                                pass
+                        if not added:
+                            try:
+                                added = bool(ida_dbg.add_bpt(address))  # type: ignore
+                            except Exception:
+                                pass
+                    if not added and hasattr(ida_dbg, 'set_bpt'):  # type: ignore
+                        try:
+                            added = bool(ida_dbg.set_bpt(address))  # type: ignore
+                        except Exception as e:
+                            notes.append(f'set_bpt error: {e}')
+                except Exception as e:
+                    notes.append(f'add_bpt error: {e}')
+                # 再次验证
+                if added:
+                    try:
+                        if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                            existed = ida_dbg.get_bpt_flags(address) != -1  # type: ignore
+                        elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                            _f = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                            existed = _f is not None
+                    except Exception:
+                        pass
+            ok = existed or added
+            result: dict[str, object] = {
+                'ok': ok,
+                'ea': int(address),
+                'existed': bool(existed and not added),
+                'added': bool(added),
+            }
+            if notes:
+                result['note'] = '; '.join(notes)[:300]
+            return result
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Delete a breakpoint at the specified address (if present).")
+    def dbg_delete_breakpoint(address: int) -> dict:  # type: ignore
+        """删除指定地址的断点。
+
+        参数:
+            address: 目标地址。
+        返回:
+            { ok, ea, existed, deleted, note? } 或 { error }。
+        说明:
+            * 若不存在断点返回 existed=False, deleted=False, ok=True (视为幂等)。
+            * 支持在未启动调试会话状态下操作 (IDA 允许设置/删除预设断点)。
+            * 使用 get_bpt_flags / get_bpt_attr 检测存在性; 删除使用 del_bpt / del_bpt(ea)。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+        if address is None:
+            return {"error": "invalid address"}
+
+        def logic():
+            if int(address) == idaapi.BADADDR:  # type: ignore
+                return {"error": "BADADDR"}
+            notes: list[str] = []
+            existed = False
+            try:
+                if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                    existed = ida_dbg.get_bpt_flags(address) != -1  # type: ignore
+                elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                    _f = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                    existed = _f is not None
+            except Exception:
+                existed = False
+            deleted = False
+            if existed:
+                try:
+                    if hasattr(ida_dbg, 'del_bpt'):  # type: ignore
+                        deleted = bool(ida_dbg.del_bpt(address))  # type: ignore
+                    elif hasattr(ida_dbg, 'del_breakpoint'):  # hypothetical fallback
+                        deleted = bool(ida_dbg.del_breakpoint(address))  # type: ignore
+                    else:
+                        notes.append('no del_bpt API')
+                except Exception as e:
+                    notes.append(f'del_bpt error: {e}')
+                if deleted:
+                    # 再验证
+                    try:
+                        if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                            existed2 = ida_dbg.get_bpt_flags(address) != -1  # type: ignore
+                        elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                            _f2 = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                            existed2 = _f2 is not None
+                        else:
+                            existed2 = False
+                        if existed2:
+                            notes.append('verification shows breakpoint still present')
+                    except Exception:
+                        pass
+            # 幂等: 不存在也算成功
+            ok = not existed or deleted or (existed and deleted)
+            result: dict[str, object] = {
+                'ok': ok,
+                'ea': int(address),
+                'existed': bool(existed),
+                'deleted': bool(deleted),
+            }
+            if notes:
+                result['note'] = '; '.join(notes)[:300]
+            return result
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Enable or disable a breakpoint at the specified address (create if enabling and absent).")
+    def dbg_enable_breakpoint(address: int, enable: bool) -> dict:  # type: ignore
+        """启用/禁用指定地址的断点 (若启用且不存在则自动创建)。
+
+        参数:
+            address: 目标地址。
+            enable: True=启用 / False=禁用。
+        返回:
+            { ok, ea, existed, enabled, changed, note? } 或 { error }。
+        说明:
+            * existed 表示操作前是否存在断点。
+            * enabled 表示操作后断点是否处于启用状态。
+            * changed 表示本次调用是否修改了状态 (创建 / 状态翻转)。
+            * 若禁用不存在的断点 => ok=True, existed=False, enabled=False, changed=False。
+            * 启用不存在时尝试自动 add_bpt。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+        if address is None:
+            return {"error": "invalid address"}
+
+        def logic():
+            if int(address) == idaapi.BADADDR:  # type: ignore
+                return {"error": "BADADDR"}
+            notes: list[str] = []
+            # 检查是否存在断点
+            existed = False
+            flags = None
+            try:
+                if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                    flags = ida_dbg.get_bpt_flags(address)  # type: ignore
+                    existed = flags != -1
+                elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                    flags = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                    existed = flags is not None
+            except Exception:
+                existed = False
+            changed = False
+            # 若需要启用且不存在 -> 创建
+            if enable and not existed:
+                try:
+                    added = False
+                    if hasattr(ida_dbg, 'add_bpt'):  # type: ignore
+                        if hasattr(ida_dbg, 'BPT_DEFAULT'):
+                            added = bool(ida_dbg.add_bpt(address, 0, ida_dbg.BPT_DEFAULT))  # type: ignore
+                        if not added:
+                            try:
+                                added = bool(ida_dbg.add_bpt(address, 0))  # type: ignore
+                            except Exception:
+                                pass
+                        if not added:
+                            try:
+                                added = bool(ida_dbg.add_bpt(address))  # type: ignore
+                            except Exception:
+                                pass
+                    if not added and hasattr(ida_dbg, 'set_bpt'):  # type: ignore
+                        try:
+                            added = bool(ida_dbg.set_bpt(address))  # type: ignore
+                        except Exception as e:
+                            notes.append(f'set_bpt error: {e}')
+                    if added:
+                        existed = True
+                        changed = True
+                    else:
+                        notes.append('failed to create breakpoint for enable')
+                except Exception as e:
+                    notes.append(f'add_bpt error: {e}')
+            # 若存在 -> 切换启用状态
+            if existed:
+                # 获取当前 enabled 状态
+                currently_enabled = None
+                try:
+                    if flags is None and hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                        flags = ida_dbg.get_bpt_flags(address)  # type: ignore
+                    if flags is not None and hasattr(ida_dbg, 'BPT_ENABLED'):
+                        currently_enabled = bool(flags & ida_dbg.BPT_ENABLED)  # type: ignore
+                except Exception:
+                    currently_enabled = None
+                # 若需要改变
+                desire = bool(enable)
+                if currently_enabled is not None and currently_enabled != desire:
+                    try:
+                        if hasattr(ida_dbg, 'enable_bpt'):  # type: ignore
+                            ok2 = ida_dbg.enable_bpt(address, desire)  # type: ignore
+                        else:
+                            # 回退: 修改 flags (若有 set_bpt_attr)
+                            ok2 = False
+                            if hasattr(ida_dbg, 'set_bpt_attr') and hasattr(ida_dbg, 'BPTATTR_FLAGS'):  # type: ignore
+                                # 如果禁用, 清除 ENABLED 位; 启用则设置
+                                new_flags = flags or 0
+                                try:
+                                    if desire:
+                                        new_flags |= ida_dbg.BPT_ENABLED  # type: ignore
+                                    else:
+                                        new_flags &= ~ida_dbg.BPT_ENABLED  # type: ignore
+                                except Exception:
+                                    pass
+                                try:
+                                    ok2 = bool(ida_dbg.set_bpt_attr(address, ida_dbg.BPTATTR_FLAGS, new_flags))  # type: ignore
+                                except Exception as e:
+                                    notes.append(f'set_bpt_attr flags error: {e}')
+                        if ok2:
+                            changed = True
+                        else:
+                            notes.append('enable/disable operation failed')
+                    except Exception as e:
+                        notes.append(f'enable_bpt error: {e}')
+                # 更新 enabled 状态再次读取
+                try:
+                    flags2 = None
+                    if hasattr(ida_dbg, 'get_bpt_flags'):  # type: ignore
+                        flags2 = ida_dbg.get_bpt_flags(address)  # type: ignore
+                    elif hasattr(ida_dbg, 'get_bpt_attr'):  # type: ignore
+                        flags2 = ida_dbg.get_bpt_attr(address, ida_dbg.BPTATTR_FLAGS)  # type: ignore
+                    if flags2 is not None and hasattr(ida_dbg, 'BPT_ENABLED'):
+                        enabled_now = bool(flags2 & ida_dbg.BPT_ENABLED)  # type: ignore
+                    else:
+                        # 如果无法获得, 依赖 desire 近似
+                        enabled_now = desire
+                except Exception:
+                    enabled_now = desire
+            else:
+                enabled_now = False
+            ok = (enable and existed) or (not enable and (not existed or existed)) or (enable and changed) or (not enable and existed)
+            result: dict[str, object] = {
+                'ok': bool(ok),
+                'ea': int(address),
+                'existed': bool(existed),
+                'enabled': bool(enabled_now),
+                'changed': bool(changed),
+            }
+            if notes:
+                result['note'] = '; '.join(notes)[:300]
+            return result
 
         return _run_in_ida(logic)
 
