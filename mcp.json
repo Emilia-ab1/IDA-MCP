@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "ida-mcp-proxy": {
-      "command": "D:\\safetools\\IDAPro-9.1\\ida-python\\python.exe",
-      "args": ["D:\\safetools\\IDAPro-9.1\\plugins\\ida_mcp\\proxy\\ida_mcp_proxy.py"],
+      "command": "path of python",
+      "args": ["path of ida_mcp_proxy.py"],
       "env": {},
       "description": "Process MCP proxy that forwards to running IDA SSE server."
     }
@@ -10,3 +10,4 @@
   "version": "1.0.0",
   "description": "Configuration for IDA-MCP SSE server"
 }
+
