@@ -143,9 +143,7 @@ IDA-MCP/
       "env": {},
       "description": "Process MCP proxy that forwards to running IDA SSE server."
     }
-  },
-  "version": "1.0.0",
-  "description": "Configuration for IDA-MCP SSE server"
+  }
 }
 ```
 
@@ -181,7 +179,3 @@ cursor 直接在模型工具导入即可（不推荐使用cursor）。
 ```bash
 python -m pip install -r requirements.txt
 ```
-
----
-需要新增或修改的功能继续提出。欢迎增量扩展。
-
