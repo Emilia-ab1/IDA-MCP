@@ -6,8 +6,7 @@
       "env": {},
       "description": "Process MCP proxy that forwards to running IDA SSE server."
     }
-  },
-  "version": "1.0.0",
-  "description": "Configuration for IDA-MCP SSE server"
+  }
 }
+
 
