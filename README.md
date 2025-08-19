@@ -1,6 +1,6 @@
 # IDA-MCP
 
-[readme-en](README-EN.md)
+[readme-en](README-EN.md) [wiki](https://github.com/jelasin/IDA-MCP/wiki)
 
 ## IDA-MCP (FastMCP SSE + 多实例协调器)
 
