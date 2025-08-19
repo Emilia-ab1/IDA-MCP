@@ -130,9 +130,11 @@ IDA-MCP/
 
 ## 代理使用
 
-在 `mcp.json` 中替换 `command` 和 `args`：
+在 `mcp.json` 中替换 `command` 和 `args`，然后将其复制到 claude 客户端的 mcp 工具配置文件或者其他 MCP 客户端的配置文件中。
 
-```text
+**claude / cherry studio / cursor 客户端示例：**
+
+```json
 {
   "mcpServers": {
     "ida-mcp-proxy": {
@@ -145,10 +147,30 @@ IDA-MCP/
   "version": "1.0.0",
   "description": "Configuration for IDA-MCP SSE server"
 }
-
 ```
 
-将其复制到 claude 客户端的 mcp 工具配置文件或者其他 MCP 客户端的配置文件中。
+claude 直接在安装目录里面的 `claude_desktop_config.json` 文件中添加上述配置。
+
+cherry studio 支持快速创建 mcp 工具，直接从 json 导入，然后粘贴上述配置示例。
+
+cursor 直接在模型工具导入即可（不推荐使用cursor）。
+
+**vscode mcp 配置示例：**
+
+```json
+{
+  "servers": {
+    "ida-mcp-proxy": {
+      "command": "path of python",
+      "args": ["path of ida_mcp_proxy.py"]
+    }
+  }
+}
+```
+
+将 copilot 设置为 Agent 模式，点击配置工具 -> 配置工具集 -> 输入工具集名称 -> 输入工具集文件名 -> 确定 -> 然后将上述配置示例直接粘贴进去即可。
+
+copilot 也会扫描claude 客户端的配置文件和 cursor 的配置文件。
 
 ## 依赖
 
