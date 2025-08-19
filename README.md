@@ -109,7 +109,7 @@
 IDA-MCP/
   ida_mcp.py              # 插件入口：启动/停止 SSE server + 注册协调器
   ida_mcp/
-    server.py             # FastMCP server 定义 (最小工具集)
+    server.py             # FastMCP server 定义
     registry.py           # 协调器实现 / 多实例注册 & /call 转发
     __init__.py           # 包初始化, 导出 create_mcp_server 并说明子模块结构
     proxy/
@@ -168,9 +168,13 @@ cursor 直接在模型工具导入即可（不推荐使用cursor）。
 }
 ```
 
+1. 永久添加：
 将 copilot 设置为 Agent 模式，点击配置工具 -> 配置工具集 -> 输入工具集名称 -> 输入工具集文件名 -> 确定 -> 然后将上述配置示例直接粘贴进去即可。
 
-copilot 也会扫描claude 客户端的配置文件和 cursor 的配置文件。
+2. 临时添加
+项目目录建立 `.vscode` 文件夹，并在其中创建 `mcp.json` 文件，将上述配置文件粘贴进去。
+
+3. copilot 也会扫描claude 客户端的配置文件和 cursor 的配置文件。
 
 ## 依赖
 
