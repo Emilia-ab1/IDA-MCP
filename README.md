@@ -1,6 +1,10 @@
 # IDA-MCP
 
-[readme-en](README-EN.md) [wiki](https://github.com/jelasin/IDA-MCP/wiki)
+[readme-en](README-EN.md) 
+
+[wiki](https://github.com/jelasin/IDA-MCP/wiki)
+
+[deepwiki](https://deepwiki.com/jelasin/IDA-MCP)
 
 ## IDA-MCP (FastMCP SSE + 多实例协调器)
 
@@ -179,3 +183,4 @@ cursor 直接在模型工具导入即可（不推荐使用cursor）。
 ```bash
 python -m pip install -r requirements.txt
 ```
+
