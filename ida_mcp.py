@@ -255,6 +255,16 @@ def start_server_async(host: str, port: int):
     def worker():
         global _uv_server
         try:
+            # Windows 控制台噪音抑制: 使用 Selector 事件循环替代 Proactor，
+            # 规避 asyncio 在 _ProactorBasePipeTransport._call_connection_lost 中
+            # 打印的 ConnectionResetError(WinError 10054) 回调异常。
+            if os.name == "nt":
+                try:
+                    import asyncio  # type: ignore
+                    if hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
+                        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # type: ignore[attr-defined]
+                except Exception:
+                    pass  # 策略设置失败时不影响后续逻辑，最多产生原有控制台提示
             server = create_mcp_server()
             # 构建 ASGI 应用 (包含 SSE 端点), 挂载路径 '/mcp'
             app = server.http_app(path="/mcp")  # type: ignore[attr-defined]
