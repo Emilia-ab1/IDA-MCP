@@ -1,14 +1,14 @@
 # IDA-MCP
 
-[readme-en](README-EN.md) 
+[readme-en](README-EN.md)
 
 [wiki](https://github.com/jelasin/IDA-MCP/wiki)
 
 [deepwiki](https://deepwiki.com/jelasin/IDA-MCP)
 
-## IDA-MCP (FastMCP SSE + 多实例协调器)
+## IDA-MCP (FastMCP + 多实例协调器)
 
-* 每个 IDA 实例启动一个 **SSE FastMCP** 服务器 (`/mcp`)
+* 每个 IDA 实例启动一个 **FastMCP** 服务器 (`/mcp`)
 * 第一个实例占用 `127.0.0.1:11337` 作为 **协调器(coordinator)**，维持内存注册表并支持工具转发
 * 后续实例自动注册到协调器；无需共享文件或手工配置端口
 * 通过一个进程型 **代理 `ida_mcp_proxy.py`**（MCP 客户端可用 command/args 启动）统一访问 / 聚合各实例工具
@@ -183,4 +183,3 @@ cursor 直接在模型工具导入即可（不推荐使用cursor）。
 ```bash
 python -m pip install -r requirements.txt
 ```
-

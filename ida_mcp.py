@@ -83,17 +83,17 @@ except Exception:  # pragma: no cover - outside IDA
 from ida_mcp.server import create_mcp_server, DEFAULT_PORT
 from ida_mcp import registry
 
-_server_thread: threading.Thread | None = None
-_uv_server = None  # type: ignore
-_stop_lock = threading.Lock()
-_active_port: int | None = None
-_hb_thread: threading.Thread | None = None
-_hb_stop = threading.Event()
-_last_register_ts: float | None = None
-_REGISTER_INTERVAL = 300  # seconds between forced refresh registrations
-_HEARTBEAT_INTERVAL = 60  # seconds between heartbeat checks
-_cached_input_file: str | None = None
-_cached_idb_path: str | None = None
+_server_thread: threading.Thread | None = None  # 后台 uvicorn 线程 (运行 FastMCP ASGI 服务)
+_uv_server = None  # type: ignore               # uvicorn.Server 实例引用, 用于优雅关闭 (should_exit)
+_stop_lock = threading.Lock()                   # 防止 stop_server 并发重入的互斥锁
+_active_port: int | None = None                 # 当前实例实际监听的 MCP 端口 (启动后写入, 停止时清空)
+_hb_thread: threading.Thread | None = None      # 心跳/保活线程对象 (负责检测协调器状态与定期刷新注册)
+_hb_stop = threading.Event()                    # 心跳线程停止信号 (stop_server 中置位)
+_last_register_ts: float | None = None          # 最近一次成功调用 registry.init_and_register 的时间戳 (epoch 秒)
+_REGISTER_INTERVAL = 300                        # 即使一切正常, 超过该间隔也会强制 refresh 注册
+_HEARTBEAT_INTERVAL = 60                        # 心跳循环唤醒/巡检间隔
+_cached_input_file: str | None = None           # 缓存的输入二进制路径 (仅主线程初始化; 心跳线程避免直接调用 IDA API)
+_cached_idb_path: str | None = None             # 缓存的 IDB 路径 (同上, 避免后台线程访问 IDA C 接口)
 
 def _heartbeat_loop():
     """后台心跳: 定期确认协调器仍可访问且本实例记录存在, 否则重新注册。

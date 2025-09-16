@@ -1,8 +1,8 @@
-# IDA-MCP (FastMCP SSE + Multi-Instance Coordinator)
+# IDA-MCP (FastMCP + Multi-Instance Coordinator)
 
 Light‑weight Model Context Protocol (MCP) integration for IDA Pro enabling:
 
-* One embedded FastMCP **SSE server** per IDA instance (`/mcp` endpoint).
+* One embedded FastMCP **server** per IDA instance (`/mcp` endpoint).
 * The first instance that can bind `127.0.0.1:11337` becomes the **coordinator** (in‑memory registry + request forwarding via `/call`).
 * Later IDA instances auto‑register themselves (no shared files, no manual port bookkeeping).
 * An optional standalone **proxy process** (`ida_mcp/proxy/ida_mcp_proxy.py`) exposes a consolidated MCP tool surface to external clients that only support spawning a single process.

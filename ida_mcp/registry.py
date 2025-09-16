@@ -85,7 +85,12 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
         self.send_header('Content-Type', 'application/json')
         self.send_header('Content-Length', str(len(data)))
         self.end_headers()
-        self.wfile.write(data)
+        try:
+            self.wfile.write(data)
+        except (ConnectionAbortedError, BrokenPipeError, OSError) as e:  # pragma: no cover
+            # 客户端在响应发送途中断开 (WinError 10053/10054 或 POSIX EPIPE/ECONNRESET)，忽略即可，不影响后续请求。
+            # 选择静默处理 (方案A)，避免在频繁探测/超时重试场景刷屏。
+            pass
     def do_GET(self):  # type: ignore
         if self.path == '/instances':
             with _lock:
