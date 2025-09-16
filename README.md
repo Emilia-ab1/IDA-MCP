@@ -1,7 +1,5 @@
 # IDA-MCP
 
-[readme-en](README-EN.md)
-
 [wiki](https://github.com/jelasin/IDA-MCP/wiki)
 
 [deepwiki](https://deepwiki.com/jelasin/IDA-MCP)
