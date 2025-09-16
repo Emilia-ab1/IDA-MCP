@@ -2,7 +2,9 @@
   "IDAMetadataDescriptorVersion": 1,
   "plugin": {
     "name": "IDA-MCP",
+    "categories": ["disassembly-and-processor-modules", "decompilation", "debugging-and-tracing", "AI"],
     "entryPoint": "ida_mcp.py",
+    "logoPath": "ida-mcp.png",
     "idaVersions": ">=8.4",
     "description": "A mcp-server for ida pro.",
     "version": "0.1.3"

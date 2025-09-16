@@ -1,5 +1,7 @@
 # IDA-MCP
 
+![logo](ida-mcp.png)
+
 [wiki](https://github.com/jelasin/IDA-MCP/wiki)
 
 [deepwiki](https://deepwiki.com/jelasin/IDA-MCP)
