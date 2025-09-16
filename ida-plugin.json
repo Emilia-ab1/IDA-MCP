@@ -3,5 +3,8 @@
   "plugin": {
     "name": "IDA-MCP",
     "entryPoint": "ida_mcp.py",
+    "idaVersions": ">=8.4",
+    "description": "A mcp-server for ida pro.",
+    "version": "0.1.3"
   }
 }
