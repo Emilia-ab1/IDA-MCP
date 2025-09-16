@@ -2,7 +2,7 @@
   "IDAMetadataDescriptorVersion": 1,
   "plugin": {
     "name": "IDA-MCP",
-    "categories": ["disassembly-and-processor-modules", "decompilation", "debugging-and-tracing", "AI"],
+    "categories": ["disassembly-and-processor-modules", "decompilation", "debugging-and-tracing", "api-scripting-and-automation"],
     "entryPoint": "ida_mcp.py",
     "logoPath": "ida-mcp.png",
     "idaVersions": ">=8.4",
