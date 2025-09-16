@@ -90,8 +90,10 @@ _active_port: int | None = None
 _hb_thread: threading.Thread | None = None
 _hb_stop = threading.Event()
 _last_register_ts: float | None = None
-_REGISTER_INTERVAL = 120  # seconds between forced refresh registrations
+_REGISTER_INTERVAL = 300  # seconds between forced refresh registrations
 _HEARTBEAT_INTERVAL = 60  # seconds between heartbeat checks
+_cached_input_file: str | None = None
+_cached_idb_path: str | None = None
 
 def _heartbeat_loop():
     """后台心跳: 定期确认协调器仍可访问且本实例记录存在, 否则重新注册。
@@ -129,9 +131,13 @@ def _heartbeat_loop():
             need_register = True
         if need_register and _active_port is not None:
             try:
-                _register_with_coordinator(_active_port)
+                # 仅用缓存的路径/文件, 避免后台线程再触碰 IDA API
+                registry.init_and_register(_active_port, _cached_input_file, _cached_idb_path)
                 _last_register_ts = now
-                _info("Heartbeat re-register successful (instance refreshed).")
+                if inst_list:
+                    _info("Heartbeat refresh registration done.")
+                else:
+                    _info("Heartbeat re-register successful (coordinator rebuilt or entry missing).")
             except Exception as e:  # pragma: no cover
                 _warn(f"Heartbeat re-register failed: {e}")
         _hb_stop.wait(_HEARTBEAT_INTERVAL)
@@ -183,16 +189,17 @@ def _register_with_coordinator(port: int):
     """
     if idaapi is None:
         return
-    input_file = getattr(idaapi, 'get_input_file_path', lambda: None)()  # type: ignore
-    idb_path = None
-    if hasattr(idaapi, 'get_path'):
+    global _cached_input_file, _cached_idb_path
+    if _cached_input_file is None:
+        _cached_input_file = getattr(idaapi, 'get_input_file_path', lambda: None)()  # type: ignore
+    if _cached_idb_path is None and hasattr(idaapi, 'get_path'):
         try:
-            idb_path = idaapi.get_path(idaapi.PATH_TYPE_IDB)  # type: ignore
+            _cached_idb_path = idaapi.get_path(idaapi.PATH_TYPE_IDB)  # type: ignore
         except Exception:
-            idb_path = None
+            _cached_idb_path = None
     try:
-        registry.init_and_register(port, input_file, idb_path)
-        _info(f"Registered instance at port={port} pid={os.getpid()} input='{input_file}' idb='{idb_path}'")
+        registry.init_and_register(port, _cached_input_file, _cached_idb_path)
+        _info(f"Registered instance at port={port} pid={os.getpid()} input='{_cached_input_file}' idb='{_cached_idb_path}'")
         # 若本实例成为协调器, 追加一条提示日志 (用户需求)
         try:
             if getattr(registry, 'is_coordinator', lambda: False)():  # type: ignore[attr-defined]
