@@ -87,6 +87,55 @@ _server_thread: threading.Thread | None = None
 _uv_server = None  # type: ignore
 _stop_lock = threading.Lock()
 _active_port: int | None = None
+_hb_thread: threading.Thread | None = None
+_hb_stop = threading.Event()
+_last_register_ts: float | None = None
+_REGISTER_INTERVAL = 120  # seconds between forced refresh registrations
+_HEARTBEAT_INTERVAL = 60  # seconds between heartbeat checks
+
+def _heartbeat_loop():
+    """后台心跳: 定期确认协调器仍可访问且本实例记录存在, 否则重新注册。
+
+    触发条件:
+        * 协调器列表为空 (所有实例丢失) -> 重新注册 (可能重建协调器)
+        * 本实例 pid 未出现在 get_instances() 结果中 -> 重新注册
+        * 正常情况下每 _REGISTER_INTERVAL 秒做一次 refresh (覆盖 started 时间, 保持活跃)
+
+    设计考量:
+        * registry 当前无心跳超时机制, 但某些情况下协调器线程可能被系统/异常终止。
+        * 使用轻量轮询, 避免对 IDA 主线程的调用; 仅访问 registry (纯网络/内存操作)。
+        * 若服务器已停止 (_active_port 为空) 则直接退出。
+    """
+    global _last_register_ts
+    pid = os.getpid()
+    while not _hb_stop.is_set():
+        # 若服务已经关闭, 退出
+        if _active_port is None or _uv_server is None:
+            break
+        try:
+            inst_list = registry.get_instances()
+        except Exception:
+            inst_list = []
+        need_register = False
+        now = time.time()
+        if not inst_list:
+            need_register = True
+        else:
+            found = any(e.get('pid') == pid for e in inst_list)
+            if not found:
+                need_register = True
+        if not need_register and _last_register_ts and (now - _last_register_ts) > _REGISTER_INTERVAL:
+            # 周期性 refresh (避免长时间无 register 导致外部误判)
+            need_register = True
+        if need_register and _active_port is not None:
+            try:
+                _register_with_coordinator(_active_port)
+                _last_register_ts = now
+                _info("Heartbeat re-register successful (instance refreshed).")
+            except Exception as e:  # pragma: no cover
+                _warn(f"Heartbeat re-register failed: {e}")
+        _hb_stop.wait(_HEARTBEAT_INTERVAL)
+    _info("Heartbeat thread exit.")
 
 # ---------------- Logging Helpers (INFO/WARN/ERROR) -----------------
 
@@ -192,6 +241,12 @@ def stop_server():
             except Exception as e:  # pragma: no cover
                 _warn(f"Deregister failed: {e}")
         _active_port = None
+        # 停止心跳线程
+        global _hb_thread
+        if _hb_thread and _hb_thread.is_alive():
+            _hb_stop.set()
+            _hb_thread.join(timeout=3)
+        _hb_thread = None
         _info("Server stopped.")
 
 
@@ -286,6 +341,14 @@ def start_server_async(host: str, port: int):
     global _active_port
     _active_port = port
     _register_with_coordinator(port)
+    # 记录注册时间并启动心跳线程
+    global _hb_thread, _last_register_ts
+    _last_register_ts = time.time()
+    if _hb_thread is None or not _hb_thread.is_alive():
+        _hb_stop.clear()
+        _hb_thread = threading.Thread(target=_heartbeat_loop, name="IDA-MCP-Heartbeat", daemon=True)
+        _hb_thread.start()
+        _info("Heartbeat thread started.")
 
 if __name__ == "__main__":
     _info("Standalone mode: starting server.")
