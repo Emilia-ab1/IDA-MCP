@@ -178,9 +178,9 @@ def get_xrefs_to_field(
     res = _call('get_xrefs_to_field', {"struct_name": struct_name, "field_name": field_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set/clear comment: params address(int), comment(str, empty => clear), port(optional). Returns backend { address,old,new,changed } or { error }. Non-repeatable comment.")
+@server.tool(description="Set/clear comment: params address(int|string), comment(str, empty => clear), port(optional). Accepts 0x / decimal / trailing h / underscores. Returns backend { address,old,new,changed } or { error }. Non-repeatable comment.")
 def set_comment(
-    address: Annotated[int, Field(description="Address to set or clear non-repeatable comment")],
+    address: Annotated[int | str, Field(description="Target address (int or string: 0x..., 1234, 401000h, 0x40_10_00)")],
     comment: Annotated[str, Field(description="Comment text; empty string clears (max 1024 chars in backend)")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -422,6 +422,35 @@ def disassemble_function(
     if target is None:
         return {"error": "No instances"}
     res = _call('disassemble_function', {"start_address": start_address}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Linear disassemble: params start_address(int|string), count(1..64), port(optional). start_address accepts 0x / decimal / trailing h / underscores. Returns backend { start_address,count,instructions:[{ ea,bytes,text,comment,is_code,len }],truncated? } or { error }. Works outside functions.")
+def linear_disassemble(
+    start_address: Annotated[int | str, Field(description="Starting linear address (int or string: 0x..., 1234, 401000h)")],
+    count: Annotated[int, Field(description="Max instruction count (1..64)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
+    """线性反汇编转发。
+
+    参数:
+        start_address: 起始线性地址 (可在函数外)。
+        count: 需要的最大指令条数 (1..64)。
+        port: 可选实例端口。
+    返回 (后端原样):
+        { start_address, count, instructions:[ { ea, bytes, text, comment, is_code, len } ... ], truncated? }
+        或 { error }。
+    说明:
+        * 不做本地再解析, 直接转发给后端 IDA 实例。
+        * 如果起点落在一条指令中间, 后端第一条可能 size=0 或 is_code=false。
+    """
+    if start_address is None:
+        return {"error": "invalid start_address"}
+    if count is None:
+        return {"error": "invalid count"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('linear_disassemble', {"start_address": start_address, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="List entry points: param port(optional). Returns backend { total,items:[{ ordinal,ea,name }] } or { error }. Name fallback logic done in backend.")

@@ -98,6 +98,52 @@ def create_mcp_server() -> FastMCP:
     name = os.getenv("IDA_MCP_NAME", "IDA-MCP")
     mcp = FastMCP(name=name, instructions="通过 MCP 工具访问 IDA 反汇编/分析数据。")
 
+    # ------------------------------------------------------------------
+    # 通用地址解析辅助: 允许工具参数接收 int 或字符串形式地址
+    # 支持格式:
+    #   1234                (十进制)
+    #   0x401000 / 0X401000 (十六进制前缀)
+    #   401000h / 401000H   (结尾 h/H 十六进制)
+    #   0x40_10_00          (下划线分隔, 会被剔除)
+    # 返回: (ok: bool, value: int | None, error: str | None)
+    # 说明: 这里不接受负值, 解析失败或越界返回 False。
+    def _parse_address(value):  # type: ignore
+        import string as _s
+        if isinstance(value, int):
+            if value < 0:
+                return False, None, "invalid address"
+            return True, int(value), None
+        if isinstance(value, str):
+            txt = value.strip()
+            if not txt:
+                return False, None, "invalid address"
+            txt = txt.replace('_', '')
+            neg = False
+            if txt.startswith(('+', '-')):
+                if txt[0] == '-':
+                    neg = True
+                txt = txt[1:]
+            try:
+                val = None
+                # trailing h 形式
+                if txt.lower().endswith('h') and len(txt) > 1:
+                    core = txt[:-1]
+                    if all(c in _s.hexdigits for c in core):
+                        val = int(core, 16)
+                    else:
+                        return False, None, "invalid address"
+                else:
+                    # base=0 支持 0x / 0o / 0b
+                    val = int(txt, 0)
+                if neg:
+                    val = -val  # type: ignore
+                if val is None or val < 0:  # type: ignore
+                    return False, None, "invalid address"
+                return True, int(val), None  # type: ignore
+            except Exception:
+                return False, None, "invalid address"
+        return False, None, "invalid address type"
+
     @mcp.tool(description="Health check: no parameters. Returns { ok: bool, count: int }. ok indicates coordinator reachable; count is number of registered instances (may be 0). On failure returns { ok:false, count:0 }.")
     def check_connection() -> dict:  # type: ignore
         if registry is None:
@@ -1171,24 +1217,18 @@ def create_mcp_server() -> FastMCP:
 
         return _run_in_ida(logic)
 
-    @mcp.tool(description="Set/clear non‑repeatable comment: params address(int), comment(str, empty => clear). Returns { address,old,new,changed } or { error }. Non‑repeatable shows in pseudocode. Comment truncated to 1024 chars.")
+    @mcp.tool(description="Set/clear non‑repeatable comment: params address(int|string), comment(str, empty => clear). Accepts 0x / decimal / trailing h / underscores. Returns { address,old,new,changed } or { error }. Non‑repeatable shows in pseudocode. Comment truncated to 1024 chars.")
     def set_comment(
-        address: Annotated[int, Field(description="Target address (instruction or data item)")],
+        address: Annotated[int | str, Field(description="Target address (instruction or data item). Accepts int or string forms: 0x..., 1234, 401000h")],
         comment: Annotated[str, Field(description="Comment text; empty string clears (max 1024 chars)")],
     ) -> dict:  # type: ignore
-        """为指定地址设置(或清除)普通注释。
+        """为指定地址设置(或清除)普通注释 (支持字符串地址形式)。
 
-        参数:
-            address: 目标地址 (指令或数据项)。
-            comment: 注释文本; 为空字符串则表示清除。
-        行为:
-            * 使用 idaapi.get_cmt / set_cmt(ea, text, 0) (非可重复)。
-            * 超过 1024 字符将被截断。
-            * 若地址无效或不在 IDA, 返回错误。
-        返回:
-            { address, old, new, changed: bool } 或 { error }。
-        说明:
-            Hex-Rays 伪代码通常会显示常规 (non-repeatable) 注释, 实现简单统一。
+        地址格式支持:
+            * 十进制: 1234
+            * 0x 前缀十六进制: 0x401000
+            * 结尾 h: 401000h
+            * 可含下划线: 0x40_10_00
         """
         if address is None:
             return {"error": "invalid address"}
@@ -1197,24 +1237,143 @@ def create_mcp_server() -> FastMCP:
         if comment is None:
             return {"error": "comment is None"}
 
+        ok, addr_int, err = _parse_address(address)
+        if not ok or addr_int is None:
+            return {"error": err or "invalid address"}
+
         def logic():
             try:
-                old = idaapi.get_cmt(address, 0)  # type: ignore
+                old = idaapi.get_cmt(addr_int, 0)  # type: ignore
             except Exception:
                 old = None
             new_text = comment.strip()
             if len(new_text) > 1024:
                 new_text = new_text[:1024]
             try:
-                ok = idaapi.set_cmt(address, new_text if new_text else None, 0)  # type: ignore
+                ok2 = idaapi.set_cmt(addr_int, new_text if new_text else None, 0)  # type: ignore
             except Exception as e:
                 return {"error": f"set failed: {e}"}
             return {
-                "address": int(address),
+                "address": int(addr_int),
                 "old": old,
                 "new": new_text if new_text else None,
-                "changed": old != (new_text if new_text else None) and ok,
+                "changed": old != (new_text if new_text else None) and ok2,
             }
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Linear disassemble from arbitrary address: params start_address(int|string), count(1..64). Success: { start_address,count,instructions:[{ ea,bytes,text,is_code,len }], truncated? }. Errors: { error: 'no_segment' | 'decode_failed' | 'no_instructions' | 'invalid start_address' }. Stops early on decode failure or segment end.")
+    def linear_disassemble(
+        start_address: Annotated[int | str, Field(description="Starting address (int or string: 0x..., 1234, 401000h)")],
+        count: Annotated[int, Field(description="Max number of instructions to decode (1..64)")],
+    ) -> dict:  # type: ignore
+        """从任意地址按线性方式反汇编若干条指令 (不要求属于函数)。
+
+        参数:
+            start_address: 起始线性地址 (必须在已映射段内)。
+            count: 反汇编指令最大条数 (1..64)。
+        返回:
+            { start_address, count, instructions: [ { ea, bytes, text, is_code, len } ... ], truncated? }
+            或 { error }。
+        行为/说明:
+            * 不借助 ida_funcs 边界; 逐条 decode_insn, 前进 insn.size 字节。
+            * 第一条即无法定位到段 -> 返回 { error: 'no_segment' }。
+            * 第一条 decode_insn 失败 -> 返回 { error: 'decode_failed' }。
+            * bytes 最多 16 字节展示 (超过截断)。
+            * 不收集注释; 仅返回最小必要指令信息。
+            * 若过程中某条 decode 失败 (size=0) 且已有至少 1 条, 终止并返回已收集 (视为成功)。
+            * 若最终收集 0 条 -> 返回 { error: 'no_instructions' }。
+        """
+        if start_address is None:
+            return {"error": "invalid start_address"}
+        if count < 1 or count > 64:
+            return {"error": "count out of range (1..64)"}
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+
+        ok, addr_int, err = _parse_address(start_address)
+        if not ok or addr_int is None:
+            return {"error": err or "invalid start_address"}
+        if addr_int < 0:
+            return {"error": "invalid start_address"}
+
+        def logic():
+            ea = int(addr_int)
+            # 首先确认段存在
+            try:
+                if hasattr(idaapi, 'getseg') and not idaapi.getseg(ea):  # type: ignore
+                    return {'error': 'no_segment'}
+            except Exception:
+                # 若 getseg 本身异常, 继续尝试 decode (容忍老版本)
+                pass
+            collected: list[dict] = []
+            for _ in range(count):
+                try:
+                    insn = idaapi.insn_t()  # type: ignore
+                    size = 0
+                    try:
+                        if idaapi.decode_insn(insn, ea):  # type: ignore
+                            size = insn.size  # type: ignore
+                    except Exception:
+                        size = 0
+                    if size <= 0:
+                        # 第一条失败 -> 报错
+                        if not collected:
+                            return {'error': 'decode_failed'}
+                        # 后续某条失败 -> 结束, 视为成功
+                        break
+                    # 读取 flags 判定 is_code
+                    is_code = False
+                    try:
+                        flags = idaapi.get_full_flags(ea)  # type: ignore
+                        is_code = bool(idaapi.is_code(flags))  # type: ignore
+                    except Exception:
+                        pass
+                    # 指令文本
+                    text = None
+                    try:
+                        if ida_lines and hasattr(ida_lines, 'generate_disassembly_line'):  # type: ignore
+                            text = ida_lines.generate_disassembly_line(ea, 0)  # type: ignore
+                        if not text:
+                            text = idaapi.generate_disasm_line(ea, 0)  # type: ignore
+                    except Exception:
+                        text = None
+                    if text is None:
+                        text = '?'
+                    # bytes
+                    b_hex = None
+                    if ida_bytes:  # type: ignore
+                        try:
+                            raw = ida_bytes.get_bytes(ea, size)  # type: ignore
+                            if raw:
+                                b_hex = raw.hex().upper()
+                                if len(b_hex) > 32:
+                                    b_hex = b_hex[:32] + '...'
+                        except Exception:
+                            b_hex = None
+                    collected.append({
+                        'ea': int(ea),
+                        'bytes': b_hex,
+                        'text': text,
+                        'is_code': is_code,
+                        'len': size,
+                    })
+                    ea += size
+                except Exception:
+                    # 意外异常: 若尚无指令 -> decode 失败; 否则结束
+                    if not collected:
+                        return {'error': 'decode_failed'}
+                    break
+            if not collected:
+                return {'error': 'no_instructions'}
+            result: dict = {
+                'start_address': int(addr_int),
+                'count': count,
+                'instructions': collected,
+            }
+            if len(collected) >= count:
+                result['truncated'] = True
+            return result
 
         return _run_in_ida(logic)
 
