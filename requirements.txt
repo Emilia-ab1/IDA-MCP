@@ -1,1 +1,2 @@
 fastmcp==2.11.3
+capstone==5.0.6

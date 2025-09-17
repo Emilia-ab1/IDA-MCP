@@ -185,3 +185,13 @@ cursor 直接在模型工具导入即可。
 ```bash
 python -m pip install -r requirements.txt
 ```
+
+## 后续计划
+
+增加UI界面，支持内部调用模型，等langchain正式更新到1.0.0后添加多agent A2A自动化逆向功能。
+
+## 开源声明
+
+本项目遵循 GPLv3 许可证开源，详见 LICENSE 文件。
+
+本项目修改了 [ROPgadget](https://github.com/JonathanSalwan/ROPgadget) 的核心代码作为 find_gadget 搜索工具的基础。
