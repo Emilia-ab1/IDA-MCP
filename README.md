@@ -155,7 +155,7 @@ claude 直接在安装目录里面的 `claude_desktop_config.json` 文件中添�
 
 cherry studio 支持快速创建 mcp 工具，直接从 json 导入，然后粘贴上述配置示例。
 
-cursor 直接在模型工具导入即可（不推荐使用cursor）。
+cursor 直接在模型工具导入即可。
 
 **vscode mcp 配置示例：**
 
@@ -183,3 +183,4 @@ cursor 直接在模型工具导入即可（不推荐使用cursor）。
 ```bash
 python -m pip install -r requirements.txt
 ```
+
