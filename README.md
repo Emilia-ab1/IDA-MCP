@@ -46,7 +46,7 @@
 * `declare_c_type(c_declaration)` – 解析并声明/更新一个本地类型 (struct/union/enum/typedef)
 * `get_entry_points()` – 获取所有入口点 (ordinal + 地址 + 名称)
 * `get_metadata` - 获取指定或当前实例基础元数据（hash/arch/bits 等）
-* `linear_disassemble(start_address, size)` - 从指定地址线性反汇编指定字节数
+* `linear_disassemble(start_address, size)` - 从指定地址线性反汇编size个指令
 
 #### dbg-tools (server)
 
@@ -185,3 +185,4 @@ cursor 直接在模型工具导入即可。
 ```bash
 python -m pip install -r requirements.txt
 ```
+
