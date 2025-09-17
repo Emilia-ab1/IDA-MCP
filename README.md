@@ -183,4 +183,3 @@ cursor 直接在模型工具导入即可。
 ```bash
 python -m pip install -r requirements.txt
 ```
-

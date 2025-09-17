@@ -89,8 +89,9 @@ _stop_lock = threading.Lock()                   # 防止 stop_server 并发重�
 _active_port: int | None = None                 # 当前实例实际监听的 MCP 端口 (启动后写入, 停止时清空)
 _hb_thread: threading.Thread | None = None      # 心跳/保活线程对象 (负责检测协调器状态与定期刷新注册)
 _hb_stop = threading.Event()                    # 心跳线程停止信号 (stop_server 中置位)
-_last_register_ts: float | None = None          # 最近一次成功调用 registry.init_and_register 的时间戳 (epoch 秒)
-_REGISTER_INTERVAL = 300                        # 即使一切正常, 超过该间隔也会强制 refresh 注册
+_last_register_ts: float | None = None          # 最近一次成功调用 registry.init_and_register 的时间戳 (仅在缺失后重注册时更新)
+_ENABLE_PERIODIC_REFRESH = False                # 设为 True 才会启用“超时周期刷新”逻辑，默认只在缺失时重注册
+_REGISTER_INTERVAL = 300                        # (可选) 原本用于周期 refresh 的阈值; 默认禁用
 _HEARTBEAT_INTERVAL = 60                        # 心跳循环唤醒/巡检间隔
 _cached_input_file: str | None = None           # 缓存的输入二进制路径 (仅主线程初始化; 心跳线程避免直接调用 IDA API)
 _cached_idb_path: str | None = None             # 缓存的 IDB 路径 (同上, 避免后台线程访问 IDA C 接口)
@@ -126,16 +127,17 @@ def _heartbeat_loop():
             found = any(e.get('pid') == pid for e in inst_list)
             if not found:
                 need_register = True
-        if not need_register and _last_register_ts and (now - _last_register_ts) > _REGISTER_INTERVAL:
-            # 周期性 refresh (避免长时间无 register 导致外部误判)
-            need_register = True
+        # 不再默认进行“时间驱动的强制 refresh”，仅在实例缺失或协调器重建时重注册。
+        if (not need_register and _ENABLE_PERIODIC_REFRESH and _last_register_ts
+                and (now - _last_register_ts) > _REGISTER_INTERVAL):
+            need_register = True  # 可选：用户显式启用时恢复旧逻辑
         if need_register and _active_port is not None:
             try:
                 # 仅用缓存的路径/文件, 避免后台线程再触碰 IDA API
                 registry.init_and_register(_active_port, _cached_input_file, _cached_idb_path)
                 _last_register_ts = now
                 if inst_list:
-                    _info("Heartbeat refresh registration done.")
+                    _info("Heartbeat re-register (periodic refresh) done.") if _ENABLE_PERIODIC_REFRESH else None
                 else:
                     _info("Heartbeat re-register successful (coordinator rebuilt or entry missing).")
             except Exception as e:  # pragma: no cover
