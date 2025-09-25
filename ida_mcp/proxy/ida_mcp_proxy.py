@@ -101,18 +101,18 @@ def _call(tool: str, params: dict | None = None, port: int | None = None) -> Any
 
 server = FastMCP(name="IDA-MCP-Proxy", instructions="Coordinator-based proxy forwarding tool calls via /call endpoint.")
 
-@server.tool(description="Health check: no params. Queries coordinator /instances. Returns { ok:bool, count:int }. ok=true only if list retrieval succeeded (count may be 0).")
+@server.tool(description="Health check: no params. Queries coordinator /instances. Returns { ok:bool, count:int }. ok=true only if list retrieval succeeded (count may be 0). When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def check_connection() -> dict:  # type: ignore
     data = _http_get('/instances')
     if not isinstance(data, list):
         return {"ok": False, "count": 0}
     return {"ok": bool(data), "count": len(data)}
 
-@server.tool(description="List all registered backend instances (raw). No params. Returns array of instance dicts as provided by coordinator: [{ id,name,port,started,last_seen,meta?... }]. Empty array if none or fetch failed.")
+@server.tool(description="List all registered backend instances (raw). No params. Returns array of instance dicts as provided by coordinator: [{ id,name,port,started,last_seen,meta?... }]. Empty array if none or fetch failed. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_instances() -> list[dict]:  # type: ignore
     return _instances()
 
-@server.tool(description="Select default target instance. Param port(optional int). If omitted auto-picks: prefer 8765 else earliest started. Returns { selected_port } or { error }. Subsequent calls without explicit port use this.")
+@server.tool(description="Select default target instance. Param port(optional int). If omitted auto-picks: prefer 8765 else earliest started. Returns { selected_port } or { error }. Subsequent calls without explicit port use this. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def select_instance(
     port: Annotated[int | None, Field(description="Target instance port to select; if omitted auto-picks preferred (8765 or earliest)")] = None
 ) -> dict:  # type: ignore
@@ -126,7 +126,7 @@ def select_instance(
     _current_port = port
     return {"selected_port": port}
 
-@server.tool(description="List functions. No params. Forwards to selected instance list_functions; auto-selects instance if none chosen. Returns underlying tool data or { error } if no instances.")
+@server.tool(description="List functions. No params. Forwards to selected instance list_functions; auto-selects instance if none chosen. Returns underlying tool data or { error } if no instances. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_functions() -> Any:  # type: ignore
     p = _ensure_port()
     if p is None:
@@ -134,7 +134,7 @@ def list_functions() -> Any:  # type: ignore
     res = _call('list_functions', {}, port=p)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get IDB metadata. Param port(optional) overrides current selection. Returns underlying get_metadata dict { input_file,arch,bits,hash,... } or { error }. Auto-selects instance if needed.")
+@server.tool(description="Get IDB metadata. Param port(optional) overrides current selection. Returns underlying get_metadata dict { input_file,arch,bits,hash,... } or { error }. Auto-selects instance if needed. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_metadata(
     port: Annotated[int | None, Field(description="Override target instance port; defaults to selected/auto-chosen")]= None
 ) -> Any:  # type: ignore
@@ -151,7 +151,7 @@ def get_metadata(
     res = _call('get_metadata', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Incoming xrefs: params address(int), port(optional). Returns underlying { address,total,xrefs } or { error }. Passes address through unchanged.")
+@server.tool(description="Incoming xrefs: params address(int), port(optional). Returns underlying { address,total,xrefs } or { error }. Passes address through unchanged. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_xrefs_to(
     address: Annotated[int, Field(description="Target address inside backend IDB")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -164,7 +164,7 @@ def get_xrefs_to(
     res = _call('get_xrefs_to', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Heuristic struct field refs: params struct_name, field_name, port(optional). Returns underlying { struct,field,offset,matches,... } or { error }. Same limitations as backend (heuristic, truncated at 500).")
+@server.tool(description="Heuristic struct field refs: params struct_name, field_name, port(optional). Returns underlying { struct,field,offset,matches,... } or { error }. Same limitations as backend (heuristic, truncated at 500). When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_xrefs_to_field(
     struct_name: Annotated[str, Field(description="Struct name (as defined in Local Types)")],
     field_name: Annotated[str, Field(description="Exact field name within the struct")],
@@ -178,7 +178,7 @@ def get_xrefs_to_field(
     res = _call('get_xrefs_to_field', {"struct_name": struct_name, "field_name": field_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set/clear comment: params address(int|string), comment(str, empty => clear), port(optional). Accepts 0x / decimal / trailing h / underscores. Returns backend { address,old,new,changed } or { error }. Non-repeatable comment.")
+@server.tool(description="Set/clear comment: params address(int|string), comment(str, empty => clear), port(optional). Accepts 0x / decimal / trailing h / underscores. Returns backend { address,old,new,changed } or { error }. Non-repeatable comment. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def set_comment(
     address: Annotated[int | str, Field(description="Target address (int or string: 0x..., 1234, 401000h, 0x40_10_00)")],
     comment: Annotated[str, Field(description="Comment text; empty string clears (max 1024 chars in backend)")],
@@ -194,7 +194,7 @@ def set_comment(
     res = _call('set_comment', {"address": address, "comment": comment}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename local variable (Hex-Rays): params function_address, old_name, new_name, port(optional). Returns backend { function,start_ea,old_name,new_name,changed } or { error }. Auto-select instance.")
+@server.tool(description="Rename local variable (Hex-Rays): params function_address, old_name, new_name, port(optional). Returns backend { function,start_ea,old_name,new_name,changed } or { error }. Auto-select instance. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def rename_local_variable(
     function_address: Annotated[int, Field(description="Function start or any internal address")],
     old_name: Annotated[str, Field(description="Existing local variable name (exact match)")],
@@ -213,7 +213,7 @@ def rename_local_variable(
     res = _call('rename_local_variable', {"function_address": function_address, "old_name": old_name, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename global variable: params old_name,new_name, port(optional). Returns backend { ea,old_name,new_name,changed } or { error }. Rejects function starts.")
+@server.tool(description="Rename global variable: params old_name,new_name, port(optional). Returns backend { ea,old_name,new_name,changed } or { error }. Rejects function starts. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def rename_global_variable(
     old_name: Annotated[str, Field(description="Existing global symbol name")],
     new_name: Annotated[str, Field(description="New symbol name (valid C identifier)")],
@@ -229,7 +229,7 @@ def rename_global_variable(
     res = _call('rename_global_variable', {"old_name": old_name, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Rename function: params function_address(start or inside), new_name, port(optional). Returns backend { start_ea,old_name,new_name,changed } or { error }.")
+@server.tool(description="Rename function: params function_address(start or inside), new_name, port(optional). Returns backend { start_ea,old_name,new_name,changed } or { error }. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def rename_function(
     function_address: Annotated[int, Field(description="Function start or internal address")],
     new_name: Annotated[str, Field(description="New function name (valid C identifier)")],
@@ -245,7 +245,7 @@ def rename_function(
     res = _call('rename_function', {"function_address": function_address, "new_name": new_name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set function prototype: params function_address, prototype(C decl), port(optional). Returns backend { start_ea,applied,old_type,new_type,parsed_name? } or { error }.")
+@server.tool(description="Set function prototype: params function_address, prototype(C decl), port(optional). Returns backend { start_ea,applied,old_type,new_type,parsed_name? } or { error }. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def set_function_prototype(
     function_address: Annotated[int, Field(description="Function start or internal address")],
     prototype: Annotated[str, Field(description="Full C function declaration text")],
@@ -261,7 +261,7 @@ def set_function_prototype(
     res = _call('set_function_prototype', {"function_address": function_address, "prototype": prototype}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set local variable type (Hex-Rays): params function_address, variable_name, new_type(C fragment), port(optional). Returns backend { function,start_ea,variable_name,old_type,new_type,applied } or { error }.")
+@server.tool(description="Set local variable type (Hex-Rays): params function_address, variable_name, new_type(C fragment), port(optional). Returns backend { function,start_ea,variable_name,old_type,new_type,applied } or { error }. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def set_local_variable_type(
     function_address: Annotated[int, Field(description="Function start or internal address")],
     variable_name: Annotated[str, Field(description="Local variable name (exact match)")],
@@ -280,7 +280,7 @@ def set_local_variable_type(
     res = _call('set_local_variable_type', {"function_address": function_address, "variable_name": variable_name, "new_type": new_type}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get function by name: params name(str), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Exact case-sensitive match.")
+@server.tool(description="Get function by name: params name(str), port(optional). Returns backend { name,start_ea,end_ea } or { error }. Exact case-sensitive match. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_function_by_name(
     name: Annotated[str, Field(description="Exact function name (case-sensitive)")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -293,7 +293,7 @@ def get_function_by_name(
     res = _call('get_function_by_name', {"name": name}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Formats: 1234, 0x401000, 401000h, 0x40_10_00 (underscores). param port(optional). Forwards to backend get_function_by_address. Returns backend { name,start_ea,end_ea,input,address } or { error }. Inside-function addresses allowed. Parse/validation occurs in backend; proxy just forwards raw value.")
+@server.tool(description="Get function by address: param address accepts INT or STRING (decimal or hex). Formats: 1234, 0x401000, 401000h, 0x40_10_00 (underscores). param port(optional). Forwards to backend get_function_by_address. Returns backend { name,start_ea,end_ea,input,address } or { error }. Inside-function addresses allowed. Parse/validation occurs in backend; proxy just forwards raw value. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_function_by_address(
     address: Annotated[int | str, Field(description="Function start or internal address (int or string: decimal/0x.../....h)")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -306,7 +306,7 @@ def get_function_by_address(
     res = _call('get_function_by_address', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get current cursor address: param port(optional). Returns backend { address } or { error }. Depends on GUI focus in target instance.")
+@server.tool(description="Get current cursor address: param port(optional). Returns backend { address } or { error }. Depends on GUI focus in target instance. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_current_address(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -316,7 +316,7 @@ def get_current_address(
     res = _call('get_current_address', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Get current function at cursor: param port(optional). Returns backend { name,start_ea,end_ea } or { error }. Uses screen EA in target instance.")
+@server.tool(description="Get current function at cursor: param port(optional). Returns backend { name,start_ea,end_ea } or { error }. Uses screen EA in target instance. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_current_function(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -326,7 +326,7 @@ def get_current_function(
     res = _call('get_current_function', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Convert number representations: params text(str), size(8|16|32|64), port(optional). Returns backend multi-format dict or { error }. Supports 0x / 0b / trailing h / underscores / sign.")
+@server.tool(description="Convert number representations: params text(str), size(8|16|32|64), port(optional). Returns backend multi-format dict or { error }. Supports 0x / 0b / trailing h / underscores / sign. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def convert_number(
     text: Annotated[str, Field(description="Numeric text to parse (decimal, 0x, 0b, trailing h, underscores, sign)")],
     size: Annotated[int, Field(description="Bit width: 8|16|32|64")],
@@ -338,7 +338,7 @@ def convert_number(
     res = _call('convert_number', {"text": text, "size": size}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List global symbols (filtered): params offset>=0, count(1..1000), filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Skips function starts.")
+@server.tool(description="List global symbols (filtered): params offset>=0, count(1..1000), filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Skips function starts. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_globals_filter(
     offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
     count: Annotated[int, Field(description="Number of items to return (1..1000)")],
@@ -351,7 +351,7 @@ def list_globals_filter(
     res = _call('list_globals_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List global symbols: params offset,count, port(optional). Returns backend { total,offset,count,items }. Unfiltered.")
+@server.tool(description="List global symbols: params offset,count, port(optional). Returns backend { total,offset,count,items }. Unfiltered. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_globals(
     offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
     count: Annotated[int, Field(description="Number of items to return (1..1000)")],
@@ -363,7 +363,7 @@ def list_globals(
     res = _call('list_globals', {"offset": offset, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List strings (filtered): params offset,count, filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Auto-inits Strings.")
+@server.tool(description="List strings (filtered): params offset,count, filter(optional substring), port(optional). Returns backend { total,offset,count,items }. Auto-inits Strings. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_strings_filter(
     offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
     count: Annotated[int, Field(description="Number of items to return (1..1000)")],
@@ -376,7 +376,7 @@ def list_strings_filter(
     res = _call('list_strings_filter', {"offset": offset, "count": count, "filter": filter}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List strings: params offset,count, port(optional). Returns backend { total,offset,count,items }. No filtering.")
+@server.tool(description="List strings: params offset,count, port(optional). Returns backend { total,offset,count,items }. No filtering. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_strings(
     offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
     count: Annotated[int, Field(description="Number of items to return (1..1000)")],
@@ -388,7 +388,7 @@ def list_strings(
     res = _call('list_strings', {"offset": offset, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List local types: param port(optional). Returns backend { total,items:[{ ordinal,name,decl }] }. decl truncated per backend logic.")
+@server.tool(description="List local types: param port(optional). Returns backend { total,items:[{ ordinal,name,decl }] }. decl truncated per backend logic. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_local_types(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -398,7 +398,7 @@ def list_local_types(
     res = _call('list_local_types', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Decompile function (Hex-Rays): params address(int), port(optional). Returns backend { name,start_ea,end_ea,address,decompiled } or { error }. Large text untruncated.")
+@server.tool(description="Decompile function (Hex-Rays): params address(int), port(optional). Returns backend { name,start_ea,end_ea,address,decompiled } or { error }. Large text untruncated. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def decompile_function(
     address: Annotated[int, Field(description="Function start or internal address to decompile")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -411,7 +411,7 @@ def decompile_function(
     res = _call('decompile_function', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Disassemble function: params start_address(int), port(optional). Returns backend { name,start_ea,end_ea,instructions:[...]} or { error }. Bytes truncated after 16 bytes.")
+@server.tool(description="Disassemble function: params start_address(int), port(optional). Returns backend { name,start_ea,end_ea,instructions:[...]} or { error }. Bytes truncated after 16 bytes. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def disassemble_function(
     start_address: Annotated[int, Field(description="Function start (internal address allowed)")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -424,7 +424,7 @@ def disassemble_function(
     res = _call('disassemble_function', {"start_address": start_address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Linear disassemble: params start_address(int|string), count(1..64), port(optional). start_address accepts 0x / decimal / trailing h / underscores. Returns backend { start_address,count,instructions:[{ ea,bytes,text,comment,is_code,len }],truncated? } or { error }. Works outside functions.")
+@server.tool(description="Linear disassemble: params start_address(int|string), count(1..64), port(optional). start_address accepts 0x / decimal / trailing h / underscores. Returns backend { start_address,count,instructions:[{ ea,bytes,text,comment,is_code,len }],truncated? } or { error }. Works outside functions. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def linear_disassemble(
     start_address: Annotated[int | str, Field(description="Starting linear address (int or string: 0x..., 1234, 401000h)")],
     count: Annotated[int, Field(description="Max instruction count (1..64)")],
@@ -453,7 +453,7 @@ def linear_disassemble(
     res = _call('linear_disassemble', {"start_address": start_address, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List entry points: param port(optional). Returns backend { total,items:[{ ordinal,ea,name }] } or { error }. Name fallback logic done in backend.")
+@server.tool(description="List entry points: param port(optional). Returns backend { total,items:[{ ordinal,ea,name }] } or { error }. Name fallback logic done in backend. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def get_entry_points(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -463,7 +463,7 @@ def get_entry_points(
     res = _call('get_entry_points', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set global variable type: params variable_name,new_type(C fragment), port(optional). Returns backend { ea,variable_name,old_type,new_type,applied } or { error }. Rejects function starts.")
+@server.tool(description="Set global variable type: params variable_name,new_type(C fragment), port(optional). Returns backend { ea,variable_name,old_type,new_type,applied } or { error }. Rejects function starts. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def set_global_variable_type(
     variable_name: Annotated[str, Field(description="Existing global variable name (not a function start)")],
     new_type: Annotated[str, Field(description="C type fragment (e.g. int, char *, MyStruct)")],
@@ -479,7 +479,7 @@ def set_global_variable_type(
     res = _call('set_global_variable_type', {"variable_name": variable_name, "new_type": new_type}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Declare/update local type: params c_declaration(single struct/union/enum/typedef), port(optional). Returns backend { name,kind,replaced,success } or { error }. Replaces existing by name.")
+@server.tool(description="Declare/update local type: params c_declaration(single struct/union/enum/typedef), port(optional). Returns backend { name,kind,replaced,success } or { error }. Replaces existing by name. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def declare_c_type(
     c_declaration: Annotated[str, Field(description="Single struct/union/enum/typedef declaration text")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -492,7 +492,7 @@ def declare_c_type(
     res = _call('declare_c_type', {"c_declaration": c_declaration}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Debugger registers: param port(optional). Returns backend { ok,registers:[{ name,value,int? }],note? } or { error }. ok=false if debugger inactive.")
+@server.tool(description="Debugger registers: param port(optional). Returns backend { ok,registers:[{ name,value,int? }],note? } or { error }. ok=false if debugger inactive. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_get_registers(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -502,7 +502,7 @@ def dbg_get_registers(
     res = _call('dbg_get_registers', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Debugger call stack: param port(optional). Returns backend { ok,frames:[{ index,ea,func }],note? } or { error }. Inactive => ok=false.")
+@server.tool(description="Debugger call stack: param port(optional). Returns backend { ok,frames:[{ index,ea,func }],note? } or { error }. Inactive => ok=false. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_get_call_stack(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -512,7 +512,7 @@ def dbg_get_call_stack(
     res = _call('dbg_get_call_stack', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="List breakpoints: param port(optional). Returns backend { ok,total,breakpoints:[...] } or { error }. ok=false if debugger inactive.")
+@server.tool(description="List breakpoints: param port(optional). Returns backend { ok,total,breakpoints:[...] } or { error }. ok=false if debugger inactive. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_list_breakpoints(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -522,7 +522,7 @@ def dbg_list_breakpoints(
     res = _call('dbg_list_breakpoints', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Start debugger: param port(optional). Returns backend { ok,started,pid?,note? } or { error }. If already running started=false with note.")
+@server.tool(description="Start debugger: param port(optional). Returns backend { ok,started,pid?,note? } or { error }. If already running started=false with note. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_start_process(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -532,7 +532,7 @@ def dbg_start_process(
     res = _call('dbg_start_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Terminate debug process: param port(optional). Returns backend { ok,exited,note? } or { error }. Inactive => ok:false,exited:false.")
+@server.tool(description="Terminate debug process: param port(optional). Returns backend { ok,exited,note? } or { error }. Inactive => ok:false,exited:false. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_exit_process(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -542,7 +542,7 @@ def dbg_exit_process(
     res = _call('dbg_exit_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Continue execution: param port(optional). Returns backend { ok,continued,note? } or { error }. Inactive => ok:false.")
+@server.tool(description="Continue execution: param port(optional). Returns backend { ok,continued,note? } or { error }. Inactive => ok:false. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_continue_process(
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
 ) -> Any:  # type: ignore
@@ -552,7 +552,7 @@ def dbg_continue_process(
     res = _call('dbg_continue_process', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Run to address: params address,int port(optional). Returns backend { ok,requested,continued,used_temp_bpt,note? } or { error }. Non-blocking.")
+@server.tool(description="Run to address: params address,int port(optional). Returns backend { ok,requested,continued,used_temp_bpt,note? } or { error }. Non-blocking. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_run_to(
     address: Annotated[int, Field(description="Target address to run to")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -565,7 +565,7 @@ def dbg_run_to(
     res = _call('dbg_run_to', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Set breakpoint: params address,int port(optional). Returns backend { ok,ea,existed,added,note? } or { error }. Can be used pre-debugger.")
+@server.tool(description="Set breakpoint: params address,int port(optional). Returns backend { ok,ea,existed,added,note? } or { error }. Can be used pre-debugger. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_set_breakpoint(
     address: Annotated[int, Field(description="Address where breakpoint should be set")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -578,7 +578,7 @@ def dbg_set_breakpoint(
     res = _call('dbg_set_breakpoint', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Delete breakpoint: params address,int port(optional). Idempotent. Returns backend { ok,ea,existed,deleted,note? } or { error }.")
+@server.tool(description="Delete breakpoint: params address,int port(optional). Idempotent. Returns backend { ok,ea,existed,deleted,note? } or { error }. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_delete_breakpoint(
     address: Annotated[int, Field(description="Address of breakpoint to delete")],
     port: Annotated[int | None, Field(description="Optional instance port override")]= None
@@ -591,7 +591,7 @@ def dbg_delete_breakpoint(
     res = _call('dbg_delete_breakpoint', {"address": address}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
-@server.tool(description="Enable/disable breakpoint: params address,int enable(bool), port(optional). Enabling creates if missing. Returns backend { ok,ea,existed,enabled,changed,note? } or { error }.")
+@server.tool(description="Enable/disable breakpoint: params address,int enable(bool), port(optional). Enabling creates if missing. Returns backend { ok,ea,existed,enabled,changed,note? } or { error }. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def dbg_enable_breakpoint(
     address: Annotated[int, Field(description="Breakpoint address")],
     enable: Annotated[bool, Field(description="True = enable (creates if missing), False = disable")],
