@@ -161,6 +161,9 @@ For cursor, simply import via model tools.
 
 **vscode mcp configuration example:**
 
+⚠️Note:
+Using vscode coploit may result in your account being banned.
+
 ```json
 {
   "servers": {
@@ -191,3 +194,4 @@ python -m pip install -r requirements.txt
 ## Future Plans
 
 Add UI interface, support internal model calls, add multi-agent A2A automated reverse engineering functionality after langchain officially updates to 1.0.0.
+
