@@ -314,17 +314,62 @@ def create_mcp_server() -> FastMCP:
         return _run_in_ida(logic)
 
 
-    @mcp.tool(description="List all functions. No params. Returns [ { name, start_ea, end_ea } ]. Iterates idautils.Functions; no pagination (caller truncates if needed).")
-    def list_functions() -> List[FunctionItem]:  # type: ignore
+    @mcp.tool(description="List functions with pagination: params offset>=0, count(1..1000). Returns { total,offset,count,items:[{ name,start_ea,end_ea }] }. Iterates idautils.Functions with pagination support.")
+    def list_functions(
+        offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+        count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    ) -> dict:  # type: ignore
+        """分页列出所有函数。
+
+        参数:
+            offset: 起始偏移 (>=0)。
+            count: 返回数量 (1..1000)。
+        返回:
+            {
+              total: 函数总数,
+              offset: 请求的 offset,
+              count: 实际返回数量,
+              items: [ { name, start_ea, end_ea } ... ]
+            } 或 { error: "..." }
+        """
+        if offset < 0:
+            return {"error": "offset < 0"}
+        if count <= 0:
+            return {"error": "count must be > 0"}
+        if count > 1000:
+            return {"error": "count too large (max 1000)"}
+
+        if not HAVE_IDA:
+            return {"total": 0, "offset": offset, "count": 0, "items": [], "note": "not in IDA"}
+
         def logic():
-            out: list[FunctionItem] = []
-            for ea in idautils.Functions():  # type: ignore
-                f = ida_funcs.get_func(ea)  # type: ignore
-                if not f:
-                    continue
-                name = idaapi.get_func_name(ea)  # type: ignore
-                out.append(FunctionItem(name=name, start_ea=int(f.start_ea), end_ea=int(f.end_ea)))
-            return out
+            functions: list[dict] = []
+            try:
+                for ea in idautils.Functions():  # type: ignore
+                    f = ida_funcs.get_func(ea)  # type: ignore
+                    if not f:
+                        continue
+                    name = idaapi.get_func_name(ea)  # type: ignore
+                    functions.append({
+                        "name": name,
+                        "start_ea": int(f.start_ea),
+                        "end_ea": int(f.end_ea)
+                    })
+            except Exception:
+                # 即使部分迭代失败也尽量返回已收集数据
+                pass
+            
+            # 按起始地址升序排序
+            functions.sort(key=lambda x: x['start_ea'])
+            total = len(functions)
+            slice_items = functions[offset: offset + count]
+            
+            return {
+                "total": total,
+                "offset": offset,
+                "count": len(slice_items),
+                "items": slice_items,
+            }
 
         return _run_in_ida(logic)
 
@@ -428,75 +473,6 @@ def create_mcp_server() -> FastMCP:
                 "end_ea": int(f.end_ea),
                 "input": original_input,
                 "address": ea_int,
-            }
-
-        return _run_in_ida(logic)
-
-    @mcp.tool(description="Get current caret address: no params. Returns { address } or { error }. Uses get_screen_ea; invalid view focus yields error.")
-    def get_current_address() -> dict:  # type: ignore
-        """获取当前 IDA 界面上光标所在(或选中)的地址。
-
-        返回:
-            { address: int } 若成功;
-            { error: "..." } 若未处于 IDA 或无法获取。
-        说明:
-            使用 ida_kernwin.get_screen_ea() / idaapi.get_screen_ea() (兼容不同版本)。
-        """
-        if not HAVE_IDA:
-            return {"error": "not in IDA"}
-        def logic():
-            ea = None
-            try:
-                if hasattr(ida_kernwin, 'get_screen_ea'):
-                    ea = ida_kernwin.get_screen_ea()  # type: ignore
-                elif hasattr(idaapi, 'get_screen_ea'):
-                    ea = idaapi.get_screen_ea()  # type: ignore
-            except Exception:
-                ea = None
-            if ea is None or int(ea) == idaapi.BADADDR:  # type: ignore
-                return {"error": "no valid address"}
-            return {"address": int(ea)}
-        return _run_in_ida(logic)
-
-    @mcp.tool(description="Get function at caret: no params. If caret inside a function returns { name,start_ea,end_ea }; else { error }. Provides quick context discovery.")
-    def get_current_function() -> dict:  # type: ignore
-        """获取当前光标所在地址所属的函数信息。
-
-        返回:
-            { name, start_ea, end_ea } 若当前地址位于某个函数内;
-            { error: "no function" } 若不在任何函数中;
-            { error: "no valid address" } 若无法获取当前地址。
-        说明:
-            先获取 screen_ea, 再通过 ida_funcs.get_func(address) 判断所属函数。
-        """
-        if not HAVE_IDA:
-            return {"error": "not in IDA"}
-
-        def logic():
-            ea = None
-            try:
-                if hasattr(ida_kernwin, 'get_screen_ea'):
-                    ea = ida_kernwin.get_screen_ea()  # type: ignore
-                elif hasattr(idaapi, 'get_screen_ea'):
-                    ea = idaapi.get_screen_ea()  # type: ignore
-            except Exception:
-                ea = None
-            if ea is None or int(ea) == idaapi.BADADDR:  # type: ignore
-                return {"error": "no valid address"}
-            try:
-                f = ida_funcs.get_func(ea)  # type: ignore
-            except Exception:
-                f = None
-            if not f:
-                return {"error": "no function"}
-            try:
-                name = idaapi.get_func_name(f.start_ea)  # type: ignore
-            except Exception:
-                name = "?"
-            return {
-                "name": name,
-                "start_ea": int(f.start_ea),
-                "end_ea": int(f.end_ea),
             }
 
         return _run_in_ida(logic)
@@ -2795,7 +2771,6 @@ def create_mcp_server() -> FastMCP:
                     if flags2 is not None and hasattr(ida_dbg, 'BPT_ENABLED'):
                         enabled_now = bool(flags2 & ida_dbg.BPT_ENABLED)  # type: ignore
                     else:
-                        # 如果无法获得, 依赖 desire 近似
                         enabled_now = desire
                 except Exception:
                     enabled_now = desire
@@ -2812,6 +2787,218 @@ def create_mcp_server() -> FastMCP:
             if notes:
                 result['note'] = '; '.join(notes)[:300]
             return result
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Step into instruction: no params. Single-step execution entering function calls. Returns { ok,stepped,note? } or { error }. Inactive debugger => ok:false. Non-blocking.")
+    def dbg_step_into() -> dict:  # type: ignore
+        """单步进入指令执行。
+
+        行为:
+            * 若调试器未激活: 返回 ok=False, note。
+            * 调用 ida_dbg.step_into() 执行单步进入。
+            * 进入函数调用内部执行。
+        返回:
+            { ok: bool, stepped: bool, note? } 或 { error }。
+        限制:
+            * 不等待执行结果; 仅发出步进请求。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "stepped": False, "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            
+            # Attempt step into
+            step_ok = False
+            errors: list[str] = []
+            tried = False
+            
+            try:
+                if hasattr(ida_dbg, 'step_into'):  # type: ignore
+                    tried = True
+                    step_ok = bool(ida_dbg.step_into())  # type: ignore
+            except Exception as e:
+                errors.append(f"step_into: {e}")
+            
+            # Fallback to request_step_into if available
+            if not step_ok and not tried:
+                try:
+                    if hasattr(ida_dbg, 'request_step_into'):  # type: ignore
+                        tried = True
+                        step_ok = bool(ida_dbg.request_step_into())  # type: ignore
+                except Exception as e:
+                    errors.append(f"request_step_into: {e}")
+            
+            if not tried:
+                return {"error": "no step_into API available"}
+            
+            if not step_ok and errors:
+                return {"ok": False, "stepped": False, "note": "; ".join(errors)[:200]}
+            
+            return {"ok": True, "stepped": bool(step_ok)}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Step over instruction: no params. Single-step execution stepping over function calls. Returns { ok,stepped,note? } or { error }. Inactive debugger => ok:false. Non-blocking.")
+    def dbg_step_over() -> dict:  # type: ignore
+        """单步跳过指令执行。
+
+        行为:
+            * 若调试器未激活: 返回 ok=False, note。
+            * 调用 ida_dbg.step_over() 执行单步跳过。
+            * 跳过函数调用，在调用后的下一条指令停止。
+        返回:
+            { ok: bool, stepped: bool, note? } 或 { error }。
+        限制:
+            * 不等待执行结果; 仅发出步进请求。
+        """
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+        if 'ida_dbg' not in globals() or ida_dbg is None:  # type: ignore
+            return {"error": "ida_dbg module missing"}
+
+        def logic():
+            try:
+                if not ida_dbg.is_debugger_on():  # type: ignore
+                    return {"ok": False, "stepped": False, "note": "debugger not active"}
+            except Exception:
+                return {"error": "cannot determine debugger state"}
+            
+            # Attempt step over
+            step_ok = False
+            errors: list[str] = []
+            tried = False
+            
+            try:
+                if hasattr(ida_dbg, 'step_over'):  # type: ignore
+                    tried = True
+                    step_ok = bool(ida_dbg.step_over())  # type: ignore
+            except Exception as e:
+                errors.append(f"step_over: {e}")
+            
+            # Fallback to request_step_over if available
+            if not step_ok and not tried:
+                try:
+                    if hasattr(ida_dbg, 'request_step_over'):  # type: ignore
+                        tried = True
+                        step_ok = bool(ida_dbg.request_step_over())  # type: ignore
+                except Exception as e:
+                    errors.append(f"request_step_over: {e}")
+            
+            if not tried:
+                return {"error": "no step_over API available"}
+            
+            if not step_ok and errors:
+                return {"ok": False, "stepped": False, "note": "; ".join(errors)[:200]}
+            
+            return {"ok": True, "stepped": bool(step_ok)}
+
+        return _run_in_ida(logic)
+
+    @mcp.tool(description="Read memory bytes: params memory_address(int|string), size(1..4096). Returns { address,size,bytes,hex,note? } or { error }. Reads raw bytes from specified address. Works in both static analysis and debugging modes.")
+    def read_memory_bytes(
+        memory_address: Annotated[int | str, Field(description="Memory address to read from (int or string: decimal/0x.../...h)")],
+        size: Annotated[int, Field(description="Number of bytes to read (1..4096)")],
+    ) -> dict:  # type: ignore
+        """读取指定地址的内存字节。
+
+        参数:
+            memory_address: 内存地址 (支持整数或字符串格式: 十进制/0x.../...h)
+            size: 读取字节数 (1..4096)
+        返回:
+            {
+              address: 解析后的地址,
+              size: 实际读取的字节数,
+              bytes: 字节数组 [int, int, ...],
+              hex: 十六进制字符串表示,
+              note?: 附加说明
+            } 或 { error: "..." }
+        说明:
+            * 在静态分析模式下使用 ida_bytes.get_bytes()
+            * 在调试模式下优先使用调试器内存读取API
+            * 支持多种地址格式: 1234, 0x401000, 401000h等
+        """
+        if size <= 0:
+            return {"error": "size must be > 0"}
+        if size > 4096:
+            return {"error": "size too large (max 4096)"}
+
+        if not HAVE_IDA:
+            return {"error": "not in IDA"}
+
+        def logic():
+            # 解析地址
+            try:
+                if isinstance(memory_address, str):
+                    addr_str = memory_address.strip().replace('_', '')
+                    if addr_str.lower().startswith('0x'):
+                        addr_int = int(addr_str, 16)
+                    elif addr_str.lower().endswith('h'):
+                        addr_int = int(addr_str[:-1], 16)
+                    else:
+                        addr_int = int(addr_str, 0)  # 支持多种进制
+                else:
+                    addr_int = int(memory_address)
+            except (ValueError, TypeError):
+                return {"error": "invalid address format"}
+
+            if addr_int < 0:
+                return {"error": "address cannot be negative"}
+
+            # 检查地址是否在有效段内
+            try:
+                seg = idaapi.getseg(addr_int)  # type: ignore
+                if not seg:
+                    return {"error": "address not in any segment"}
+            except Exception:
+                pass  # 继续尝试读取
+
+            bytes_data = None
+            read_method = "unknown"
+
+            if bytes_data is None:
+                try:
+                    bytes_data = idaapi.get_bytes(addr_int, size)  # type: ignore
+                    read_method = "basic"
+                except Exception as e:
+                    return {"error": f"failed to read memory: {e}"}
+
+            if bytes_data is None:
+                return {"error": "failed to read memory: no data returned"}
+
+            # 转换为字节列表和十六进制字符串
+            try:
+                if isinstance(bytes_data, bytes):
+                    byte_list = list(bytes_data)
+                elif isinstance(bytes_data, (list, tuple)):
+                    byte_list = list(bytes_data)
+                else:
+                    # 尝试转换为bytes
+                    byte_list = list(bytes(bytes_data))
+                
+                hex_str = ' '.join(f'{b:02X}' for b in byte_list)
+                
+                result = {
+                    "address": addr_int,
+                    "size": len(byte_list),
+                    "bytes": byte_list,
+                    "hex": hex_str,
+                }
+                
+                if read_method != "unknown":
+                    result["note"] = f"read via {read_method}"
+                
+                return result
+                
+            except Exception as e:
+                return {"error": f"failed to process bytes data: {e}"}
 
         return _run_in_ida(logic)
 

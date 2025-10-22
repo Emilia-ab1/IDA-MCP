@@ -13,19 +13,19 @@
 * Subsequent instances automatically register with the coordinator; no need to share files or manually configure ports
 * Unified access / aggregation of instance tools via a process-based **proxy `ida_mcp_proxy.py`** (MCP clients can start it via command/args)
 
+The tool philosophy is to minimize operations. Most IDEs do not support an excessive number of tools. Too many tools can lead to tool invocation failures and reduced accuracy.
+
 ## Current Tools
 
 ### Plugin Built-in (`server.py`)
 
-#### reverse-tools (server)
+#### reverse-tools
 
 * `check_connection` – Quick health check of plugin and coordinator (ok/count)
 * `list_instances` – Returns raw list of registered instances
-* `list_functions` – Returns all functions in current IDA database (name, start_ea, end_ea)
+* `list_functions(offset, count)` – List functions with pagination (name, start_ea, end_ea)
 * `get_function_by_name(name)` – Get start/end address of a single function by exact name match
 * `get_function_by_address(address)` – Get function information via address (start or internal)
-* `get_current_address()` – Get current cursor address in UI
-* `get_current_function()` – Get function at current cursor position (if exists)
 * `convert_number(text, size)` – Number conversion (decimal/hex/binary ↔ multiple representations, specified bit width)
 * `list_globals_filter(offset, count, filter?)` – Paginated + fuzzy (substring) filtered global symbols list (excluding functions)
 * `list_globals(offset, count)` – Paginated list of all global symbols (excluding functions)
@@ -47,8 +47,9 @@
 * `get_entry_points()` – Get all entry points (ordinal + address + name)
 * `get_metadata` - Get basic metadata of specified or current instance (hash/arch/bits etc.)
 * `linear_disassemble(start_address, size)` - Linear disassembly of size instructions from specified address
+* `read_memory_bytes(memory_address, size)` – Read memory bytes from specified address (1-4096 bytes)
 
-#### dbg-tools (server)
+#### dbg-tools
 
 * `dbg_get_registers()` – Get current values of all registers
 * `dbg_get_call_stack()` – Get current call stack
@@ -60,54 +61,8 @@
 * `dbg_set_breakpoint(address)` – Set breakpoint
 * `dbg_delete_breakpoint(address)` – Delete breakpoint (idempotent)
 * `dbg_enable_breakpoint(address, enable)` – Enable/disable breakpoint (creates if doesn't exist and enabling)
-
-### Proxy (`ida_mcp_proxy.py`)
-
-* `select_instance(port?)` - Select IDA instance to use
-
-#### reverse-tools (proxy)
-
-* `check_connection` - Check if active instances exist
-* `list_instances` - Return raw instance list
-* `list_functions` - For selected or auto-selected instance; forwarded via coordinator
-* `get_function_by_name(name, port?)` - Forward function query by name
-* `get_function_by_address(address, port?)` - Forward function query by address
-* `get_current_address(port?)` - Forward get current UI cursor address
-* `get_current_function(port?)` - Forward get function at current cursor (if exists)
-* `convert_number(text, size, port?)` - Forward number conversion
-* `list_globals_filter(offset, count, filter?, port?)` - Forward paginated global symbols query
-* `list_globals(offset, count, port?)` - Forward paginated global symbols query (no filter)
-* `list_strings_filter(offset, count, filter?, port?)` - Forward paginated strings query
-* `list_strings(offset, count, port?)` - Forward paginated strings query (no filter)
-* `list_local_types(port?)` - Forward list Local Types
-* `decompile_function(address, port?)` - Forward decompile function (requires Hex-Rays)
-* `disassemble_function(start_address, port?)` - Forward function disassembly
-* `get_metadata(port?)` - Get basic metadata of specified or current instance (hash/arch/bits etc.)
-* `get_xrefs_to(address, port?)` - Forward get cross-references to address
-* `get_xrefs_to_field(struct_name, field_name, port?)` - Forward heuristic field reference search
-* `set_comment(address, comment, port?)` - Forward set address comment
-* `rename_local_variable(function_address, old_name, new_name, port?)` - Forward rename local variable
-* `rename_global_variable(old_name, new_name, port?)` - Forward rename global variable
-* `set_global_variable_type(variable_name, new_type, port?)` - Forward set global variable type
-* `rename_function(function_address, new_name, port?)` - Forward rename function
-* `set_function_prototype(function_address, prototype, port?)` - Forward set function prototype
-* `set_local_variable_type(function_address, variable_name, new_type, port?)` - Forward set local variable type
-* `declare_c_type(c_declaration, port?)` - Forward declare/update local type
-* `get_entry_points(port?)` - Forward get entry points list
-* `linear_disassemble(start_address, size, port?)` - Forward linear disassembly
-
-#### dbg-tools (proxy)
-
-* `dbg_get_registers(port?)` - Forward get current register values
-* `dbg_get_call_stack(port?)` - Forward get current call stack
-* `dbg_list_breakpoints(port?)` - Forward list all breakpoints
-* `dbg_start_process(port?)` - Forward start debugging
-* `dbg_exit_process(port?)` - Forward terminate debug process
-* `dbg_continue_process(port?)` - Forward continue execution
-* `dbg_run_to(address, port?)` - Forward run to specified address
-* `dbg_set_breakpoint(address, port?)` - Forward set breakpoint
-* `dbg_delete_breakpoint(address, port?)` - Forward delete breakpoint
-* `dbg_enable_breakpoint(address, enable, port?)` - Forward enable/disable breakpoint
+* `dbg_step_into()` – Step into instruction (single step)
+* `dbg_step_over()` – Step over instruction (call)
 
 ## Directory Structure
 
@@ -194,4 +149,3 @@ python -m pip install -r requirements.txt
 ## Future Plans
 
 Add UI interface, support internal model calls, add multi-agent A2A automated reverse engineering functionality after langchain officially updates to 1.0.0.
-

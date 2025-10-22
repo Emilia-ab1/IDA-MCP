@@ -126,12 +126,16 @@ def select_instance(
     _current_port = port
     return {"selected_port": port}
 
-@server.tool(description="List functions. No params. Forwards to selected instance list_functions; auto-selects instance if none chosen. Returns underlying tool data or { error } if no instances. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
-def list_functions() -> Any:  # type: ignore
-    p = _ensure_port()
-    if p is None:
+@server.tool(description="List functions with pagination: params offset>=0, count(1..1000), port(optional). Returns backend { total,offset,count,items:[{ name,start_ea,end_ea }] } or { error }. Auto-selects instance if needed. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
+def list_functions(
+    offset: Annotated[int, Field(description="Pagination start offset (>=0)")],
+    count: Annotated[int, Field(description="Number of items to return (1..1000)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
         return {"error": "No instances"}
-    res = _call('list_functions', {}, port=p)
+    res = _call('list_functions', {"offset": offset, "count": count}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Get IDB metadata. Param port(optional) overrides current selection. Returns underlying get_metadata dict { input_file,arch,bits,hash,... } or { error }. Auto-selects instance if needed. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
@@ -304,26 +308,6 @@ def get_function_by_address(
     if target is None:
         return {"error": "No instances"}
     res = _call('get_function_by_address', {"address": address}, port=target)
-    return res.get('data') if isinstance(res, dict) else res
-
-@server.tool(description="Get current cursor address: param port(optional). Returns backend { address } or { error }. Depends on GUI focus in target instance. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
-def get_current_address(
-    port: Annotated[int | None, Field(description="Optional instance port override")]= None
-) -> Any:  # type: ignore
-    target = port if port is not None else _ensure_port()
-    if target is None:
-        return {"error": "No instances"}
-    res = _call('get_current_address', {}, port=target)
-    return res.get('data') if isinstance(res, dict) else res
-
-@server.tool(description="Get current function at cursor: param port(optional). Returns backend { name,start_ea,end_ea } or { error }. Uses screen EA in target instance. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
-def get_current_function(
-    port: Annotated[int | None, Field(description="Optional instance port override")]= None
-) -> Any:  # type: ignore
-    target = port if port is not None else _ensure_port()
-    if target is None:
-        return {"error": "No instances"}
-    res = _call('get_current_function', {}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
 @server.tool(description="Convert number representations: params text(str), size(8|16|32|64), port(optional). Returns backend multi-format dict or { error }. Supports 0x / 0b / trailing h / underscores / sign. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
@@ -603,6 +587,42 @@ def dbg_enable_breakpoint(
     if target is None:
         return {"error": "No instances"}
     res = _call('dbg_enable_breakpoint', {"address": address, "enable": bool(enable)}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Step into instruction: param port(optional). Single-step execution entering function calls. Returns backend { ok,stepped,note? } or { error }. Inactive debugger => ok:false. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
+def dbg_step_into(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_step_into', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Step over instruction: param port(optional). Single-step execution stepping over function calls. Returns backend { ok,stepped,note? } or { error }. Inactive debugger => ok:false. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
+def dbg_step_over(
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('dbg_step_over', {}, port=target)
+    return res.get('data') if isinstance(res, dict) else res
+
+@server.tool(description="Read memory bytes: params memory_address(int|string), size(1..4096), port(optional). Returns backend { address,size,bytes,hex,note? } or { error }. Reads raw bytes from specified address. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
+def read_memory_bytes(
+    memory_address: Annotated[int | str, Field(description="Memory address to read from (int or string: decimal/0x.../...h)")],
+    size: Annotated[int, Field(description="Number of bytes to read (1..4096)")],
+    port: Annotated[int | None, Field(description="Optional instance port override")]= None
+) -> Any:  # type: ignore
+    if size <= 0:
+        return {"error": "size must be > 0"}
+    if size > 4096:
+        return {"error": "size too large (max 4096)"}
+    target = port if port is not None else _ensure_port()
+    if target is None:
+        return {"error": "No instances"}
+    res = _call('read_memory_bytes', {"memory_address": memory_address, "size": size}, port=target)
     return res.get('data') if isinstance(res, dict) else res
 
 if __name__ == "__main__":
