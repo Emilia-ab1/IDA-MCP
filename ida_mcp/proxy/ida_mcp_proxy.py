@@ -38,7 +38,7 @@
 实现说明
 --------------------
 * 使用 urllib 标准库, 避免额外依赖。
-* 超时严格 (GET 1 秒, CALL 5 秒) 防止阻塞。
+* 超时统一为 30 秒, 防止阻塞并减少瞬态空实例导致的误判。
 * 内部维护 _current_port 作为默认目标。
 """
 from __future__ import annotations
@@ -52,11 +52,13 @@ except Exception:  # pragma: no cover
 from fastmcp import FastMCP
 
 COORD_URL = "http://127.0.0.1:11337"
+REQUEST_TIMEOUT = 30
+DEFAULT_PORT = 8765
 _current_port: Optional[int] = None
 
 def _http_get(path: str) -> Any:
     try:
-        with urllib.request.urlopen(COORD_URL + path, timeout=1) as r:  # type: ignore
+        with urllib.request.urlopen(COORD_URL + path, timeout=REQUEST_TIMEOUT) as r:  # type: ignore
             return json.loads(r.read().decode('utf-8') or 'null')
     except Exception:
         return None
@@ -65,7 +67,7 @@ def _http_post(path: str, obj: dict) -> Any:
     data = json.dumps(obj).encode('utf-8')
     req = urllib.request.Request(COORD_URL + path, data=data, method='POST', headers={'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=5) as r:  # type: ignore
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as r:  # type: ignore
             return json.loads(r.read().decode('utf-8') or 'null')
     except Exception as e:
         return {"error": str(e)}
@@ -74,29 +76,57 @@ def _instances() -> List[Dict[str, Any]]:
     data = _http_get('/instances')
     return data if isinstance(data, list) else []
 
-def _choose_default_port() -> Optional[int]:
-    inst = _instances()
-    if not inst:
-        return None
-    for e in inst:
-        if e.get('port') == 8765:
-            return 8765
-    inst_sorted = sorted(inst, key=lambda x: x.get('started', 0))
-    return inst_sorted[0].get('port')
+def _is_valid_port(p: Any) -> bool:
+    return isinstance(p, int) and 1 <= p <= 65535
 
-def _ensure_port() -> Optional[int]:
+def _get_current_selected_port() -> Optional[int]:
+    """查询协调器维护的当前选中实例端口。"""
+    res = _http_get('/current_instance')
+    if isinstance(res, dict) and _is_valid_port(res.get('port')):
+        return int(res['port'])
+    return None
+
+def _coord_select_instance(port: Optional[int] = None) -> Optional[int]:
+    """向协调器请求选择实例端口（无参时自动优先 8765，其次最早启动）。"""
+    payload: Dict[str, Any] = {}
+    if port is not None and _is_valid_port(port):
+        payload['port'] = int(port)
+    res = _http_post('/select_instance', payload)
+    if isinstance(res, dict) and _is_valid_port(res.get('selected_port')):
+        return int(res['selected_port'])
+    return None
+
+def _choose_default_port() -> Optional[int]:
+    """选择一个默认端口：优先使用协调器自动选择；失败时回退到 8765。"""
+    sel = _coord_select_instance(None)
+    if _is_valid_port(sel):
+        return sel
+    return DEFAULT_PORT
+
+def _ensure_port() -> int:
+    """确保返回一个非空且合理范围的端口。默认回退到 8765。"""
     global _current_port
-    if _current_port and any(e.get('port') == _current_port for e in _instances()):
+    # 已有选择且数值合理则直接使用
+    if _is_valid_port(_current_port):
+        return int(_current_port)  # type: ignore[arg-type]
+    # 从协调器查询当前选中端口
+    curr = _get_current_selected_port()
+    if _is_valid_port(curr):
+        _current_port = int(curr)  # type: ignore[arg-type]
         return _current_port
-    _current_port = _choose_default_port()
-    return _current_port
+    # 请求协调器自动选择（优先 8765）
+    sel = _coord_select_instance(None)
+    if _is_valid_port(sel):
+        _current_port = int(sel)  # type: ignore[arg-type]
+        return _current_port
+    # 最终回退到固定默认端口 8765（确保非空）
+    _current_port = DEFAULT_PORT
+    return DEFAULT_PORT
 
 def _call(tool: str, params: dict | None = None, port: int | None = None) -> Any:
-    body = {"tool": tool, "params": params or {}}
-    if port is not None:
-        body['port'] = port
-    elif _ensure_port() is not None:
-        body['port'] = _ensure_port()
+    """统一转发调用：始终携带非空端口，端口范围校验不通过则回退。"""
+    target_port = port if _is_valid_port(port) else _ensure_port()
+    body = {"tool": tool, "params": params or {}, "port": int(target_port)}
     return _http_post('/call', body)
 
 server = FastMCP(name="IDA-MCP-Proxy", instructions="Coordinator-based proxy forwarding tool calls via /call endpoint.")
@@ -117,14 +147,29 @@ def select_instance(
     port: Annotated[int | None, Field(description="Target instance port to select; if omitted auto-picks preferred (8765 or earliest)")] = None
 ) -> dict:  # type: ignore
     global _current_port
-    if port is None:
-        port = _choose_default_port()
-    if port is None:
-        return {"error": "No instances"}
-    if not any(e.get('port') == port for e in _instances()):
-        return {"error": f"Port {port} not found"}
-    _current_port = port
-    return {"selected_port": port}
+    # 显式端口：先校验范围，再交给协调器选择与记录
+    if port is not None:
+        if not _is_valid_port(port):
+            return {"error": "invalid port"}
+        sel = _coord_select_instance(port)
+        if _is_valid_port(sel):
+            _current_port = int(sel)  # type: ignore[arg-type]
+            return {"selected_port": _current_port}
+        # 根据当前实例列表返回更明确的错误
+        inst = _instances()
+        if not inst:
+            return {"error": "No instances"}
+        if not any(e.get('port') == port for e in inst):
+            return {"error": f"Port {port} not found"}
+        return {"error": "failed to select instance"}
+    # 未提供端口：请求协调器自动选择（优先 8765），失败则回退到默认
+    sel = _coord_select_instance(None)
+    if _is_valid_port(sel):
+        _current_port = int(sel)  # type: ignore[arg-type]
+        return {"selected_port": _current_port}
+    # 若自动选择失败，尝试本地确保（最终回退到 8765）
+    _current_port = _ensure_port()
+    return {"selected_port": _current_port}
 
 @server.tool(description="List functions with pagination: params offset>=0, count(1..1000), port(optional). Returns backend { total,offset,count,items:[{ name,start_ea,end_ea }] } or { error }. Auto-selects instance if needed. When multiple IDA instances are running, be sure to specify the correct port for your call to avoid invoking the wrong instance.")
 def list_functions(

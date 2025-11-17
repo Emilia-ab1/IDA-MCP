@@ -45,7 +45,7 @@ The tool philosophy is to minimize operations. Most IDEs do not support an exces
 * `set_local_variable_type(function_address, variable_name, new_type)` – Set local variable type (Hex-Rays)
 * `declare_c_type(c_declaration)` – Parse and declare/update a local type (struct/union/enum/typedef)
 * `get_entry_points()` – Get all entry points (ordinal + address + name)
-* `get_metadata` - Get basic metadata of specified or current instance (hash/arch/bits etc.)
+* `get_metadata()` - Get basic metadata of specified or current instance (hash/arch/bits etc.)
 * `linear_disassemble(start_address, size)` - Linear disassembly of size instructions from specified address
 * `read_memory_bytes(memory_address, size)` – Read memory bytes from specified address (1-4096 bytes)
 

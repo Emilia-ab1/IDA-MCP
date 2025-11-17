@@ -66,19 +66,80 @@ from typing import List, Dict, Any, Optional
 import os
 import atexit
 import sys
+try:  # optional: IDA console output
+    import ida_kernwin  # type: ignore
+    HAVE_IDA = True
+except Exception:  # pragma: no cover
+    ida_kernwin = None  # type: ignore
+    HAVE_IDA = False
 
 COORD_HOST = "127.0.0.1"
 COORD_PORT = 11337
+REQUEST_TIMEOUT = 30  # seconds
+DEBUG_ENABLED = False
+DEBUG_MAX_LEN = 1000
 
 _instances: List[Dict[str, Any]] = []
 _lock = threading.RLock()
 _is_coordinator = False
 _server_thread: Optional[threading.Thread] = None
 _self_pid = os.getpid()
+_current_instance_port: Optional[int] = None
+
+
+def _short(v: Any) -> str:
+    try:
+        s = json.dumps(v, ensure_ascii=False)
+    except Exception:
+        s = str(v)
+    if len(s) > DEBUG_MAX_LEN:
+        return s[:DEBUG_MAX_LEN] + "..."
+    return s
+
+def _debug_log(event: str, **fields: Any):  # pragma: no cover
+    if not DEBUG_ENABLED:
+        return
+    ts = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    kv = ' '.join(f"{k}={_short(v)}" for k, v in fields.items())
+    line = f"[{ts}] [registry] {event} {kv}\n"
+    try:
+        if HAVE_IDA and hasattr(ida_kernwin, 'execute_sync') and hasattr(ida_kernwin, 'msg'):
+            def _emit():  # type: ignore
+                try:
+                    ida_kernwin.msg(line)  # type: ignore
+                except Exception:
+                    try:
+                        print(line, end='')
+                    except Exception:
+                        pass
+                return 0
+            try:
+                ida_kernwin.execute_sync(_emit, ida_kernwin.MFF_READ)  # type: ignore
+            except Exception:
+                try:
+                    ida_kernwin.msg(line)  # type: ignore
+                except Exception:
+                    try:
+                        print(line, end='')
+                    except Exception:
+                        pass
+        else:
+            print(line, end='')
+    except Exception:
+        pass
+
+def set_debug(enable: bool):
+    global DEBUG_ENABLED
+    DEBUG_ENABLED = bool(enable)
+
+def is_debug_enabled() -> bool:
+    return DEBUG_ENABLED
+
 
 class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
     def log_message(self, format, *args):
         return
+
     def _send(self, code: int, obj: Any):
         data = json.dumps(obj).encode('utf-8')
         self.send_response(code)
@@ -94,9 +155,17 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
     def do_GET(self):  # type: ignore
         if self.path == '/instances':
             with _lock:
+                _debug_log('GET /instances', count=len(_instances))
                 self._send(200, _instances)
+        elif self.path == '/current_instance':
+            with _lock:
+                _debug_log('GET /current_instance', port=_current_instance_port)
+                self._send(200, {"port": _current_instance_port})
+        elif self.path == '/debug':
+            self._send(200, {"enabled": DEBUG_ENABLED})
         else:
             self._send(404, {"error": "not found"})
+
     def do_POST(self):  # type: ignore
         length = int(self.headers.get('Content-Length', '0'))
         raw = self.rfile.read(length) if length else b''
@@ -104,6 +173,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
             payload = json.loads(raw.decode('utf-8') or '{}')
         except Exception:
             payload = {}
+        _debug_log('POST', path=self.path, client=f"{self.client_address}", content_length=length)
         if self.path == '/register':
             needed = {'pid', 'port'}
             if not needed.issubset(payload):
@@ -115,6 +185,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 _instances.clear()
                 _instances.extend(existing)
                 _instances.append(payload)
+            _debug_log('REGISTER', pid=payload.get('pid'), port=payload.get('port'), input_file=payload.get('input_file'), idb=payload.get('idb'))
             self._send(200, {"status": "ok"})
         elif self.path == '/deregister':
             pid = payload.get('pid')
@@ -123,9 +194,36 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 return
             with _lock:
                 remaining = [e for e in _instances if e.get('pid') != pid]
+                if _current_instance_port and not any(e.get('port') == _current_instance_port for e in remaining):
+                    _current_instance_port = None
                 _instances.clear()
                 _instances.extend(remaining)
+            _debug_log('DEREGISTER', pid=pid, remaining=len(_instances))
             self._send(200, {"status": "ok"})
+        elif self.path == '/select_instance':
+            port = payload.get('port')
+            with _lock:
+                if port is None:
+                    # Auto-select if port is not provided
+                    if not _instances:
+                        self._send(404, {"error": "No instances to select from"})
+                        return
+                    
+                    # Prioritize 8765, then earliest started
+                    sorted_instances = sorted(_instances, key=lambda x: (x.get('port') != 8765, x.get('started', float('inf'))))
+                    _current_instance_port = sorted_instances[0].get('port')
+                else:
+                    if not any(e.get('port') == port for e in _instances):
+                        self._send(404, {"error": f"Instance with port {port} not found"})
+                        return
+                    _current_instance_port = port
+            _debug_log('SELECT_INSTANCE', requested=port, selected=_current_instance_port)
+            self._send(200, {"status": "ok", "selected_port": _current_instance_port})
+        elif self.path == '/debug':
+            # Toggle debug logging: payload { enable: bool }
+            enable = bool(payload.get('enable') if 'enable' in payload else payload.get('enabled', False))
+            set_debug(enable)
+            self._send(200, {"status": "ok", "enabled": DEBUG_ENABLED})
         elif self.path == '/call':
             # payload: { pid | port, tool, params }
             target_pid = payload.get('pid')
@@ -154,12 +252,14 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
             if not isinstance(port, int):
                 self._send(500, {"error": "bad target port"})
                 return
+            t0 = time.time()
+            _debug_log('CALL_BEGIN', tool=tool, target_port=port, pid=target.get('pid'), params_keys=list((params or {}).keys()))
             # Forward the tool call over SSE MCP (JSON-RPC) using fastmcp Client dynamically.
             try:
                 from fastmcp import Client  # type: ignore
                 import asyncio
                 async def _do():
-                    async with Client(f"http://127.0.0.1:{port}/mcp/") as c:  # type: ignore
+                    async with Client(f"http://127.0.0.1:{port}/mcp/", timeout=REQUEST_TIMEOUT) as c:  # type: ignore
                         resp = await c.call_tool(tool, params)
                         # Convert data into plain JSON serializable structures
                         def norm(x):
@@ -172,8 +272,17 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                             return x
                         return {"tool": tool, "data": norm(resp.data)}
                 result = asyncio.run(_do())
+                dt_ms = int((time.time() - t0) * 1000)
+                # Attempt to estimate response size
+                try:
+                    resp_size = len(json.dumps(result, ensure_ascii=False))
+                except Exception:
+                    resp_size = 0
+                _debug_log('CALL_OK', tool=tool, target_port=port, elapsed_ms=dt_ms, resp_size=resp_size)
                 self._send(200, result)
             except Exception as e:  # pragma: no cover
+                dt_ms = int((time.time() - t0) * 1000)
+                _debug_log('CALL_FAIL', tool=tool, target_port=port, elapsed_ms=dt_ms, error=str(e))
                 self._send(500, {"error": f"call failed: {e}"})
         else:
             self._send(404, {"error": "not found"})
@@ -197,6 +306,7 @@ def _coordinator_alive() -> bool:
             return True
     except OSError:
         return False
+
 
 def init_and_register(port: int, input_file: str | None, idb_path: str | None):
     """确保协调器运行, 若不存在则当前进程抢占成为协调器, 然后注册本实例。
@@ -243,7 +353,7 @@ def _post_json(path: str, obj: Any):
     data = json.dumps(obj).encode('utf-8')
     req = urllib.request.Request(f'http://{COORD_HOST}:{COORD_PORT}{path}', data=data, method='POST', headers={'Content-Type': 'application/json'})
     try:
-        urllib.request.urlopen(req, timeout=1)
+        urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT)
     except Exception:
         pass
 
@@ -252,7 +362,7 @@ def get_instances() -> List[Dict[str, Any]]:
         with _lock:
             return list(_instances)
     try:
-        with urllib.request.urlopen(f'http://{COORD_HOST}:{COORD_PORT}/instances', timeout=1) as resp:  # type: ignore
+        with urllib.request.urlopen(f'http://{COORD_HOST}:{COORD_PORT}/instances', timeout=REQUEST_TIMEOUT) as resp:  # type: ignore
             raw = resp.read()
             data = json.loads(raw.decode('utf-8') or '[]')
             if isinstance(data, list):
@@ -268,7 +378,7 @@ def call_tool(pid: int | None = None, port: int | None = None, tool: str = '', p
     body = json.dumps({"pid": pid, "port": port, "tool": tool, "params": params or {}}).encode('utf-8')
     req = urllib.request.Request(f'http://{COORD_HOST}:{COORD_PORT}/call', data=body, method='POST', headers={'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=5) as resp:  # type: ignore
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:  # type: ignore
             raw = resp.read()
             return json.loads(raw.decode('utf-8') or '{}')
     except Exception as e:
