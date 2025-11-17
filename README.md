@@ -1,5 +1,5 @@
 # IDA-MCP
-
+[![MCP Badge](https://lobehub.com/badge/mcp/captain-ai-hub-ida-mcp)](https://lobehub.com/mcp/captain-ai-hub-ida-mcp)
 ![logo](ida-mcp.png)
 
 [wiki](https://github.com/jelasin/IDA-MCP/wiki)
@@ -149,3 +149,4 @@ python -m pip install -r requirements.txt
 ## Future Plans
 
 Add UI interface, support internal model calls, add multi-agent A2A automated reverse engineering functionality after langchain officially updates to 1.0.0.
+
