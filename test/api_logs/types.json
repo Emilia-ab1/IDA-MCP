@@ -1,0 +1,273 @@
+{
+  "category": "types",
+  "generated_at": "2025-12-04T17:12:25.723803",
+  "total_calls": 16,
+  "calls": [
+    {
+      "timestamp": "2025-12-04T17:12:02.332057",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "struct TestStruct { int field1; char field2; };"
+      },
+      "port": 8765,
+      "result": {
+        "decl": "struct TestStruct { int field1; char field2; };",
+        "ok": true,
+        "messages": [
+          "// struct tag: 'TestStruct'\n",
+          "// struct\n// {\n//   int field1;\n//   char field2;\n// }\n\n",
+          "// struct tag: 'TestStruct'\n",
+          "// struct TestStruct\n\n"
+        ]
+      },
+      "duration_ms": 1657.65
+    },
+    {
+      "timestamp": "2025-12-04T17:12:03.916267",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "typedef unsigned int UINT32;"
+      },
+      "port": 8765,
+      "result": {
+        "decl": "typedef unsigned int UINT32;",
+        "ok": true,
+        "messages": [
+          "// typedef: UINT32 = ",
+          "// unsigned int\n\n"
+        ]
+      },
+      "duration_ms": 1572.12
+    },
+    {
+      "timestamp": "2025-12-04T17:12:05.516134",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "enum TestEnum { VALUE_A = 0, VALUE_B = 1, VALUE_C = 2 };"
+      },
+      "port": 8765,
+      "result": {
+        "decl": "enum TestEnum { VALUE_A = 0, VALUE_B = 1, VALUE_C = 2 };",
+        "ok": true,
+        "messages": [
+          "// struct tag: 'TestEnum'\n",
+          "// enum\n// {\n//   VALUE_A = 0x0,\n//   VALUE_B = 0x1,\n//   VALUE_C = 0x2,\n// }\n\n",
+          "// struct tag: 'TestEnum'\n",
+          "// enum TestEnum\n\n"
+        ]
+      },
+      "duration_ms": 1598.04
+    },
+    {
+      "timestamp": "2025-12-04T17:12:07.064660",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "\n                struct ComplexStruct {\n                    int id;\n                    char name[32];\n                    struct {\n                        int x;\n                        int y;\n                    } position;\n                    void* data;\n                };\n            "
+      },
+      "port": 8765,
+      "result": {
+        "decl": "struct ComplexStruct {\n                    int id;\n                    char name[32];\n                    struct {\n                        int x;\n                        int y;\n                    } position;\n                    void* data;\n                };",
+        "ok": true,
+        "messages": [
+          "// struct tag: 'ComplexStruct::$CDF557A927ED2BFF93B09908D4EFCA76'\n",
+          "// struct\n// {\n//   int x;\n//   int y;\n// }\n\n",
+          "// struct tag: 'ComplexStruct'\n",
+          "// struct\n// {\n//   int id;\n//   char name[32];\n//   struct ComplexStruct::$CDF557A927ED2BFF93B09908D4EFCA76 position;\n//   void *data;\n// }\n\n",
+          "// struct tag: 'ComplexStruct'\n"
+        ]
+      },
+      "duration_ms": 1546.69
+    },
+    {
+      "timestamp": "2025-12-04T17:12:08.570714",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "invalid syntax here {"
+      },
+      "port": 8765,
+      "result": {
+        "error": "parse failed (1 errors)",
+        "details": [
+          "Syntax error near: invalid\n"
+        ]
+      },
+      "duration_ms": 1503.67
+    },
+    {
+      "timestamp": "2025-12-04T17:12:10.125715",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty declaration"
+      },
+      "duration_ms": 1552.86
+    },
+    {
+      "timestamp": "2025-12-04T17:12:11.632696",
+      "category": "types",
+      "tool": "set_function_prototype",
+      "params": {
+        "function_address": 5368713216,
+        "prototype": "int __cdecl func(int a, int b)"
+      },
+      "port": 8765,
+      "result": {
+        "error": "parse failed or not a function type",
+        "details": []
+      },
+      "duration_ms": 1502.96
+    },
+    {
+      "timestamp": "2025-12-04T17:12:13.139876",
+      "category": "types",
+      "tool": "set_function_prototype",
+      "params": {
+        "function_address": 3735928559,
+        "prototype": "int func(void)"
+      },
+      "port": 8765,
+      "result": {
+        "error": "function not found"
+      },
+      "duration_ms": 1505.01
+    },
+    {
+      "timestamp": "2025-12-04T17:12:14.708915",
+      "category": "types",
+      "tool": "set_function_prototype",
+      "params": {
+        "function_address": 5368713216,
+        "prototype": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty prototype"
+      },
+      "duration_ms": 1566.71
+    },
+    {
+      "timestamp": "2025-12-04T17:12:16.243053",
+      "category": "types",
+      "tool": "set_function_prototype",
+      "params": {
+        "function_address": 5368713216,
+        "prototype": "invalid prototype syntax"
+      },
+      "port": 8765,
+      "result": {
+        "error": "parse failed or not a function type",
+        "details": []
+      },
+      "duration_ms": 1532.51
+    },
+    {
+      "timestamp": "2025-12-04T17:12:17.784412",
+      "category": "types",
+      "tool": "set_local_variable_type",
+      "params": {
+        "function_address": 5368713216,
+        "variable_name": "v1",
+        "new_type": "int"
+      },
+      "port": 8765,
+      "result": {
+        "error": "local variable not found"
+      },
+      "duration_ms": 1539.11
+    },
+    {
+      "timestamp": "2025-12-04T17:12:19.345914",
+      "category": "types",
+      "tool": "set_local_variable_type",
+      "params": {
+        "function_address": 5368713216,
+        "variable_name": "v1",
+        "new_type": "char*"
+      },
+      "port": 8765,
+      "result": {
+        "error": "local variable not found"
+      },
+      "duration_ms": 1559.56
+    },
+    {
+      "timestamp": "2025-12-04T17:12:20.821155",
+      "category": "types",
+      "tool": "set_global_variable_type",
+      "params": {
+        "variable_name": "_gnu_exception_handler",
+        "new_type": "int"
+      },
+      "port": 8765,
+      "result": {
+        "ea": "0x140002120",
+        "variable_name": "_gnu_exception_handler",
+        "old_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
+        "new_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
+        "applied": false
+      },
+      "duration_ms": 1473.5
+    },
+    {
+      "timestamp": "2025-12-04T17:12:22.345283",
+      "category": "types",
+      "tool": "set_global_variable_type",
+      "params": {
+        "variable_name": "nonexistent_global_xyz123",
+        "new_type": "int"
+      },
+      "port": 8765,
+      "result": {
+        "error": "global not found"
+      },
+      "duration_ms": 1521.87
+    },
+    {
+      "timestamp": "2025-12-04T17:12:23.856641",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "struct TestGlobalType { int a; int b; };"
+      },
+      "port": 8765,
+      "result": {
+        "decl": "struct TestGlobalType { int a; int b; };",
+        "ok": true,
+        "messages": [
+          "// struct tag: 'TestGlobalType'\n",
+          "// struct\n// {\n//   int a;\n//   int b;\n// }\n\n",
+          "// struct tag: 'TestGlobalType'\n",
+          "// struct TestGlobalType\n\n"
+        ]
+      },
+      "duration_ms": 1509.53
+    },
+    {
+      "timestamp": "2025-12-04T17:12:25.308861",
+      "category": "types",
+      "tool": "set_global_variable_type",
+      "params": {
+        "variable_name": "_gnu_exception_handler",
+        "new_type": "struct TestGlobalType"
+      },
+      "port": 8765,
+      "result": {
+        "ea": "0x140002120",
+        "variable_name": "_gnu_exception_handler",
+        "old_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
+        "new_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
+        "applied": false
+      },
+      "duration_ms": 1452.43
+    }
+  ]
+}

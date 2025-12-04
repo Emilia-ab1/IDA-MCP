@@ -1,0 +1,525 @@
+{
+  "category": "core",
+  "generated_at": "2025-12-04T17:31:52.034966",
+  "total_calls": 1,
+  "calls": [
+    {
+      "timestamp": "2025-12-04T17:31:30.242799",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 100
+      },
+      "port": 8765,
+      "result": {
+        "total": 107,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "name": "WinMainCRTStartup",
+            "start_ea": "0x140001000",
+            "end_ea": "0x14000101E"
+          },
+          {
+            "name": "__tmainCRTStartup",
+            "start_ea": "0x140001020",
+            "end_ea": "0x14000139B"
+          },
+          {
+            "name": "mainCRTStartup",
+            "start_ea": "0x1400013A0",
+            "end_ea": "0x1400013BE"
+          },
+          {
+            "name": "atexit",
+            "start_ea": "0x1400013C0",
+            "end_ea": "0x1400013C5"
+          },
+          {
+            "name": "__mingw_invalidParameterHandler",
+            "start_ea": "0x1400013D0",
+            "end_ea": "0x1400013D1"
+          },
+          {
+            "name": "sub_1400013E0",
+            "start_ea": "0x1400013E0",
+            "end_ea": "0x140001404"
+          },
+          {
+            "name": "sub_140001410",
+            "start_ea": "0x140001410",
+            "end_ea": "0x14000145A"
+          },
+          {
+            "name": "sub_140001460",
+            "start_ea": "0x140001460",
+            "end_ea": "0x140001491"
+          },
+          {
+            "name": "sub_1400014A0",
+            "start_ea": "0x1400014A0",
+            "end_ea": "0x14000158E"
+          },
+          {
+            "name": "sub_140001590",
+            "start_ea": "0x140001590",
+            "end_ea": "0x1400015A4"
+          },
+          {
+            "name": "sub_1400015B0",
+            "start_ea": "0x1400015B0",
+            "end_ea": "0x1400015C5"
+          },
+          {
+            "name": "sub_1400015D0",
+            "start_ea": "0x1400015D0",
+            "end_ea": "0x1400015FF"
+          },
+          {
+            "name": "sub_140001600",
+            "start_ea": "0x140001600",
+            "end_ea": "0x140001678"
+          },
+          {
+            "name": "sub_140001680",
+            "start_ea": "0x140001680",
+            "end_ea": "0x1400016E3"
+          },
+          {
+            "name": "sub_1400016F0",
+            "start_ea": "0x1400016F0",
+            "end_ea": "0x140001792"
+          },
+          {
+            "name": "sub_1400017A0",
+            "start_ea": "0x1400017A0",
+            "end_ea": "0x14000183E"
+          },
+          {
+            "name": "sub_140001840",
+            "start_ea": "0x140001840",
+            "end_ea": "0x1400018DA"
+          },
+          {
+            "name": "sub_1400018E0",
+            "start_ea": "0x1400018E0",
+            "end_ea": "0x140001938"
+          },
+          {
+            "name": "sub_140001940",
+            "start_ea": "0x140001940",
+            "end_ea": "0x140001965"
+          },
+          {
+            "name": "sub_140001970",
+            "start_ea": "0x140001970",
+            "end_ea": "0x1400019C0"
+          },
+          {
+            "name": "sub_1400019C0",
+            "start_ea": "0x1400019C0",
+            "end_ea": "0x1400019D1"
+          },
+          {
+            "name": "sub_1400019E0",
+            "start_ea": "0x1400019E0",
+            "end_ea": "0x1400019F1"
+          },
+          {
+            "name": "sub_140001A00",
+            "start_ea": "0x140001A00",
+            "end_ea": "0x140001A12"
+          },
+          {
+            "name": "sub_140001A20",
+            "start_ea": "0x140001A20",
+            "end_ea": "0x140001A53"
+          },
+          {
+            "name": "sub_140001A60",
+            "start_ea": "0x140001A60",
+            "end_ea": "0x140001AB0"
+          },
+          {
+            "name": "sub_140001AB0",
+            "start_ea": "0x140001AB0",
+            "end_ea": "0x140001C1D"
+          },
+          {
+            "name": "sub_140001C20",
+            "start_ea": "0x140001C20",
+            "end_ea": "0x140001C5C"
+          },
+          {
+            "name": "sub_140001C60",
+            "start_ea": "0x140001C60",
+            "end_ea": "0x140001C87"
+          },
+          {
+            "name": "sub_140001C90",
+            "start_ea": "0x140001C90",
+            "end_ea": "0x140001F28"
+          },
+          {
+            "name": "__dyn_tls_init",
+            "start_ea": "0x140001F30",
+            "end_ea": "0x140001F99"
+          },
+          {
+            "name": "__tlregdtor",
+            "start_ea": "0x140001FA0",
+            "end_ea": "0x140001FA3"
+          },
+          {
+            "name": "__dyn_tls_dtor",
+            "start_ea": "0x140001FB0",
+            "end_ea": "0x140001FC2"
+          },
+          {
+            "name": "__do_global_dtors",
+            "start_ea": "0x140001FD0",
+            "end_ea": "0x140002016"
+          },
+          {
+            "name": "__do_global_ctors",
+            "start_ea": "0x140002020",
+            "end_ea": "0x140002088"
+          },
+          {
+            "name": "__main",
+            "start_ea": "0x140002090",
+            "end_ea": "0x140002118"
+          },
+          {
+            "name": "__mingw_raise_matherr",
+            "start_ea": "0x140002280",
+            "end_ea": "0x1400022C2"
+          },
+          {
+            "name": "__mingw_setusermatherr",
+            "start_ea": "0x1400022D0",
+            "end_ea": "0x1400022DC"
+          },
+          {
+            "name": "_fpreset",
+            "start_ea": "0x1400022E0",
+            "end_ea": "0x1400022E3"
+          },
+          {
+            "name": "_matherr",
+            "start_ea": "0x1400022F0",
+            "end_ea": "0x140002358"
+          },
+          {
+            "name": "_pei386_runtime_relocator",
+            "start_ea": "0x140002360",
+            "end_ea": "0x14000266C"
+          },
+          {
+            "name": "__write_memory",
+            "start_ea": "0x140002670",
+            "end_ea": "0x140002807"
+          },
+          {
+            "name": "__report_error",
+            "start_ea": "0x140002810",
+            "end_ea": "0x14000286A"
+          },
+          {
+            "name": "_setargv",
+            "start_ea": "0x140002870",
+            "end_ea": "0x140002873"
+          },
+          {
+            "name": "__guard_check_icall_dummy",
+            "start_ea": "0x140002880",
+            "end_ea": "0x140002881"
+          },
+          {
+            "name": "__getmainargs",
+            "start_ea": "0x140002890",
+            "end_ea": "0x1400028F7"
+          },
+          {
+            "name": "__p___initenv",
+            "start_ea": "0x140002900",
+            "end_ea": "0x14000290B"
+          },
+          {
+            "name": "_amsg_exit",
+            "start_ea": "0x140002910",
+            "end_ea": "0x14000293E"
+          },
+          {
+            "name": "printf",
+            "start_ea": "0x140002940",
+            "end_ea": "0x140002997"
+          },
+          {
+            "name": "___w64_mingwthr_add_key_dtor",
+            "start_ea": "0x1400029A0",
+            "end_ea": "0x140002A10"
+          },
+          {
+            "name": "___w64_mingwthr_remove_key_dtor",
+            "start_ea": "0x140002A10",
+            "end_ea": "0x140002A97"
+          },
+          {
+            "name": "__mingw_TLScallback",
+            "start_ea": "0x140002AA0",
+            "end_ea": "0x140002C32"
+          },
+          {
+            "name": "fprintf",
+            "start_ea": "0x140002C40",
+            "end_ea": "0x140002C88"
+          },
+          {
+            "name": "_ValidateImageBase",
+            "start_ea": "0x140002C90",
+            "end_ea": "0x140002CB3"
+          },
+          {
+            "name": "_FindPESection",
+            "start_ea": "0x140002CC0",
+            "end_ea": "0x140002CFD"
+          },
+          {
+            "name": "_FindPESectionByName",
+            "start_ea": "0x140002D00",
+            "end_ea": "0x140002D91"
+          },
+          {
+            "name": "__mingw_GetSectionForAddress",
+            "start_ea": "0x140002DA0",
+            "end_ea": "0x140002E0E"
+          },
+          {
+            "name": "__mingw_GetSectionCount",
+            "start_ea": "0x140002E10",
+            "end_ea": "0x140002E3C"
+          },
+          {
+            "name": "_FindPESectionExec",
+            "start_ea": "0x140002E40",
+            "end_ea": "0x140002E9B"
+          },
+          {
+            "name": "_GetPEImageBase",
+            "start_ea": "0x140002EA0",
+            "end_ea": "0x140002EC7"
+          },
+          {
+            "name": "_IsNonwritableInCurrentImage",
+            "start_ea": "0x140002ED0",
+            "end_ea": "0x140002F5A"
+          },
+          {
+            "name": "__mingw_enum_import_library_names",
+            "start_ea": "0x140002F60",
+            "end_ea": "0x140003020"
+          },
+          {
+            "name": "sub_140003020",
+            "start_ea": "0x140003020",
+            "end_ea": "0x140003050"
+          },
+          {
+            "name": "vfprintf",
+            "start_ea": "0x140003050",
+            "end_ea": "0x140003084"
+          },
+          {
+            "name": "_guard_dispatch_icall_dummy",
+            "start_ea": "0x140003090",
+            "end_ea": "0x140003092"
+          },
+          {
+            "name": "__local_stdio_printf_options",
+            "start_ea": "0x1400030A0",
+            "end_ea": "0x1400030A8"
+          },
+          {
+            "name": "__C_specific_handler",
+            "start_ea": "0x1400030B0",
+            "end_ea": "0x1400030B6"
+          },
+          {
+            "name": "__p__commode",
+            "start_ea": "0x1400030C0",
+            "end_ea": "0x1400030C6"
+          },
+          {
+            "name": "__p__fmode",
+            "start_ea": "0x1400030D0",
+            "end_ea": "0x1400030D6"
+          },
+          {
+            "name": "_cexit",
+            "start_ea": "0x1400030E0",
+            "end_ea": "0x1400030E6"
+          },
+          {
+            "name": "_configthreadlocale",
+            "start_ea": "0x1400030F0",
+            "end_ea": "0x1400030F6"
+          },
+          {
+            "name": "_crt_atexit",
+            "start_ea": "0x140003100",
+            "end_ea": "0x140003106"
+          },
+          {
+            "name": "_initterm",
+            "start_ea": "0x140003110",
+            "end_ea": "0x140003116"
+          },
+          {
+            "name": "_initterm_e",
+            "start_ea": "0x140003120",
+            "end_ea": "0x140003126"
+          },
+          {
+            "name": "_set_invalid_parameter_handler",
+            "start_ea": "0x140003130",
+            "end_ea": "0x140003136"
+          },
+          {
+            "name": "exit",
+            "start_ea": "0x140003140",
+            "end_ea": "0x140003146"
+          },
+          {
+            "name": "free",
+            "start_ea": "0x140003150",
+            "end_ea": "0x140003156"
+          },
+          {
+            "name": "malloc",
+            "start_ea": "0x140003160",
+            "end_ea": "0x140003166"
+          },
+          {
+            "name": "memcpy",
+            "start_ea": "0x140003170",
+            "end_ea": "0x140003176"
+          },
+          {
+            "name": "memset",
+            "start_ea": "0x140003180",
+            "end_ea": "0x140003186"
+          },
+          {
+            "name": "strcpy",
+            "start_ea": "0x140003190",
+            "end_ea": "0x140003196"
+          },
+          {
+            "name": "strlen",
+            "start_ea": "0x1400031A0",
+            "end_ea": "0x1400031A6"
+          },
+          {
+            "name": "strncpy",
+            "start_ea": "0x1400031B0",
+            "end_ea": "0x1400031B6"
+          },
+          {
+            "name": "SetUnhandledExceptionFilter",
+            "start_ea": "0x1400031C0",
+            "end_ea": "0x1400031C6"
+          },
+          {
+            "name": "Sleep",
+            "start_ea": "0x1400031D0",
+            "end_ea": "0x1400031D6"
+          },
+          {
+            "name": "signal",
+            "start_ea": "0x1400031E0",
+            "end_ea": "0x1400031E6"
+          },
+          {
+            "name": "__setusermatherr",
+            "start_ea": "0x1400031F0",
+            "end_ea": "0x1400031F6"
+          },
+          {
+            "name": "__acrt_iob_func",
+            "start_ea": "0x140003200",
+            "end_ea": "0x140003206"
+          },
+          {
+            "name": "VirtualProtect",
+            "start_ea": "0x140003210",
+            "end_ea": "0x140003216"
+          },
+          {
+            "name": "VirtualQuery",
+            "start_ea": "0x140003220",
+            "end_ea": "0x140003226"
+          },
+          {
+            "name": "GetLastError",
+            "start_ea": "0x140003230",
+            "end_ea": "0x140003236"
+          },
+          {
+            "name": "abort",
+            "start_ea": "0x140003240",
+            "end_ea": "0x140003246"
+          },
+          {
+            "name": "_initialize_narrow_environment",
+            "start_ea": "0x140003250",
+            "end_ea": "0x140003256"
+          },
+          {
+            "name": "_configure_narrow_argv",
+            "start_ea": "0x140003260",
+            "end_ea": "0x140003266"
+          },
+          {
+            "name": "__p___argc",
+            "start_ea": "0x140003270",
+            "end_ea": "0x140003276"
+          },
+          {
+            "name": "__p___argv",
+            "start_ea": "0x140003280",
+            "end_ea": "0x140003286"
+          },
+          {
+            "name": "__p__environ",
+            "start_ea": "0x140003290",
+            "end_ea": "0x140003296"
+          },
+          {
+            "name": "_set_new_mode",
+            "start_ea": "0x1400032A0",
+            "end_ea": "0x1400032A6"
+          },
+          {
+            "name": "_set_app_type",
+            "start_ea": "0x1400032B0",
+            "end_ea": "0x1400032B6"
+          },
+          {
+            "name": "_exit",
+            "start_ea": "0x1400032C0",
+            "end_ea": "0x1400032C6"
+          },
+          {
+            "name": "__stdio_common_vfprintf",
+            "start_ea": "0x1400032D0",
+            "end_ea": "0x1400032D6"
+          }
+        ]
+      },
+      "duration_ms": 1501.1
+    }
+  ]
+}

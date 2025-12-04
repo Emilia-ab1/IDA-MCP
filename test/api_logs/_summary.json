@@ -1,0 +1,12 @@
+{
+  "generated_at": "2025-12-04T17:31:52.040938",
+  "total_calls": 13,
+  "stats_by_category": {
+    "debug": 12,
+    "core": 1
+  },
+  "files": [
+    "core.json",
+    "debug.json"
+  ]
+}

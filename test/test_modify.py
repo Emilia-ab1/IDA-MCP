@@ -1,0 +1,196 @@
+"""测试 api_modify.py 中的工具。
+
+测试逻辑：
+1. 使用 fixtures 获取有效的函数/全局变量地址
+2. 测试注释、重命名等修改操作
+3. 注意：这些测试会修改 IDB 数据库
+
+API 参数对应：
+- set_comment: items (List of {address, comment})
+- rename_function: function_address (str), new_name
+- rename_local_variable: function_address (str), old_name, new_name
+- rename_global_variable: old_name, new_name
+"""
+import pytest
+
+
+class TestSetComment:
+    """设置注释测试。"""
+    
+    def test_set_comment_single(self, tool_caller, first_function_address):
+        """测试设置单个注释。"""
+        test_comment = "Test comment from pytest"
+        # API 接受 items: List[{address, comment}]
+        result = tool_caller("set_comment", {
+            "items": [{"address": hex(first_function_address), "comment": test_comment}]
+        })
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        if "error" not in result[0]:
+            # API 返回 changed 字段
+            assert "changed" in result[0]
+    
+    def test_set_comment_batch(self, tool_caller, functions_cache):
+        """测试批量设置注释。"""
+        if len(functions_cache) < 3:
+            pytest.skip("Not enough functions")
+        
+        items = [
+            {"address": f["start_ea"], "comment": f"Batch comment {i}"}
+            for i, f in enumerate(functions_cache[:3])
+        ]
+        result = tool_caller("set_comment", {"items": items})
+        
+        assert isinstance(result, list)
+        assert len(result) == 3
+    
+    def test_set_comment_clear(self, tool_caller, first_function_address):
+        """测试清除注释。"""
+        addr = hex(first_function_address)
+        # 先设置注释
+        tool_caller("set_comment", {
+            "items": [{"address": addr, "comment": "To be cleared"}]
+        })
+        
+        # 然后清除
+        result = tool_caller("set_comment", {
+            "items": [{"address": addr, "comment": ""}]
+        })
+        
+        assert isinstance(result, list)
+    
+    def test_set_comment_multiple_different(self, tool_caller, functions_cache):
+        """测试设置不同的注释到不同地址。"""
+        if len(functions_cache) < 2:
+            pytest.skip("Not enough functions")
+        
+        items = [
+            {"address": functions_cache[0]["start_ea"], "comment": "Comment A"},
+            {"address": functions_cache[1]["start_ea"], "comment": "Comment B"},
+        ]
+        result = tool_caller("set_comment", {"items": items})
+        
+        assert isinstance(result, list)
+        assert len(result) == 2
+
+
+class TestRenameFunction:
+    """重命名函数测试。"""
+    
+    def test_rename_function(self, tool_caller, first_function):
+        """测试重命名函数。"""
+        old_name = first_function["name"]
+        # start_ea 是 hex 字符串，去掉 0x 前缀用于名称
+        addr_str = first_function['start_ea'].replace('0x', '').replace('0X', '')
+        new_name = f"test_renamed_{addr_str}"
+        
+        # API 参数: function_address (str), new_name
+        result = tool_caller("rename_function", {
+            "function_address": first_function["start_ea"],
+            "new_name": new_name
+        })
+        
+        if "error" not in result:
+            assert "changed" in result
+            # 恢复原名
+            tool_caller("rename_function", {
+                "function_address": first_function["start_ea"],
+                "new_name": old_name
+            })
+        else:
+            # 如果失败，打印调试信息
+            print(f"rename_function failed: {result}")
+            # 可能是数据库状态问题，尝试通过函数名
+            result2 = tool_caller("rename_function", {
+                "function_address": old_name,
+                "new_name": new_name
+            })
+            if "error" not in result2:
+                # 恢复原名
+                tool_caller("rename_function", {
+                    "function_address": new_name,
+                    "new_name": old_name
+                })
+    
+    def test_rename_function_by_name(self, tool_caller, first_function):
+        """测试通过函数名重命名（回退测试）。"""
+        old_name = first_function["name"]
+        new_name = f"test_by_name_{old_name[:8]}"
+        
+        result = tool_caller("rename_function", {
+            "function_address": old_name,
+            "new_name": new_name
+        })
+        
+        # 恢复原名（无论成功与否都尝试）
+        if "error" not in result:
+            tool_caller("rename_function", {
+                "function_address": new_name,
+                "new_name": old_name
+            })
+    
+    def test_rename_function_invalid_name(self, tool_caller, first_function):
+        """测试使用无效名称（以数字开头）。"""
+        result = tool_caller("rename_function", {
+            "function_address": first_function["start_ea"],
+            "new_name": "123invalid"
+        })
+        # API 验证 C 标识符，应该返回错误
+        assert "error" in result
+    
+    def test_rename_function_empty_name(self, tool_caller, first_function):
+        """测试空名称。"""
+        result = tool_caller("rename_function", {
+            "function_address": first_function["start_ea"],
+            "new_name": ""
+        })
+        assert "error" in result
+
+
+class TestRenameLocalVariable:
+    """重命名局部变量测试。"""
+    
+    @pytest.mark.hexrays
+    def test_rename_local_variable(self, tool_caller, first_function_address):
+        """测试重命名局部变量。"""
+        # API 参数: function_address (str), old_name, new_name
+        result = tool_caller("rename_local_variable", {
+            "function_address": hex(first_function_address),
+            "old_name": "v1",
+            "new_name": "test_var"
+        })
+        # 可能成功或失败（取决于是否有该变量）
+        assert isinstance(result, dict)
+
+
+class TestRenameGlobalVariable:
+    """重命名全局变量测试。"""
+    
+    def test_rename_global_variable(self, tool_caller, first_global):
+        """测试重命名全局变量。"""
+        old_name = first_global["name"]
+        # ea 是 hex 字符串，去掉 0x 前缀用于名称
+        addr_str = first_global['ea'].replace('0x', '').replace('0X', '')
+        new_name = f"test_global_{addr_str}"
+        
+        # API 参数: old_name, new_name
+        result = tool_caller("rename_global_variable", {
+            "old_name": old_name,
+            "new_name": new_name
+        })
+        
+        if "error" not in result and result.get("changed"):
+            # 恢复原名
+            tool_caller("rename_global_variable", {
+                "old_name": new_name,
+                "new_name": old_name
+            })
+    
+    def test_rename_global_variable_not_found(self, tool_caller):
+        """测试重命名不存在的全局变量。"""
+        result = tool_caller("rename_global_variable", {
+            "old_name": "nonexistent_global_xyz123",
+            "new_name": "new_name"
+        })
+        assert "error" in result

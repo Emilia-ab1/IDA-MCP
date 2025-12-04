@@ -1,0 +1,319 @@
+{
+  "category": "modify",
+  "generated_at": "2025-12-04T17:12:25.719296",
+  "total_calls": 15,
+  "calls": [
+    {
+      "timestamp": "2025-12-04T17:11:21.895573",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x140001000",
+            "comment": "Test comment from pytest"
+          }
+        ]
+      },
+      "port": 8765,
+      "result": [
+        {
+          "address": "0x140001000",
+          "old": null,
+          "new": "Test comment from pytest",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1492.23
+    },
+    {
+      "timestamp": "2025-12-04T17:11:23.430465",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x140001000",
+            "comment": "Batch comment 0"
+          },
+          {
+            "address": "0x140001020",
+            "comment": "Batch comment 1"
+          },
+          {
+            "address": "0x1400013A0",
+            "comment": "Batch comment 2"
+          }
+        ]
+      },
+      "port": 8765,
+      "result": [
+        {
+          "address": "0x140001000",
+          "old": "Test comment from pytest",
+          "new": "Batch comment 0",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x140001020",
+          "old": null,
+          "new": "Batch comment 1",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x1400013A0",
+          "old": null,
+          "new": "Batch comment 2",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1532.98
+    },
+    {
+      "timestamp": "2025-12-04T17:11:24.923248",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x140001000",
+            "comment": "To be cleared"
+          }
+        ]
+      },
+      "port": 8765,
+      "result": [
+        {
+          "address": "0x140001000",
+          "old": "Batch comment 0",
+          "new": "To be cleared",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1490.6
+    },
+    {
+      "timestamp": "2025-12-04T17:11:26.389156",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x140001000",
+            "comment": ""
+          }
+        ]
+      },
+      "port": 8765,
+      "result": [
+        {
+          "address": "0x140001000",
+          "old": "To be cleared",
+          "new": null,
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1465.74
+    },
+    {
+      "timestamp": "2025-12-04T17:11:27.875942",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x140001000",
+            "comment": "Comment A"
+          },
+          {
+            "address": "0x140001020",
+            "comment": "Comment B"
+          }
+        ]
+      },
+      "port": 8765,
+      "result": [
+        {
+          "address": "0x140001000",
+          "old": null,
+          "new": "Comment A",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x140001020",
+          "old": "Batch comment 1",
+          "new": "Comment B",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1485.52
+    },
+    {
+      "timestamp": "2025-12-04T17:11:29.404480",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x140001000",
+        "new_name": "test_renamed_140001000"
+      },
+      "port": 8765,
+      "result": {
+        "start_ea": "0x140001000",
+        "old_name": "WinMainCRTStartup",
+        "new_name": "test_renamed_140001000",
+        "changed": true
+      },
+      "duration_ms": 1526.22
+    },
+    {
+      "timestamp": "2025-12-04T17:11:30.912790",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x140001000",
+        "new_name": "WinMainCRTStartup"
+      },
+      "port": 8765,
+      "result": {
+        "start_ea": "0x140001000",
+        "old_name": "test_renamed_140001000",
+        "new_name": "WinMainCRTStartup",
+        "changed": true
+      },
+      "duration_ms": 1507.97
+    },
+    {
+      "timestamp": "2025-12-04T17:11:32.431587",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "WinMainCRTStartup",
+        "new_name": "test_by_name_WinMainC"
+      },
+      "port": 8765,
+      "result": {
+        "start_ea": "0x140001000",
+        "old_name": "WinMainCRTStartup",
+        "new_name": "test_by_name_WinMainC",
+        "changed": true
+      },
+      "duration_ms": 1516.84
+    },
+    {
+      "timestamp": "2025-12-04T17:11:33.927411",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "test_by_name_WinMainC",
+        "new_name": "WinMainCRTStartup"
+      },
+      "port": 8765,
+      "result": {
+        "start_ea": "0x140001000",
+        "old_name": "test_by_name_WinMainC",
+        "new_name": "WinMainCRTStartup",
+        "changed": true
+      },
+      "duration_ms": 1496.01
+    },
+    {
+      "timestamp": "2025-12-04T17:11:35.450852",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x140001000",
+        "new_name": "123invalid"
+      },
+      "port": 8765,
+      "result": {
+        "error": "new_name not a valid C identifier"
+      },
+      "duration_ms": 1521.79
+    },
+    {
+      "timestamp": "2025-12-04T17:11:36.987166",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x140001000",
+        "new_name": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty new_name"
+      },
+      "duration_ms": 1534.68
+    },
+    {
+      "timestamp": "2025-12-04T17:11:38.549433",
+      "category": "modify",
+      "tool": "rename_local_variable",
+      "params": {
+        "function_address": "0x140001000",
+        "old_name": "v1",
+        "new_name": "test_var"
+      },
+      "port": 8765,
+      "result": {
+        "error": "local variable not found"
+      },
+      "duration_ms": 1559.08
+    },
+    {
+      "timestamp": "2025-12-04T17:11:41.623183",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "_gnu_exception_handler",
+        "new_name": "test_global_140002120"
+      },
+      "port": 8765,
+      "result": {
+        "ea": "0x140002120",
+        "old_name": "_gnu_exception_handler",
+        "new_name": "test_global_140002120",
+        "changed": true
+      },
+      "duration_ms": 1498.8
+    },
+    {
+      "timestamp": "2025-12-04T17:11:43.179530",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "test_global_140002120",
+        "new_name": "_gnu_exception_handler"
+      },
+      "port": 8765,
+      "result": {
+        "ea": "0x140002120",
+        "old_name": "test_global_140002120",
+        "new_name": "_gnu_exception_handler",
+        "changed": true
+      },
+      "duration_ms": 1556.25
+    },
+    {
+      "timestamp": "2025-12-04T17:11:44.748611",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "nonexistent_global_xyz123",
+        "new_name": "new_name"
+      },
+      "port": 8765,
+      "result": {
+        "error": "global not found"
+      },
+      "duration_ms": 1566.84
+    }
+  ]
+}

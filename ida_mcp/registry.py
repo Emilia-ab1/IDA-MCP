@@ -86,7 +86,6 @@ _server_thread: Optional[threading.Thread] = None
 _self_pid = os.getpid()
 _current_instance_port: Optional[int] = None
 
-
 def _short(v: Any) -> str:
     try:
         s = json.dumps(v, ensure_ascii=False)
@@ -167,6 +166,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
             self._send(404, {"error": "not found"})
 
     def do_POST(self):  # type: ignore
+        global _current_instance_port
         length = int(self.headers.get('Content-Length', '0'))
         raw = self.rfile.read(length) if length else b''
         try:
@@ -261,16 +261,31 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 async def _do():
                     async with Client(f"http://127.0.0.1:{port}/mcp/", timeout=REQUEST_TIMEOUT) as c:  # type: ignore
                         resp = await c.call_tool(tool, params)
-                        # Convert data into plain JSON serializable structures
-                        def norm(x):
-                            if isinstance(x, list):
-                                return [norm(i) for i in x]
-                            if isinstance(x, dict):
-                                return {k: norm(v) for k, v in x.items()}
-                            if hasattr(x, '__dict__'):
-                                return norm(vars(x))
-                            return x
-                        return {"tool": tool, "data": norm(resp.data)}
+                        # Extract data from response content (JSON text)
+                        # fastmcp returns data in resp.content[0].text as JSON string
+                        data = None
+                        if hasattr(resp, 'content') and resp.content:
+                            for item in resp.content:
+                                if hasattr(item, 'text') and item.text:
+                                    try:
+                                        data = json.loads(item.text)
+                                        break
+                                    except (json.JSONDecodeError, TypeError):
+                                        continue
+                        # Fallback: try resp.data with normalization
+                        if data is None and hasattr(resp, 'data') and resp.data is not None:
+                            def norm(x):
+                                if isinstance(x, list):
+                                    return [norm(i) for i in x]
+                                if isinstance(x, dict):
+                                    return {k: norm(v) for k, v in x.items()}
+                                if hasattr(x, 'model_dump'):
+                                    return x.model_dump()
+                                if hasattr(x, '__dict__') and x.__dict__:
+                                    return norm(vars(x))
+                                return x
+                            data = norm(resp.data)
+                        return {"tool": tool, "data": data}
                 result = asyncio.run(_do())
                 dt_ms = int((time.time() - t0) * 1000)
                 # Attempt to estimate response size

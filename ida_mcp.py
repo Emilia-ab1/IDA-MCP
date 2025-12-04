@@ -67,6 +67,11 @@
 本文件只包含逻辑入口与生命周期管理, 实际工具定义在 ``ida_mcp/server.py``。
 """
 
+import warnings
+# 必须在任何可能导入 websockets 的模块之前设置过滤器
+warnings.filterwarnings("ignore", category=DeprecationWarning, module=r"websockets\..*")
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=r".*websockets.*")
+
 import threading
 import os
 import traceback
@@ -80,8 +85,7 @@ except Exception:  # pragma: no cover - outside IDA
     idaapi = None  # type: ignore
     ida_kernwin = None  # type: ignore
 
-from ida_mcp.server import create_mcp_server, DEFAULT_PORT
-from ida_mcp import registry
+from ida_mcp import create_mcp_server, DEFAULT_PORT, registry
 
 _server_thread: threading.Thread | None = None  # 后台 uvicorn 线程 (运行 FastMCP ASGI 服务)
 _uv_server = None  # type: ignore               # uvicorn.Server 实例引用, 用于优雅关闭 (should_exit)
@@ -111,10 +115,24 @@ def _heartbeat_loop():
     """
     global _last_register_ts
     pid = os.getpid()
+    
+    # 等待服务器初始化完成 (最多 10 秒)
+    for _ in range(20):
+        if _hb_stop.is_set():
+            _info("Heartbeat thread exit (stop signal during startup).")
+            return
+        if _uv_server is not None:
+            break
+        time.sleep(0.5)
+    
     while not _hb_stop.is_set():
         # 若服务已经关闭, 退出
-        if _active_port is None or _uv_server is None:
+        if _active_port is None:
             break
+        # 服务器可能在重启中，跳过本轮检查
+        if _uv_server is None:
+            _hb_stop.wait(_HEARTBEAT_INTERVAL)
+            continue
         try:
             inst_list = registry.get_instances()
         except Exception:
@@ -258,10 +276,8 @@ def stop_server():
         _hb_thread = None
         _info("Server stopped.")
 
-
 def PLUGIN_ENTRY():  # IDA looks for this symbol
     return IDAMCPPlugin()
-
 
 class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
     flags = 0
@@ -302,7 +318,6 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
         if is_running():
             stop_server()
 
-
 def start_server_async(host: str, port: int):
     """异步(线程)启动 uvicorn FastMCP 服务。
 
@@ -332,6 +347,10 @@ def start_server_async(host: str, port: int):
             server = create_mcp_server()
             # 构建 ASGI 应用 (包含 SSE 端点), 挂载路径 '/mcp'
             app = server.http_app(path="/mcp")  # type: ignore[attr-defined]
+            # 在导入 uvicorn 之前再次确保过滤器生效
+            import warnings as _w
+            _w.filterwarnings("ignore", category=DeprecationWarning, module=r"websockets")
+            _w.filterwarnings("ignore", category=DeprecationWarning, module=r"uvicorn")
             import uvicorn  # Local import to avoid overhead if never started
             # 使用 warning 日志级别并关闭 access log, 避免输出无意义的 CTRL+C 提示。
             config = uvicorn.Config(app, host=host, port=port, log_level="warning", access_log=False)

@@ -1,2 +1,2 @@
-fastmcp==2.13.0.2
-capstone==5.0.6
+fastmcp==2.13.2
+pytest==9.0.1

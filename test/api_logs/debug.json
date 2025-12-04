@@ -1,0 +1,412 @@
+{
+  "category": "debug",
+  "generated_at": "2025-12-04T17:31:52.030310",
+  "total_calls": 12,
+  "calls": [
+    {
+      "timestamp": "2025-12-04T17:31:28.739986",
+      "category": "debug",
+      "tool": "dbg_list_breakpoints",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "total": 0,
+        "breakpoints": []
+      },
+      "duration_ms": 1514.82
+    },
+    {
+      "timestamp": "2025-12-04T17:31:31.723228",
+      "category": "debug",
+      "tool": "dbg_set_breakpoint",
+      "params": {
+        "address": 5368714144
+      },
+      "port": 8765,
+      "result": {
+        "query": "5368714144",
+        "ok": false,
+        "ea": 5368714144,
+        "existed": false,
+        "added": false,
+        "error": null
+      },
+      "duration_ms": 1479.43
+    },
+    {
+      "timestamp": "2025-12-04T17:31:33.242549",
+      "category": "debug",
+      "tool": "dbg_list_breakpoints",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "total": 0,
+        "breakpoints": []
+      },
+      "duration_ms": 1517.18
+    },
+    {
+      "timestamp": "2025-12-04T17:31:34.768364",
+      "category": "debug",
+      "tool": "dbg_enable_breakpoint",
+      "params": {
+        "address": 5368714144,
+        "enable": true
+      },
+      "port": 8765,
+      "result": {
+        "ok": false,
+        "ea": 5368714144,
+        "existed": false,
+        "enabled": false,
+        "changed": false
+      },
+      "duration_ms": 1523.75
+    },
+    {
+      "timestamp": "2025-12-04T17:31:41.086859",
+      "category": "debug",
+      "tool": "dbg_start_process",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "started": true,
+        "pid": null,
+        "suspended": true
+      },
+      "duration_ms": 6316.66
+    },
+    {
+      "timestamp": "2025-12-04T17:31:42.587153",
+      "category": "debug",
+      "tool": "dbg_get_registers",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "registers": [
+          {
+            "name": "RAX",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "RBX",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RCX",
+            "value": "0x000000FA929A0000",
+            "int": 1076201390080
+          },
+          {
+            "name": "RDX",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "RSI",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RDI",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RBP",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RSP",
+            "value": "0x000000FA9270FCA8",
+            "int": 1076198702248
+          },
+          {
+            "name": "R8",
+            "value": "0x000000FA929A0000",
+            "int": 1076201390080
+          },
+          {
+            "name": "R9",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R10",
+            "value": "0x00007FFE90A8E210",
+            "int": 140731325407760
+          },
+          {
+            "name": "R11",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R12",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R13",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R14",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R15",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RIP",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "CS",
+            "value": "0x33",
+            "int": 51
+          },
+          {
+            "name": "SS",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "DS",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "ES",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "FS",
+            "value": "0x53",
+            "int": 83
+          },
+          {
+            "name": "GS",
+            "value": "0x2B",
+            "int": 43
+          }
+        ],
+        "notes": [
+          "using hardcoded x64 register names"
+        ]
+      },
+      "duration_ms": 1498.54
+    },
+    {
+      "timestamp": "2025-12-04T17:31:44.112375",
+      "category": "debug",
+      "tool": "dbg_get_registers",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "registers": [
+          {
+            "name": "RAX",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "RBX",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RCX",
+            "value": "0x000000FA929A0000",
+            "int": 1076201390080
+          },
+          {
+            "name": "RDX",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "RSI",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RDI",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RBP",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RSP",
+            "value": "0x000000FA9270FCA8",
+            "int": 1076198702248
+          },
+          {
+            "name": "R8",
+            "value": "0x000000FA929A0000",
+            "int": 1076201390080
+          },
+          {
+            "name": "R9",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R10",
+            "value": "0x00007FFE90A8E210",
+            "int": 140731325407760
+          },
+          {
+            "name": "R11",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R12",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R13",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R14",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "R15",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "RIP",
+            "value": "0x00007FF6A16413A0",
+            "int": 140697246372768
+          },
+          {
+            "name": "CS",
+            "value": "0x33",
+            "int": 51
+          },
+          {
+            "name": "SS",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "DS",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "ES",
+            "value": "0x00",
+            "int": 0
+          },
+          {
+            "name": "FS",
+            "value": "0x53",
+            "int": 83
+          },
+          {
+            "name": "GS",
+            "value": "0x2B",
+            "int": 43
+          }
+        ],
+        "notes": [
+          "using hardcoded x64 register names"
+        ]
+      },
+      "duration_ms": 1522.48
+    },
+    {
+      "timestamp": "2025-12-04T17:31:45.646524",
+      "category": "debug",
+      "tool": "dbg_get_call_stack",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": false,
+        "frames": [],
+        "note": "call stack API unavailable or empty"
+      },
+      "duration_ms": 1532.95
+    },
+    {
+      "timestamp": "2025-12-04T17:31:47.200617",
+      "category": "debug",
+      "tool": "dbg_step_into",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "stepped": true
+      },
+      "duration_ms": 1551.44
+    },
+    {
+      "timestamp": "2025-12-04T17:31:48.820117",
+      "category": "debug",
+      "tool": "dbg_step_over",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "stepped": true
+      },
+      "duration_ms": 1517.13
+    },
+    {
+      "timestamp": "2025-12-04T17:31:50.477774",
+      "category": "debug",
+      "tool": "dbg_delete_breakpoint",
+      "params": {
+        "address": 5368714144
+      },
+      "port": 8765,
+      "result": {
+        "query": "5368714144",
+        "ok": true,
+        "ea": 5368714144,
+        "existed": false,
+        "deleted": false,
+        "error": null
+      },
+      "duration_ms": 1555.09
+    },
+    {
+      "timestamp": "2025-12-04T17:31:52.010953",
+      "category": "debug",
+      "tool": "dbg_exit_process",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "exited": true
+      },
+      "duration_ms": 1531.47
+    }
+  ]
+}
