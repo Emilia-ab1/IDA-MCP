@@ -2,10 +2,11 @@
 
 提供工具:
     - declare_type         声明/更新类型
-    - apply_types          应用类型
     - set_function_prototype  设置函数原型
     - set_local_variable_type 设置局部变量类型
     - set_global_variable_type 设置全局变量类型
+    - list_structs         列出结构体
+    - get_struct_info      获取结构体详情
 """
 from __future__ import annotations
 
@@ -83,8 +84,8 @@ def _parse_decls_python(decls: str, hti_flags: int) -> tuple:
     """
     try:
         # ida_typeinf.parse_decls(til, input, printer, hti_flags)
-        # til=None 使用默认类型库
-        errors = ida_typeinf.parse_decls(None, decls, False, hti_flags)
+        # 使用默认类型库
+        errors = ida_typeinf.parse_decls(ida_typeinf.get_idati(), decls, False, hti_flags)
         return (errors, [])
     except Exception as e:
         return (-1, [str(e)])
@@ -539,3 +540,132 @@ def set_global_variable_type(
         "new_type": new_type_str,
         "applied": bool(applied),
     }
+
+
+# ============================================================================
+# 结构体列表
+# ============================================================================
+
+@tool
+@idaread
+def list_structs(
+    pattern: Annotated[Optional[str], "Optional name filter"] = None,
+) -> dict:
+    """List all structures/unions defined in the database."""
+    items: List[dict] = []
+    
+    try:
+        # 使用 get_ordinal_limit() 获取 ordinal 上限（参考 ida-pro-mcp 实现）
+        limit = ida_typeinf.get_ordinal_limit()  # type: ignore
+        
+        for ordinal in range(1, limit):
+            try:
+                tif = ida_typeinf.tinfo_t()
+                # 使用 tinfo_t.get_numbered_type(None, ordinal) 方法
+                tif.get_numbered_type(None, ordinal)
+                
+                # 只保留 UDT (User Defined Types: struct/union)
+                if not tif.is_udt():
+                    continue
+                
+                name = tif.get_type_name()
+                if not name:
+                    continue
+                
+                # 获取成员信息
+                udt = ida_typeinf.udt_type_data_t()
+                member_count = 0
+                is_union = False
+                if tif.get_udt_details(udt):
+                    member_count = udt.size()
+                    is_union = udt.is_union
+                
+                items.append({
+                    "ordinal": ordinal,
+                    "name": name,
+                    "kind": "union" if is_union else "struct",
+                    "size": tif.get_size(),
+                    "members": member_count,
+                })
+            except Exception:
+                continue
+    except Exception:
+        pass
+    
+    # 过滤
+    if pattern:
+        substr = pattern.lower()
+        items = [it for it in items if substr in it.get('name', '').lower()]
+    
+    return {"total": len(items), "items": items}
+
+
+# ============================================================================
+# 结构体详情
+# ============================================================================
+
+@tool
+@idaread
+def get_struct_info(
+    name: Annotated[str, "Structure/union name"],
+) -> dict:
+    """Get detailed structure/union definition with fields."""
+    if not name or not name.strip():
+        return {"error": "empty name"}
+    
+    name = name.strip()
+    
+    try:
+        til = ida_typeinf.get_idati()
+        tif = ida_typeinf.tinfo_t()
+        
+        # 尝试按名称获取类型
+        if not tif.get_named_type(til, name):
+            return {"error": "type not found", "name": name}
+        
+        if not (tif.is_struct() or tif.is_union()):
+            return {"error": "not a struct/union", "name": name}
+        
+        kind = "struct" if tif.is_struct() else "union"
+        size = tif.get_size()
+        
+        # 获取成员详情
+        udt = ida_typeinf.udt_type_data_t()
+        members: List[dict] = []
+        
+        if tif.get_udt_details(udt):
+            for i in range(udt.size()):
+                try:
+                    member = udt[i]
+                    mname = member.name if member.name else f"field_{i}"
+                    mtype = member.type
+                    moffset = member.offset // 8  # 位转字节
+                    msize = member.size // 8 if member.size else None
+                    
+                    # 获取类型字符串
+                    mtype_str = None
+                    if mtype:
+                        try:
+                            mtype_str = ida_typeinf.print_tinfo('', 0, 0, ida_typeinf.PRTYPE_1LINE, mtype, '', '')
+                        except Exception:
+                            mtype_str = str(mtype)
+                    
+                    members.append({
+                        "index": i,
+                        "name": mname,
+                        "type": mtype_str,
+                        "offset": moffset,
+                        "size": msize,
+                    })
+                except Exception:
+                    continue
+        
+        return {
+            "name": name,
+            "kind": kind,
+            "size": size if size != idaapi.BADADDR else None,
+            "members": members,
+            "member_count": len(members),
+        }
+    except Exception as e:
+        return {"error": str(e), "name": name}

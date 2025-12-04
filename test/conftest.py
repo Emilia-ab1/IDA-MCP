@@ -43,6 +43,10 @@ _API_CATEGORIES = {
     "list_local_types": "core",
     "get_entry_points": "core",
     "convert_number": "core",
+    "list_imports": "core",
+    "list_exports": "core",
+    "list_segments": "core",
+    "get_cursor": "core",
     
     # Analysis
     "decompile": "analysis",
@@ -51,6 +55,8 @@ _API_CATEGORIES = {
     "xrefs_to": "analysis",
     "xrefs_from": "analysis",
     "xrefs_to_field": "analysis",
+    "find_bytes": "analysis",
+    "get_basic_blocks": "analysis",
     
     # Memory
     "get_bytes": "memory",
@@ -65,12 +71,15 @@ _API_CATEGORIES = {
     "rename_function": "modify",
     "rename_local_variable": "modify",
     "rename_global_variable": "modify",
+    "patch_bytes": "modify",
     
     # Types
     "declare_type": "types",
     "set_function_prototype": "types",
     "set_local_variable_type": "types",
     "set_global_variable_type": "types",
+    "list_structs": "types",
+    "get_struct_info": "types",
     
     # Stack
     "stack_frame": "stack",
@@ -79,24 +88,15 @@ _API_CATEGORIES = {
     
     # Debug
     "dbg_regs": "debug",
-    "dbg_get_registers": "debug",
     "dbg_callstack": "debug",
-    "dbg_get_call_stack": "debug",
     "dbg_list_bps": "debug",
-    "dbg_list_breakpoints": "debug",
     "dbg_start": "debug",
-    "dbg_start_process": "debug",
     "dbg_exit": "debug",
-    "dbg_exit_process": "debug",
     "dbg_continue": "debug",
-    "dbg_continue_process": "debug",
     "dbg_run_to": "debug",
     "dbg_add_bp": "debug",
-    "dbg_set_breakpoint": "debug",
     "dbg_delete_bp": "debug",
-    "dbg_delete_breakpoint": "debug",
     "dbg_enable_bp": "debug",
-    "dbg_enable_breakpoint": "debug",
     "dbg_step_into": "debug",
     "dbg_step_over": "debug",
     "dbg_read_mem": "debug",

@@ -66,12 +66,7 @@ from typing import List, Dict, Any, Optional
 import os
 import atexit
 import sys
-try:  # optional: IDA console output
-    import ida_kernwin  # type: ignore
-    HAVE_IDA = True
-except Exception:  # pragma: no cover
-    ida_kernwin = None  # type: ignore
-    HAVE_IDA = False
+import ida_kernwin  # type: ignore
 
 COORD_HOST = "127.0.0.1"
 COORD_PORT = 11337
@@ -102,7 +97,7 @@ def _debug_log(event: str, **fields: Any):  # pragma: no cover
     kv = ' '.join(f"{k}={_short(v)}" for k, v in fields.items())
     line = f"[{ts}] [registry] {event} {kv}\n"
     try:
-        if HAVE_IDA and hasattr(ida_kernwin, 'execute_sync') and hasattr(ida_kernwin, 'msg'):
+        if hasattr(ida_kernwin, 'execute_sync') and hasattr(ida_kernwin, 'msg'):
             def _emit():  # type: ignore
                 try:
                     ida_kernwin.msg(line)  # type: ignore
@@ -266,9 +261,10 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                         data = None
                         if hasattr(resp, 'content') and resp.content:
                             for item in resp.content:
-                                if hasattr(item, 'text') and item.text:
+                                text = getattr(item, 'text', None)
+                                if text:
                                     try:
-                                        data = json.loads(item.text)
+                                        data = json.loads(text)
                                         break
                                     except (json.JSONDecodeError, TypeError):
                                         continue

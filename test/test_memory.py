@@ -8,8 +8,14 @@ API 参数对应：
 - get_bytes: addr (逗号分隔), size
 - get_u8/u16/u32/u64: addr (逗号分隔)
 - get_string: addr (逗号分隔), max_len
+
+运行方式：
+    pytest -m memory        # 只运行 memory 模块测试
+    pytest test_memory.py   # 运行此文件所有测试
 """
 import pytest
+
+pytestmark = pytest.mark.memory
 
 
 class TestGetBytes:

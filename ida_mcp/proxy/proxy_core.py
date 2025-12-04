@@ -79,4 +79,43 @@ def register_tools(server: Any) -> None:
     ) -> Any:
         """获取入口点。"""
         return forward("get_entry_points", {}, port)
-
+    
+    @server.tool(description="List imported functions with module names.")
+    def list_imports(
+        offset: Annotated[int, Field(description="Pagination offset")] = 0,
+        count: Annotated[int, Field(description="Number of items")] = 100,
+        pattern: Annotated[Optional[str], Field(description="Optional name/module filter")] = None,
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """列出导入函数。"""
+        params: dict[str, Any] = {"offset": offset, "count": count}
+        if pattern:
+            params["pattern"] = pattern
+        return forward("list_imports", params, port)
+    
+    @server.tool(description="List exported functions/symbols.")
+    def list_exports(
+        offset: Annotated[int, Field(description="Pagination offset")] = 0,
+        count: Annotated[int, Field(description="Number of items")] = 100,
+        pattern: Annotated[Optional[str], Field(description="Optional name filter")] = None,
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """列出导出函数。"""
+        params: dict[str, Any] = {"offset": offset, "count": count}
+        if pattern:
+            params["pattern"] = pattern
+        return forward("list_exports", params, port)
+    
+    @server.tool(description="List memory segments with permissions.")
+    def list_segments(
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """列出内存段。"""
+        return forward("list_segments", {}, port)
+    
+    @server.tool(description="Get current cursor position and context in IDA.")
+    def get_cursor(
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """获取当前光标位置。"""
+        return forward("get_cursor", {}, port)

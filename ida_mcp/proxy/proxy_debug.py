@@ -25,21 +25,21 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """启动调试器。"""
-        return forward("dbg_start_process", {}, port)
+        return forward("dbg_start", {}, port)
     
     @server.tool(description="Exit/terminate debugger process.")
     def dbg_exit(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """退出调试器。"""
-        return forward("dbg_exit_process", {}, port)
+        return forward("dbg_exit", {}, port)
     
     @server.tool(description="Continue debugger execution.")
     def dbg_continue(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """继续执行。"""
-        return forward("dbg_continue_process", {}, port)
+        return forward("dbg_continue", {}, port)
     
     @server.tool(description="Step into next instruction.")
     def dbg_step_into(
@@ -77,21 +77,21 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """获取寄存器。"""
-        return forward("dbg_get_registers", {}, port)
+        return forward("dbg_regs", {}, port)
     
     @server.tool(description="Get call stack.")
     def dbg_stack(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """获取调用栈。"""
-        return forward("dbg_get_call_stack", {}, port)
+        return forward("dbg_callstack", {}, port)
     
     @server.tool(description="List all breakpoints.")
     def dbg_list_breakpoints(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """列出断点。"""
-        return forward("dbg_list_breakpoints", {}, port)
+        return forward("dbg_list_bps", {}, port)
     
     @server.tool(description="Set breakpoint at address.")
     def dbg_set_bp(
@@ -99,7 +99,7 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """设置断点。"""
-        return forward("dbg_set_breakpoint", {"address": address}, port)
+        return forward("dbg_add_bp", {"addr": address}, port)
     
     @server.tool(description="Delete breakpoint at address.")
     def dbg_del_bp(
@@ -107,7 +107,7 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """删除断点。"""
-        return forward("dbg_delete_breakpoint", {"address": address}, port)
+        return forward("dbg_delete_bp", {"addr": address}, port)
     
     @server.tool(description="Enable or disable breakpoint.")
     def dbg_enable_bp(
@@ -116,9 +116,8 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """启用/禁用断点。"""
-        return forward("dbg_enable_breakpoint", {
-            "address": address,
-            "enable": enable
+        return forward("dbg_enable_bp", {
+            "items": [{"address": address, "enable": enable}]
         }, port)
     
     @server.tool(description="Set or delete breakpoint. action='set' or 'delete'.")
@@ -128,6 +127,6 @@ def register_tools(server: Any) -> None:
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """管理断点。"""
-        tool = "dbg_set_breakpoint" if action == "set" else "dbg_delete_breakpoint"
-        return forward(tool, {"address": address}, port)
+        tool = "dbg_add_bp" if action == "set" else "dbg_delete_bp"
+        return forward(tool, {"addr": address}, port)
 

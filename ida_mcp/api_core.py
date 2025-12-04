@@ -11,12 +11,16 @@
     - list_local_types     列出本地类型
     - get_entry_points     列出入口点
     - convert_number       数字转换
+    - list_imports         列出导入表
+    - list_exports         列出导出表
+    - list_segments        列出内存段
+    - get_cursor           获取当前光标位置
 """
 from __future__ import annotations
 
 import os
 import hashlib
-from typing import Annotated, Optional, List
+from typing import Annotated, Optional, List, Union
 
 from .rpc import tool
 from .sync import idaread
@@ -28,6 +32,11 @@ import idautils  # type: ignore
 import ida_funcs  # type: ignore
 import ida_bytes  # type: ignore
 import ida_typeinf  # type: ignore
+import ida_segment  # type: ignore
+import ida_nalt  # type: ignore
+import ida_entry  # type: ignore
+import ida_name  # type: ignore
+import ida_kernwin  # type: ignore
 
 from . import registry
 
@@ -202,7 +211,7 @@ def list_functions(
 @tool
 @idaread
 def get_function(
-    query: Annotated[str, "Function name or address (0x...)"],
+    query: Annotated[Union[int, str], "Function name or address (0x...)"],
 ) -> dict:
     """Get function by name or address. Auto-detects input type."""
     if not query:
@@ -506,3 +515,191 @@ def convert_number(
         "bytes_le": bytes_le,
         "bytes_be": bytes_be,
     }
+
+
+# ============================================================================
+# 导入表
+# ============================================================================
+
+@tool
+@idaread
+def list_imports(
+    offset: Annotated[int, "Pagination offset (>=0)"] = 0,
+    count: Annotated[int, "Number of items (1..1000)"] = 100,
+    pattern: Annotated[Optional[str], "Optional name filter"] = None,
+) -> dict:
+    """List imported functions with module names."""
+    if offset < 0:
+        return {"error": "offset < 0"}
+    if count <= 0:
+        return {"error": "count must be > 0"}
+    if count > 1000:
+        return {"error": "count too large (max 1000)"}
+    
+    items: List[dict] = []
+    
+    def import_callback(ea: int, name: str, ordinal: int) -> bool:
+        """回调函数，收集每个导入项。"""
+        if name:
+            items.append({
+                "ea": hex_addr(ea),
+                "name": name,
+                "ordinal": ordinal if ordinal else None,
+                "module": current_module,
+            })
+        return True  # 继续枚举
+    
+    try:
+        nimps = idaapi.get_import_module_qty()
+        for i in range(nimps):
+            current_module = idaapi.get_import_module_name(i)
+            if current_module is None:
+                current_module = f"module_{i}"
+            idaapi.enum_import_names(i, import_callback)
+    except Exception:
+        pass
+    
+    items.sort(key=lambda x: (x.get('module', ''), x.get('name', '')))
+    
+    if pattern:
+        # 支持搜索函数名或模块名
+        substr = pattern.lower()
+        items = [
+            it for it in items 
+            if substr in it.get('name', '').lower() or substr in it.get('module', '').lower()
+        ]
+    
+    return paginate(items, offset, count)  # type: ignore
+
+
+# ============================================================================
+# 导出表
+# ============================================================================
+
+@tool
+@idaread
+def list_exports(
+    offset: Annotated[int, "Pagination offset (>=0)"] = 0,
+    count: Annotated[int, "Number of items (1..1000)"] = 100,
+    pattern: Annotated[Optional[str], "Optional name filter"] = None,
+) -> dict:
+    """List exported functions/symbols."""
+    if offset < 0:
+        return {"error": "offset < 0"}
+    if count <= 0:
+        return {"error": "count must be > 0"}
+    if count > 1000:
+        return {"error": "count too large (max 1000)"}
+    
+    items: List[dict] = []
+    
+    try:
+        for entry_idx, ordinal, ea, name in idautils.Entries():
+            if name:
+                items.append({
+                    "ea": hex_addr(ea),
+                    "name": name,
+                    "ordinal": ordinal if ordinal else None,
+                })
+    except Exception:
+        pass
+    
+    items.sort(key=lambda x: int(x['ea'], 16))
+    
+    if pattern:
+        items = pattern_filter(items, 'name', pattern)
+    
+    return paginate(items, offset, count)  # type: ignore
+
+
+# ============================================================================
+# 内存段
+# ============================================================================
+
+@tool
+@idaread
+def list_segments() -> dict:
+    """List memory segments with permissions."""
+    items: List[dict] = []
+    
+    try:
+        for seg in idautils.Segments():
+            s = ida_segment.getseg(seg)
+            if not s:
+                continue
+            
+            name = ida_segment.get_segm_name(s)
+            seg_class = ida_segment.get_segm_class(s)
+            
+            # 解析权限
+            perm = s.perm
+            readable = bool(perm & ida_segment.SEGPERM_READ)
+            writable = bool(perm & ida_segment.SEGPERM_WRITE)
+            executable = bool(perm & ida_segment.SEGPERM_EXEC)
+            perm_str = f"{'r' if readable else '-'}{'w' if writable else '-'}{'x' if executable else '-'}"
+            
+            items.append({
+                "name": name,
+                "start_ea": hex_addr(s.start_ea),
+                "end_ea": hex_addr(s.end_ea),
+                "size": s.end_ea - s.start_ea,
+                "perm": perm_str,
+                "class": seg_class,
+                "bitness": s.bitness * 16 + 16,  # 0=16bit, 1=32bit, 2=64bit
+            })
+    except Exception:
+        pass
+    
+    return {"total": len(items), "items": items}
+
+
+# ============================================================================
+# 光标位置
+# ============================================================================
+
+@tool
+@idaread
+def get_cursor() -> dict:
+    """Get current cursor position and context in IDA."""
+    result: dict = {}
+    
+    # 获取当前光标地址
+    try:
+        ea = ida_kernwin.get_screen_ea()
+        result["ea"] = hex_addr(ea)
+        result["ea_int"] = ea
+    except Exception:
+        result["ea"] = None
+        result["ea_int"] = None
+    
+    # 获取当前函数
+    ea_int = result.get("ea_int")
+    if ea_int is not None:
+        try:
+            f = ida_funcs.get_func(ea_int)
+            if f:
+                result["function"] = {
+                    "name": idaapi.get_func_name(f.start_ea),
+                    "start_ea": hex_addr(f.start_ea),
+                    "end_ea": hex_addr(f.end_ea),
+                }
+            else:
+                result["function"] = None
+        except Exception:
+            result["function"] = None
+    
+    # 获取选区
+    try:
+        selection_start, selection_end = ida_kernwin.read_range_selection(None)
+        if selection_start != idaapi.BADADDR and selection_end != idaapi.BADADDR:
+            result["selection"] = {
+                "start": hex_addr(selection_start),
+                "end": hex_addr(selection_end),
+                "size": selection_end - selection_start,
+            }
+        else:
+            result["selection"] = None
+    except Exception:
+        result["selection"] = None
+    
+    return result

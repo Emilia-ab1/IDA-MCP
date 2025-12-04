@@ -13,8 +13,14 @@ API 参数对应：
 注意：
 - 64 位代码和简单函数可能没有显式栈帧定义
 - 栈帧获取可能来自：ida9_frame、classic_frame、hexrays_lvars
+
+运行方式：
+    pytest -m stack         # 只运行 stack 模块测试
+    pytest test_stack.py    # 运行此文件所有测试
 """
 import pytest
+
+pytestmark = pytest.mark.stack
 
 
 class TestStackFrame:

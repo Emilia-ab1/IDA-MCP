@@ -80,4 +80,27 @@ def register_tools(server: Any) -> None:
     ) -> Any:
         """查找函数。"""
         return forward("get_function", {"query": query}, port)
-
+    
+    @server.tool(description="Search for byte pattern with wildcards (e.g. '48 8B ?? ?? 48 89').")
+    def find_bytes(
+        pattern: Annotated[str, Field(description="Byte pattern with wildcards")],
+        start: Annotated[Optional[str], Field(description="Start address")] = None,
+        end: Annotated[Optional[str], Field(description="End address")] = None,
+        limit: Annotated[int, Field(description="Max results")] = 100,
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """字节模式搜索。"""
+        params: dict[str, Any] = {"pattern": pattern, "limit": limit}
+        if start:
+            params["start"] = start
+        if end:
+            params["end"] = end
+        return forward("find_bytes", params, port)
+    
+    @server.tool(description="Get basic blocks with control flow information.")
+    def get_basic_blocks(
+        addr: Annotated[str, Field(description="Function address or name")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """获取基本块。"""
+        return forward("get_basic_blocks", {"addr": addr}, port)

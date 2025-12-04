@@ -4,14 +4,23 @@
 1. 测试类型声明
 2. 测试函数原型设置
 3. 测试变量类型设置
+4. 测试结构体列表和详情
 
 API 参数对应：
 - declare_type: decl
 - set_function_prototype: function_address (int), prototype
 - set_local_variable_type: function_address (int), variable_name, new_type
 - set_global_variable_type: variable_name, new_type
+- list_structs: pattern (可选)
+- get_struct_info: name
+
+运行方式：
+    pytest -m types         # 只运行 types 模块测试
+    pytest test_types.py    # 运行此文件所有测试
 """
 import pytest
+
+pytestmark = pytest.mark.types
 
 
 class TestDeclareType:
@@ -180,3 +189,57 @@ class TestSetGlobalVariableType:
         })
         
         assert isinstance(result, dict)
+
+
+class TestListStructs:
+    """结构体列表测试。"""
+    
+    def test_list_structs(self, tool_caller):
+        """测试列出结构体。"""
+        result = tool_caller("list_structs")
+        assert isinstance(result, dict)
+        assert "items" in result
+        
+        if result["items"]:
+            s = result["items"][0]
+            assert "name" in s
+            assert "kind" in s
+            assert "size" in s
+            assert "members" in s
+    
+    def test_list_structs_with_pattern(self, tool_caller):
+        """测试按模式过滤结构体。"""
+        result = tool_caller("list_structs", {"pattern": "test"})
+        assert isinstance(result, dict)
+        assert "items" in result
+
+
+class TestGetStructInfo:
+    """结构体详情测试。"""
+    
+    def test_get_struct_info(self, tool_caller):
+        """测试获取结构体详情。"""
+        # 先创建一个测试结构体
+        tool_caller("declare_type", {
+            "decl": "struct TestStructInfo { int field1; char field2; void* field3; };"
+        })
+        
+        result = tool_caller("get_struct_info", {"name": "TestStructInfo"})
+        assert isinstance(result, dict)
+        
+        if "error" not in result:
+            assert "name" in result
+            assert "members" in result
+            assert isinstance(result["members"], list)
+    
+    def test_get_struct_info_not_found(self, tool_caller):
+        """测试获取不存在的结构体。"""
+        result = tool_caller("get_struct_info", {"name": "__nonexistent_struct_12345__"})
+        assert isinstance(result, dict)
+        assert "error" in result
+    
+    def test_get_struct_info_empty_name(self, tool_caller):
+        """测试空名称。"""
+        result = tool_caller("get_struct_info", {"name": ""})
+        assert isinstance(result, dict)
+        assert "error" in result

@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 
-from typing import Annotated, Optional, List, Dict, Any
+from typing import Annotated, Optional, List, Dict, Any, Union
 
 from .rpc import tool
 from .sync import idaread, idawrite
@@ -34,7 +34,7 @@ IDA9_OR_LATER = IDA_VERSION >= 900
 @tool
 @idaread
 def stack_frame(
-    addr: Annotated[str, "Function address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Function address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Get stack frame variables for function(s)."""
     queries = normalize_list_input(addr)

@@ -3,11 +3,16 @@
 测试逻辑：
 1. 测试各种资源端点
 2. 验证资源返回格式
+
+运行方式：
+    pytest -m resources     # 只运行 resources 模块测试
+    pytest test_resources.py # 运行此文件所有测试
 """
 import pytest
 import urllib.request
 import json
 
+pytestmark = pytest.mark.resources
 
 COORDINATOR_HOST = "127.0.0.1"
 COORDINATOR_PORT = 11337

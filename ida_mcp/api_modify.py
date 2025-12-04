@@ -1,10 +1,11 @@
-"""修改 API - 注释、重命名等。
+"""修改 API - 注释、重命名、补丁等。
 
 提供工具:
     - set_comment          设置注释 (批量)
     - rename_function      重命名函数
     - rename_local_variable 重命名局部变量
     - rename_global_variable 重命名全局变量
+    - patch_bytes          字节补丁
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from .utils import parse_address, is_valid_c_identifier, normalize_list_input, h
 import idaapi  # type: ignore
 import ida_funcs  # type: ignore
 import ida_hexrays  # type: ignore
+import ida_bytes  # type: ignore
 
 @tool
 @idawrite
@@ -276,4 +278,112 @@ def rename_global_variable(
         "changed": bool(ok),
     }
 
+
+# ============================================================================
+# 字节补丁
+# ============================================================================
+
+@tool
+@idawrite
+def patch_bytes(
+    items: Annotated[List[Dict[str, Any]], "List of {address, bytes: [int,...] or hex_string}"],
+) -> List[dict]:
+    """Patch bytes at address(es). Each item: {address, bytes}.
+    
+    bytes can be:
+    - List of integers: [0x90, 0x90, 0x90]
+    - Hex string: "90 90 90" or "909090"
+    """
+    results = []
+    
+    for item in items:
+        address = item.get("address")
+        data = item.get("bytes")
+        
+        if address is None:
+            results.append({"error": "invalid address", "item": item})
+            continue
+        
+        parsed = parse_address(address)
+        if not parsed["ok"] or parsed["value"] is None:
+            results.append({"error": "invalid address", "address": address})
+            continue
+        
+        addr_int = parsed["value"]
+        
+        # 解析字节数据
+        byte_list: List[int] = []
+        
+        if isinstance(data, list):
+            # 直接是整数列表
+            try:
+                byte_list = [int(b) & 0xFF for b in data]
+            except (ValueError, TypeError) as e:
+                results.append({"error": f"invalid bytes: {e}", "address": hex_addr(addr_int)})
+                continue
+        elif isinstance(data, str):
+            # 十六进制字符串
+            hex_str = data.strip().replace(' ', '')
+            if len(hex_str) % 2 != 0:
+                results.append({"error": "hex string length must be even", "address": hex_addr(addr_int)})
+                continue
+            try:
+                byte_list = [int(hex_str[i:i+2], 16) for i in range(0, len(hex_str), 2)]
+            except ValueError as e:
+                results.append({"error": f"invalid hex string: {e}", "address": hex_addr(addr_int)})
+                continue
+        else:
+            results.append({"error": "bytes must be list or hex string", "address": hex_addr(addr_int)})
+            continue
+        
+        if not byte_list:
+            results.append({"error": "empty bytes", "address": hex_addr(addr_int)})
+            continue
+        
+        if len(byte_list) > 1024:
+            results.append({"error": "bytes too long (max 1024)", "address": hex_addr(addr_int)})
+            continue
+        
+        # 读取原始字节
+        old_bytes = None
+        try:
+            old_data = ida_bytes.get_bytes(addr_int, len(byte_list))
+            if old_data:
+                old_bytes = ' '.join(f'{b:02X}' for b in old_data)
+        except Exception:
+            pass
+        
+        # 写入补丁
+        patched_count = 0
+        errors: List[str] = []
+        
+        for i, b in enumerate(byte_list):
+            try:
+                ida_bytes.patch_byte(addr_int + i, b)
+                patched_count += 1
+            except Exception as e:
+                errors.append(f"offset {i}: {e}")
+                break
+        
+        # 读取验证
+        new_bytes = None
+        try:
+            new_data = ida_bytes.get_bytes(addr_int, len(byte_list))
+            if new_data:
+                new_bytes = ' '.join(f'{b:02X}' for b in new_data)
+        except Exception:
+            pass
+        
+        result: dict = {
+            "address": hex_addr(addr_int),
+            "size": len(byte_list),
+            "patched": patched_count,
+            "old_bytes": old_bytes,
+            "new_bytes": new_bytes,
+            "error": errors[0] if errors else None,
+        }
+        
+        results.append(result)
+    
+    return results
 

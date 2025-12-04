@@ -1,16 +1,16 @@
 """调试器 API - 调试器控制 (unsafe)。
 
 提供工具:
-    - dbg_regs / dbg_get_registers  获取寄存器
-    - dbg_callstack / dbg_get_call_stack  获取调用栈
-    - dbg_list_bps / dbg_list_breakpoints  列出断点
-    - dbg_start / dbg_start_process  启动调试
-    - dbg_exit / dbg_exit_process  退出调试
-    - dbg_continue / dbg_continue_process  继续执行
+    - dbg_regs  获取寄存器
+    - dbg_callstack  获取调用栈
+    - dbg_list_bps  列出断点
+    - dbg_start  启动调试
+    - dbg_exit  退出调试
+    - dbg_continue  继续执行
     - dbg_run_to  运行到地址
-    - dbg_add_bp / dbg_set_breakpoint  添加断点
-    - dbg_delete_bp / dbg_delete_breakpoint  删除断点
-    - dbg_enable_bp / dbg_enable_breakpoint  启用/禁用断点
+    - dbg_add_bp  添加断点
+    - dbg_delete_bp  删除断点
+    - dbg_enable_bp  启用/禁用断点
     - dbg_step_into  单步进入
     - dbg_step_over  单步跳过
     - dbg_read_mem  读取调试内存
@@ -72,13 +72,6 @@ def _wait_for_debugger_event(timeout_ms: int = 1000) -> bool:
 @tool
 @idaread
 def dbg_regs() -> dict:
-    """Get all registers for all threads."""
-    return dbg_get_registers()
-
-
-@tool
-@idaread
-def dbg_get_registers() -> dict:
     """Get all debugger registers (requires active debugger)."""
     try:
         if not ida_dbg.is_debugger_on():
@@ -140,13 +133,6 @@ def dbg_get_registers() -> dict:
 @tool
 @idaread
 def dbg_callstack() -> dict:
-    """Get call stack with module and symbol information."""
-    return dbg_get_call_stack()
-
-
-@tool
-@idaread
-def dbg_get_call_stack() -> dict:
     """Get current call stack (requires active debugger)."""
     try:
         if not ida_dbg.is_debugger_on():
@@ -224,13 +210,6 @@ def dbg_get_call_stack() -> dict:
 @tool
 @idaread
 def dbg_list_bps() -> dict:
-    """List all breakpoints with their status."""
-    return dbg_list_breakpoints()
-
-
-@tool
-@idaread
-def dbg_list_breakpoints() -> dict:
     """List all breakpoints (works without active debugger)."""
     # 注意：断点可以在调试器不运行时存在，所以不检查 is_debugger_on()
     bps: List[dict] = []
@@ -300,13 +279,6 @@ def dbg_list_breakpoints() -> dict:
 @tool
 @idawrite
 def dbg_start() -> dict:
-    """Start debugger process."""
-    return dbg_start_process()
-
-
-@tool
-@idawrite
-def dbg_start_process() -> dict:
     """Start debugger process (debugger type should be configured manually in IDA)."""
     try:
         if ida_dbg.is_debugger_on():
@@ -355,13 +327,6 @@ def dbg_start_process() -> dict:
 @tool
 @idawrite
 def dbg_exit() -> dict:
-    """Exit debugger process."""
-    return dbg_exit_process()
-
-
-@tool
-@idawrite
-def dbg_exit_process() -> dict:
     """Exit debugger."""
     try:
         if not ida_dbg.is_debugger_on():
@@ -380,13 +345,6 @@ def dbg_exit_process() -> dict:
 @tool
 @idawrite
 def dbg_continue() -> dict:
-    """Continue debugger execution."""
-    return dbg_continue_process()
-
-
-@tool
-@idawrite
-def dbg_continue_process() -> dict:
     """Continue execution."""
     try:
         if not ida_dbg.is_debugger_on():
@@ -424,7 +382,7 @@ def dbg_continue_process() -> dict:
 @tool
 @idawrite
 def dbg_run_to(
-    addr: Annotated[str, "Target address to run to"],
+    addr: Annotated[Union[int, str], "Target address to run to"],
 ) -> dict:
     """Run debugger to specific address."""
     parsed = parse_address(addr)
@@ -514,7 +472,7 @@ def dbg_run_to(
 @tool
 @idawrite
 def dbg_add_bp(
-    addr: Annotated[str, "Address(es) for breakpoint - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) for breakpoint - single or comma-separated"],
 ) -> List[dict]:
     """Add breakpoint(s) at address(es)."""
     queries = normalize_list_input(addr)
@@ -587,17 +545,8 @@ def _set_breakpoint_single(query: str) -> dict:
 
 @tool
 @idawrite
-def dbg_set_breakpoint(
-    address: Annotated[Union[int, str], "Address for breakpoint (hex or decimal)"],
-) -> dict:
-    """Set breakpoint at address."""
-    return _set_breakpoint_single(str(address))
-
-
-@tool
-@idawrite
 def dbg_delete_bp(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Delete breakpoint(s) at address(es)."""
     queries = normalize_list_input(addr)
@@ -652,15 +601,6 @@ def _delete_breakpoint_single(query: str) -> dict:
         result['note'] = '; '.join(notes)[:300]
     
     return result
-
-
-@tool
-@idawrite
-def dbg_delete_breakpoint(
-    address: Annotated[Union[int, str], "Breakpoint address (hex or decimal)"],
-) -> dict:
-    """Delete breakpoint at address."""
-    return _delete_breakpoint_single(str(address))
 
 
 @tool
@@ -755,19 +695,6 @@ def _enable_breakpoint_single(address: int, enable: bool) -> dict:
         result['note'] = '; '.join(notes)[:300]
     
     return result
-
-
-@tool
-@idawrite
-def dbg_enable_breakpoint(
-    address: Annotated[Union[int, str], "Breakpoint address (hex or decimal)"],
-    enable: Annotated[bool, "True=enable, False=disable"],
-) -> dict:
-    """Enable or disable breakpoint."""
-    parsed = parse_address(str(address))
-    if not parsed["ok"] or parsed["value"] is None:
-        return {"error": "invalid address"}
-    return _enable_breakpoint_single(parsed["value"], enable)
 
 
 # ============================================================================

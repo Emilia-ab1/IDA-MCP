@@ -1,10 +1,10 @@
 {
   "category": "analysis",
-  "generated_at": "2025-12-04T17:12:25.709928",
-  "total_calls": 18,
+  "generated_at": "2025-12-04T19:00:26.033041",
+  "total_calls": 28,
   "calls": [
     {
-      "timestamp": "2025-12-04T17:09:05.398818",
+      "timestamp": "2025-12-04T18:59:36.452270",
       "category": "analysis",
       "tool": "decompile",
       "params": {
@@ -21,10 +21,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1495.49
+      "duration_ms": 1558.52
     },
     {
-      "timestamp": "2025-12-04T17:09:06.886428",
+      "timestamp": "2025-12-04T18:59:38.189619",
       "category": "analysis",
       "tool": "decompile",
       "params": {
@@ -41,10 +41,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1485.46
+      "duration_ms": 1732.51
     },
     {
-      "timestamp": "2025-12-04T17:09:08.458326",
+      "timestamp": "2025-12-04T18:59:39.833040",
       "category": "analysis",
       "tool": "decompile",
       "params": {
@@ -77,10 +77,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1569.21
+      "duration_ms": 1642.39
     },
     {
-      "timestamp": "2025-12-04T17:09:09.945161",
+      "timestamp": "2025-12-04T18:59:41.586388",
       "category": "analysis",
       "tool": "decompile",
       "params": {
@@ -93,10 +93,10 @@
           "query": "0xDEADBEEF"
         }
       ],
-      "duration_ms": 1484.94
+      "duration_ms": 1750.53
     },
     {
-      "timestamp": "2025-12-04T17:09:11.627887",
+      "timestamp": "2025-12-04T18:59:43.335141",
       "category": "analysis",
       "tool": "decompile",
       "params": {
@@ -113,10 +113,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1680.98
+      "duration_ms": 1745.14
     },
     {
-      "timestamp": "2025-12-04T17:09:13.290713",
+      "timestamp": "2025-12-04T18:59:45.189807",
       "category": "analysis",
       "tool": "disasm",
       "params": {
@@ -188,10 +188,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1660.48
+      "duration_ms": 1852.07
     },
     {
-      "timestamp": "2025-12-04T17:09:14.774556",
+      "timestamp": "2025-12-04T18:59:46.926541",
       "category": "analysis",
       "tool": "disasm",
       "params": {
@@ -263,10 +263,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1481.21
+      "duration_ms": 1734.3
     },
     {
-      "timestamp": "2025-12-04T17:09:16.277608",
+      "timestamp": "2025-12-04T18:59:48.545117",
       "category": "analysis",
       "tool": "disasm",
       "params": {
@@ -1634,10 +1634,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1501.74
+      "duration_ms": 1616.07
     },
     {
-      "timestamp": "2025-12-04T17:09:17.853985",
+      "timestamp": "2025-12-04T18:59:50.395905",
       "category": "analysis",
       "tool": "disasm",
       "params": {
@@ -1650,10 +1650,10 @@
           "query": "0xDEADBEEF"
         }
       ],
-      "duration_ms": 1573.36
+      "duration_ms": 1847.46
     },
     {
-      "timestamp": "2025-12-04T17:09:19.338581",
+      "timestamp": "2025-12-04T18:59:51.987822",
       "category": "analysis",
       "tool": "linear_disassemble",
       "params": {
@@ -1738,10 +1738,10 @@
         ],
         "truncated": true
       },
-      "duration_ms": 1483.2
+      "duration_ms": 1589.88
     },
     {
-      "timestamp": "2025-12-04T17:09:20.962060",
+      "timestamp": "2025-12-04T18:59:53.586940",
       "category": "analysis",
       "tool": "linear_disassemble",
       "params": {
@@ -2106,10 +2106,10 @@
         ],
         "truncated": true
       },
-      "duration_ms": 1621.01
+      "duration_ms": 1610.25
     },
     {
-      "timestamp": "2025-12-04T17:09:22.467985",
+      "timestamp": "2025-12-04T18:59:55.243136",
       "category": "analysis",
       "tool": "linear_disassemble",
       "params": {
@@ -2120,10 +2120,10 @@
       "result": {
         "error": "count out of range (1..64)"
       },
-      "duration_ms": 1504.37
+      "duration_ms": 1641.61
     },
     {
-      "timestamp": "2025-12-04T17:09:23.954793",
+      "timestamp": "2025-12-04T18:59:56.792810",
       "category": "analysis",
       "tool": "linear_disassemble",
       "params": {
@@ -2134,10 +2134,10 @@
       "result": {
         "error": "count out of range (1..64)"
       },
-      "duration_ms": 1484.85
+      "duration_ms": 1552.61
     },
     {
-      "timestamp": "2025-12-04T17:09:25.514107",
+      "timestamp": "2025-12-04T18:59:58.426483",
       "category": "analysis",
       "tool": "xrefs_to",
       "params": {
@@ -2159,10 +2159,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1557.29
+      "duration_ms": 1625.1
     },
     {
-      "timestamp": "2025-12-04T17:09:27.012709",
+      "timestamp": "2025-12-04T19:00:00.094813",
       "category": "analysis",
       "tool": "xrefs_to",
       "params": {
@@ -2184,10 +2184,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1496.83
+      "duration_ms": 1667.45
     },
     {
-      "timestamp": "2025-12-04T17:09:28.494584",
+      "timestamp": "2025-12-04T19:00:01.694919",
       "category": "analysis",
       "tool": "xrefs_to",
       "params": {
@@ -2245,10 +2245,10 @@
           "error": null
         }
       ],
-      "duration_ms": 1479.8
+      "duration_ms": 1597.44
     },
     {
-      "timestamp": "2025-12-04T17:09:31.581449",
+      "timestamp": "2025-12-04T19:00:04.861650",
       "category": "analysis",
       "tool": "xrefs_to",
       "params": {
@@ -2270,10 +2270,102 @@
           "error": null
         }
       ],
-      "duration_ms": 1531.45
+      "duration_ms": 1556.64
     },
     {
-      "timestamp": "2025-12-04T17:09:33.119471",
+      "timestamp": "2025-12-04T19:00:06.441777",
+      "category": "analysis",
+      "tool": "xrefs_from",
+      "params": {
+        "addr": "0x140001000"
+      },
+      "port": 8765,
+      "result": [
+        {
+          "query": "0x140001000",
+          "address": "0x140001000",
+          "total": 1,
+          "xrefs": [
+            {
+              "to": "0x140001004",
+              "type": 21,
+              "iscode": true
+            }
+          ],
+          "error": null
+        }
+      ],
+      "duration_ms": 1574.54
+    },
+    {
+      "timestamp": "2025-12-04T19:00:08.015468",
+      "category": "analysis",
+      "tool": "xrefs_from",
+      "params": {
+        "addr": "0x140001000,0x140001020,0x1400013A0"
+      },
+      "port": 8765,
+      "result": [
+        {
+          "query": "0x140001000",
+          "address": "0x140001000",
+          "total": 1,
+          "xrefs": [
+            {
+              "to": "0x140001004",
+              "type": 21,
+              "iscode": true
+            }
+          ],
+          "error": null
+        },
+        {
+          "query": "0x140001020",
+          "address": "0x140001020",
+          "total": 1,
+          "xrefs": [
+            {
+              "to": "0x140001022",
+              "type": 21,
+              "iscode": true
+            }
+          ],
+          "error": null
+        },
+        {
+          "query": "0x1400013A0",
+          "address": "0x1400013A0",
+          "total": 1,
+          "xrefs": [
+            {
+              "to": "0x1400013A4",
+              "type": 21,
+              "iscode": true
+            }
+          ],
+          "error": null
+        }
+      ],
+      "duration_ms": 1579.21
+    },
+    {
+      "timestamp": "2025-12-04T19:00:09.719656",
+      "category": "analysis",
+      "tool": "xrefs_from",
+      "params": {
+        "addr": "invalid_addr"
+      },
+      "port": 8765,
+      "result": [
+        {
+          "error": "invalid address",
+          "query": "invalid_addr"
+        }
+      ],
+      "duration_ms": 1700.68
+    },
+    {
+      "timestamp": "2025-12-04T19:00:11.428339",
       "category": "analysis",
       "tool": "xrefs_to_field",
       "params": {
@@ -2284,7 +2376,647 @@
       "result": {
         "error": "struct not found"
       },
-      "duration_ms": 1535.38
+      "duration_ms": 1698.91
+    },
+    {
+      "timestamp": "2025-12-04T19:00:16.285001",
+      "category": "analysis",
+      "tool": "find_bytes",
+      "params": {
+        "pattern": "48 83 EC 28",
+        "limit": 5
+      },
+      "port": 8765,
+      "result": {
+        "pattern": "48 83 EC 28",
+        "ida_pattern": "48 83 EC 28",
+        "total": 0,
+        "matches": []
+      },
+      "duration_ms": 1615.05
+    },
+    {
+      "timestamp": "2025-12-04T19:00:17.990628",
+      "category": "analysis",
+      "tool": "find_bytes",
+      "params": {
+        "pattern": "55 48 ?? ??",
+        "limit": 10
+      },
+      "port": 8765,
+      "result": {
+        "pattern": "55 48 ?? ??",
+        "ida_pattern": "55 48 ? ?",
+        "total": 0,
+        "matches": []
+      },
+      "duration_ms": 1702.09
+    },
+    {
+      "timestamp": "2025-12-04T19:00:19.582882",
+      "category": "analysis",
+      "tool": "find_bytes",
+      "params": {
+        "pattern": "ZZ XX"
+      },
+      "port": 8765,
+      "result": {
+        "error": "invalid hex byte: ZZ"
+      },
+      "duration_ms": 1589.62
+    },
+    {
+      "timestamp": "2025-12-04T19:00:21.245381",
+      "category": "analysis",
+      "tool": "find_bytes",
+      "params": {
+        "pattern": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty pattern"
+      },
+      "duration_ms": 1661.29
+    },
+    {
+      "timestamp": "2025-12-04T19:00:22.841221",
+      "category": "analysis",
+      "tool": "get_basic_blocks",
+      "params": {
+        "addr": "0x140001000"
+      },
+      "port": 8765,
+      "result": {
+        "query": "0x140001000",
+        "function": "WinMainCRTStartup",
+        "start_ea": "0x140001000",
+        "end_ea": "0x14000101E",
+        "total": 33,
+        "blocks": [
+          {
+            "start_ea": "0x140001000",
+            "end_ea": "0x140001004",
+            "size": 4,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140001004",
+            "end_ea": "0x140001017",
+            "size": 19,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140001017",
+            "end_ea": "0x14000101E",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 2
+          },
+          {
+            "start_ea": "0x140002120",
+            "end_ea": "0x14000213F",
+            "size": 31,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000213F",
+            "end_ea": "0x14000214E",
+            "size": 15,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000214E",
+            "end_ea": "0x14000215A",
+            "size": 12,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000215A",
+            "end_ea": "0x140002165",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002165",
+            "end_ea": "0x140002175",
+            "size": 16,
+            "predecessors": [],
+            "successors": [],
+            "type": 1
+          },
+          {
+            "start_ea": "0x140002175",
+            "end_ea": "0x140002177",
+            "size": 2,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002177",
+            "end_ea": "0x14000218C",
+            "size": 21,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000218C",
+            "end_ea": "0x140002192",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002192",
+            "end_ea": "0x1400021A9",
+            "size": 23,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021A9",
+            "end_ea": "0x1400021B3",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021B3",
+            "end_ea": "0x1400021BE",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021BE",
+            "end_ea": "0x1400021C5",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021C5",
+            "end_ea": "0x1400021D0",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021D0",
+            "end_ea": "0x1400021D2",
+            "size": 2,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021D2",
+            "end_ea": "0x1400021DC",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021DC",
+            "end_ea": "0x1400021E3",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021E3",
+            "end_ea": "0x1400021F4",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021F4",
+            "end_ea": "0x1400021FA",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021FA",
+            "end_ea": "0x14000220B",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000220B",
+            "end_ea": "0x14000221C",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000221C",
+            "end_ea": "0x140002222",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002222",
+            "end_ea": "0x140002233",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002233",
+            "end_ea": "0x14000223F",
+            "size": 12,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000223F",
+            "end_ea": "0x140002253",
+            "size": 20,
+            "predecessors": [],
+            "successors": [],
+            "type": 1
+          },
+          {
+            "start_ea": "0x140002253",
+            "end_ea": "0x140002257",
+            "size": 4,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002257",
+            "end_ea": "0x14000225E",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000225E",
+            "end_ea": "0x140002265",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002265",
+            "end_ea": "0x14000226A",
+            "size": 5,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000226A",
+            "end_ea": "0x140002270",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002270",
+            "end_ea": "0x14000227A",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 2
+          }
+        ]
+      },
+      "duration_ms": 1595.42
+    },
+    {
+      "timestamp": "2025-12-04T19:00:24.422573",
+      "category": "analysis",
+      "tool": "get_basic_blocks",
+      "params": {
+        "addr": "WinMainCRTStartup"
+      },
+      "port": 8765,
+      "result": {
+        "query": "WinMainCRTStartup",
+        "function": "WinMainCRTStartup",
+        "start_ea": "0x140001000",
+        "end_ea": "0x14000101E",
+        "total": 33,
+        "blocks": [
+          {
+            "start_ea": "0x140001000",
+            "end_ea": "0x140001004",
+            "size": 4,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140001004",
+            "end_ea": "0x140001017",
+            "size": 19,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140001017",
+            "end_ea": "0x14000101E",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 2
+          },
+          {
+            "start_ea": "0x140002120",
+            "end_ea": "0x14000213F",
+            "size": 31,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000213F",
+            "end_ea": "0x14000214E",
+            "size": 15,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000214E",
+            "end_ea": "0x14000215A",
+            "size": 12,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000215A",
+            "end_ea": "0x140002165",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002165",
+            "end_ea": "0x140002175",
+            "size": 16,
+            "predecessors": [],
+            "successors": [],
+            "type": 1
+          },
+          {
+            "start_ea": "0x140002175",
+            "end_ea": "0x140002177",
+            "size": 2,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002177",
+            "end_ea": "0x14000218C",
+            "size": 21,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000218C",
+            "end_ea": "0x140002192",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002192",
+            "end_ea": "0x1400021A9",
+            "size": 23,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021A9",
+            "end_ea": "0x1400021B3",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021B3",
+            "end_ea": "0x1400021BE",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021BE",
+            "end_ea": "0x1400021C5",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021C5",
+            "end_ea": "0x1400021D0",
+            "size": 11,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021D0",
+            "end_ea": "0x1400021D2",
+            "size": 2,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021D2",
+            "end_ea": "0x1400021DC",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021DC",
+            "end_ea": "0x1400021E3",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021E3",
+            "end_ea": "0x1400021F4",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021F4",
+            "end_ea": "0x1400021FA",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x1400021FA",
+            "end_ea": "0x14000220B",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000220B",
+            "end_ea": "0x14000221C",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000221C",
+            "end_ea": "0x140002222",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002222",
+            "end_ea": "0x140002233",
+            "size": 17,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002233",
+            "end_ea": "0x14000223F",
+            "size": 12,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000223F",
+            "end_ea": "0x140002253",
+            "size": 20,
+            "predecessors": [],
+            "successors": [],
+            "type": 1
+          },
+          {
+            "start_ea": "0x140002253",
+            "end_ea": "0x140002257",
+            "size": 4,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002257",
+            "end_ea": "0x14000225E",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000225E",
+            "end_ea": "0x140002265",
+            "size": 7,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002265",
+            "end_ea": "0x14000226A",
+            "size": 5,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x14000226A",
+            "end_ea": "0x140002270",
+            "size": 6,
+            "predecessors": [],
+            "successors": [],
+            "type": 0
+          },
+          {
+            "start_ea": "0x140002270",
+            "end_ea": "0x14000227A",
+            "size": 10,
+            "predecessors": [],
+            "successors": [],
+            "type": 2
+          }
+        ]
+      },
+      "duration_ms": 1576.21
+    },
+    {
+      "timestamp": "2025-12-04T19:00:26.012350",
+      "category": "analysis",
+      "tool": "get_basic_blocks",
+      "params": {
+        "addr": "__nonexistent_func__"
+      },
+      "port": 8765,
+      "result": {
+        "error": "not found",
+        "query": "__nonexistent_func__"
+      },
+      "duration_ms": 1589.51
     }
   ]
 }

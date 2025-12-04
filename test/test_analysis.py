@@ -10,8 +10,16 @@ API 参数对应：
 - disasm: addr (逗号分隔的地址或名称字符串)
 - linear_disassemble: start_address, count
 - xrefs_to: addr (逗号分隔的地址字符串)
+- find_bytes: pattern, start, end, limit
+- get_basic_blocks: addr
+
+运行方式：
+    pytest -m analysis      # 只运行 analysis 模块测试
+    pytest test_analysis.py # 运行此文件所有测试
 """
 import pytest
+
+pytestmark = pytest.mark.analysis
 
 
 class TestDecompile:
@@ -196,6 +204,38 @@ class TestXrefsTo:
             assert "xrefs" in result[0]
 
 
+class TestXrefsFrom:
+    """交叉引用（从）测试。"""
+    
+    def test_xrefs_from_function(self, tool_caller, first_function_address):
+        """测试函数的出向交叉引用。"""
+        result = tool_caller("xrefs_from", {"addr": hex(first_function_address)})
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        if "error" not in result[0]:
+            assert "xrefs" in result[0]
+    
+    def test_xrefs_from_batch(self, tool_caller, functions_cache):
+        """测试批量交叉引用查询。"""
+        if len(functions_cache) < 3:
+            pytest.skip("Not enough functions for batch test")
+        
+        addr_list = ",".join(f["start_ea"] for f in functions_cache[:3])
+        result = tool_caller("xrefs_from", {"addr": addr_list})
+        
+        assert isinstance(result, list)
+        assert len(result) == 3
+    
+    def test_xrefs_from_invalid_address(self, tool_caller):
+        """测试无效地址。"""
+        result = tool_caller("xrefs_from", {"addr": "invalid_addr"})
+        
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert "error" in result[0]
+
+
 class TestXrefsToField:
     """结构体字段引用测试。"""
     
@@ -230,3 +270,78 @@ class TestXrefsToField:
             "field_name": "unknown_field"
         })
         assert isinstance(result, dict)
+
+
+class TestFindBytes:
+    """字节搜索测试。"""
+    
+    def test_find_bytes_simple(self, tool_caller, first_function_address):
+        """测试简单字节搜索。"""
+        # 先读取函数开头几个字节
+        bytes_result = tool_caller("get_bytes", {
+            "addr": hex(first_function_address),
+            "size": 4
+        })
+        
+        if isinstance(bytes_result, list) and bytes_result:
+            hex_bytes = bytes_result[0].get("hex", "")
+            if hex_bytes:
+                # 取前几个字节作为搜索模式
+                pattern = hex_bytes[:11]  # "XX XX XX XX"
+                result = tool_caller("find_bytes", {"pattern": pattern, "limit": 5})
+                assert isinstance(result, dict)
+                if "matches" in result:
+                    assert isinstance(result["matches"], list)
+    
+    def test_find_bytes_with_wildcard(self, tool_caller):
+        """测试带通配符的字节搜索。"""
+        # 搜索常见模式
+        result = tool_caller("find_bytes", {
+            "pattern": "55 48 ?? ??",
+            "limit": 10
+        })
+        assert isinstance(result, dict)
+    
+    def test_find_bytes_invalid_pattern(self, tool_caller):
+        """测试无效模式。"""
+        result = tool_caller("find_bytes", {"pattern": "ZZ XX"})
+        assert isinstance(result, dict)
+        assert "error" in result
+    
+    def test_find_bytes_empty_pattern(self, tool_caller):
+        """测试空模式。"""
+        result = tool_caller("find_bytes", {"pattern": ""})
+        assert isinstance(result, dict)
+        assert "error" in result
+
+
+class TestBasicBlocks:
+    """基本块测试。"""
+    
+    def test_get_basic_blocks_by_address(self, tool_caller, first_function_address):
+        """测试按地址获取基本块。"""
+        result = tool_caller("get_basic_blocks", {"addr": hex(first_function_address)})
+        assert isinstance(result, dict)
+        
+        if "error" not in result:
+            assert "blocks" in result
+            assert "total" in result
+            assert isinstance(result["blocks"], list)
+            
+            if result["blocks"]:
+                block = result["blocks"][0]
+                assert "start_ea" in block
+                assert "end_ea" in block
+                assert "predecessors" in block
+                assert "successors" in block
+    
+    def test_get_basic_blocks_by_name(self, tool_caller, first_function_name):
+        """测试按函数名获取基本块。"""
+        result = tool_caller("get_basic_blocks", {"addr": first_function_name})
+        assert isinstance(result, dict)
+    
+    def test_get_basic_blocks_not_found(self, tool_caller):
+        """测试不存在的函数。"""
+        result = tool_caller("get_basic_blocks", {"addr": "__nonexistent_func__"})
+        assert isinstance(result, dict)
+        assert "error" in result

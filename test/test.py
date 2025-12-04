@@ -2,17 +2,29 @@
 """IDA-MCP 测试主入口。
 
 使用方法:
-    1. 启动 IDA 并加载插件
-    2. 运行测试:
-        python -m pytest test/ -v           # 运行全部测试
-        python -m pytest test/ -v -k core   # 只运行 core 测试
-        python -m pytest test/ -v -m debug  # 只运行调试器测试
-        python -m pytest test/ -v --ignore=test/test_debug.py  # 跳过调试器测试
+    python test/test.py                 # 运行全部测试（不含 debug）
+    python test/test.py --all           # 运行全部测试（含 debug）
+    python test/test.py --quick         # 快速测试（不含 slow/debug/hexrays）
     
-    或者直接运行此文件:
-        python test/test.py                 # 运行全部测试
-        python test/test.py --quick         # 快速测试（跳过慢速测试）
-        python test/test.py --debug         # 运行调试器测试
+    # 按模块运行:
+    python test/test.py --core          # Core 模块（元数据、函数、导入导出等）
+    python test/test.py --analysis      # Analysis 模块（反编译、搜索、基本块等）
+    python test/test.py --types         # Types 模块（类型声明、结构体等）
+    python test/test.py --modify        # Modify 模块（注释、重命名、补丁等）
+    python test/test.py --memory        # Memory 模块（读取字节/整数/字符串）
+    python test/test.py --stack         # Stack 模块（栈帧变量）
+    python test/test.py --debug         # Debug 模块（调试器，需手动配置）
+    python test/test.py --resources     # Resources 模块（MCP 资源）
+    
+    # 组合使用:
+    python test/test.py --core --analysis   # 运行 core 和 analysis
+    python test/test.py --hexrays           # 只运行需要 Hex-Rays 的测试
+    
+    # 直接使用 pytest:
+    pytest -m core                      # 只运行 core 模块
+    pytest -m "core or analysis"        # 运行 core 和 analysis
+    pytest -m "not debug"               # 排除 debug 模块
+    pytest test/test_core.py            # 运行指定文件
 """
 import sys
 import os
@@ -22,11 +34,13 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+# 可用的模块 markers
+MODULES = ["core", "analysis", "types", "modify", "memory", "stack", "debug", "resources"]
+
 
 def check_coordinator() -> bool:
     """检查 coordinator 是否可用。"""
     import urllib.request
-    import urllib.error
     import json
     
     try:
@@ -34,11 +48,19 @@ def check_coordinator() -> bool:
         req = urllib.request.Request(url)
         with urllib.request.urlopen(req, timeout=2) as resp:
             data = json.loads(resp.read().decode('utf-8'))
-            # API 直接返回列表，不是 {"instances": [...]} 格式
             instances = data if isinstance(data, list) else []
             return len(instances) > 0
     except Exception:
         return False
+
+
+def print_help():
+    """打印帮助信息。"""
+    print(__doc__)
+    print("可用模块:")
+    for m in MODULES:
+        print(f"  --{m}")
+    print()
 
 
 def run_tests(args: list | None = None):
@@ -62,24 +84,45 @@ def run_tests(args: list | None = None):
     test_dir = os.path.dirname(os.path.abspath(__file__))
     pytest_args = [test_dir, "-v"]
     
+    # 收集要运行的模块
+    selected_modules: list[str] = []
+    run_all = False
+    quick_mode = False
+    hexrays_only = False
+    remaining_args: list[str] = []
+    
     if args:
-        if "--quick" in args:
-            # 快速测试：跳过慢速和调试器测试
-            pytest_args.extend(["-m", "not slow and not debug"])
-            args.remove("--quick")
-        
-        if "--debug" in args:
-            # 调试器测试
-            pytest_args.extend(["-m", "debug"])
-            args.remove("--debug")
-        
-        if "--hexrays" in args:
-            # Hex-Rays 测试
-            pytest_args.extend(["-m", "hexrays"])
-            args.remove("--hexrays")
-        
-        # 传递其他参数给 pytest
-        pytest_args.extend(args)
+        for arg in args:
+            if arg == "--all":
+                run_all = True
+            elif arg == "--quick":
+                quick_mode = True
+            elif arg == "--hexrays":
+                hexrays_only = True
+            elif arg.startswith("--") and arg[2:] in MODULES:
+                selected_modules.append(arg[2:])
+            else:
+                remaining_args.append(arg)
+    
+    # 构建 marker 表达式
+    if hexrays_only:
+        pytest_args.extend(["-m", "hexrays"])
+    elif quick_mode:
+        pytest_args.extend(["-m", "not slow and not debug and not hexrays"])
+    elif selected_modules:
+        # 运行指定模块
+        marker_expr = " or ".join(selected_modules)
+        pytest_args.extend(["-m", marker_expr])
+    elif not run_all:
+        # 默认排除 debug（需要手动配置调试器）
+        pytest_args.extend(["-m", "not debug"])
+    
+    # 传递其他参数给 pytest
+    pytest_args.extend(remaining_args)
+    
+    # 显示将要运行的测试
+    print(f"Running: pytest {' '.join(pytest_args[1:])}")
+    print()
     
     # 运行测试
     return pytest.main(pytest_args)
@@ -90,7 +133,7 @@ def main():
     args = sys.argv[1:]
     
     if "--help" in args or "-h" in args:
-        print(__doc__)
+        print_help()
         return 0
     
     return run_tests(args)
@@ -98,4 +141,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

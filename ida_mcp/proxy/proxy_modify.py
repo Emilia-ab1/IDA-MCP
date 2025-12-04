@@ -65,3 +65,11 @@ def register_tools(server: Any) -> None:
             "old_name": old_name,
             "new_name": new_name
         }, port)
+    
+    @server.tool(description="Patch bytes at address(es). items: [{address, bytes: [int,...] or hex_string}].")
+    def patch_bytes(
+        items: Annotated[list, Field(description="List of {address, bytes} objects")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """字节补丁。"""
+        return forward("patch_bytes", {"items": items}, port)

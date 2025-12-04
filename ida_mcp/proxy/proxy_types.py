@@ -65,4 +65,22 @@ def register_tools(server: Any) -> None:
     ) -> Any:
         """声明新类型。"""
         return forward("declare_type", {"decl": decl}, port)
-
+    
+    @server.tool(description="List all structures/unions defined in the database.")
+    def list_structs(
+        pattern: Annotated[Optional[str], Field(description="Optional name filter")] = None,
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """列出结构体。"""
+        params: dict[str, Any] = {}
+        if pattern:
+            params["pattern"] = pattern
+        return forward("list_structs", params, port)
+    
+    @server.tool(description="Get detailed structure/union definition with fields.")
+    def get_struct_info(
+        name: Annotated[str, Field(description="Structure/union name")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """获取结构体详情。"""
+        return forward("get_struct_info", {"name": name}, port)

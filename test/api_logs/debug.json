@@ -1,12 +1,12 @@
 {
   "category": "debug",
-  "generated_at": "2025-12-04T17:31:52.030310",
+  "generated_at": "2025-12-04T18:47:45.563889",
   "total_calls": 12,
   "calls": [
     {
-      "timestamp": "2025-12-04T17:31:28.739986",
+      "timestamp": "2025-12-04T18:47:19.766568",
       "category": "debug",
-      "tool": "dbg_list_breakpoints",
+      "tool": "dbg_list_bps",
       "params": {},
       "port": 8765,
       "result": {
@@ -14,30 +14,32 @@
         "total": 0,
         "breakpoints": []
       },
-      "duration_ms": 1514.82
+      "duration_ms": 1658.49
     },
     {
-      "timestamp": "2025-12-04T17:31:31.723228",
+      "timestamp": "2025-12-04T18:47:22.925148",
       "category": "debug",
-      "tool": "dbg_set_breakpoint",
+      "tool": "dbg_add_bp",
       "params": {
-        "address": 5368714144
+        "addr": "0x1400013a0"
       },
       "port": 8765,
-      "result": {
-        "query": "5368714144",
-        "ok": false,
-        "ea": 5368714144,
-        "existed": false,
-        "added": false,
-        "error": null
-      },
-      "duration_ms": 1479.43
+      "result": [
+        {
+          "query": "0x1400013a0",
+          "ok": true,
+          "ea": 5368714144,
+          "existed": false,
+          "added": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 1558.38
     },
     {
-      "timestamp": "2025-12-04T17:31:33.242549",
+      "timestamp": "2025-12-04T18:47:24.499197",
       "category": "debug",
-      "tool": "dbg_list_breakpoints",
+      "tool": "dbg_list_bps",
       "params": {},
       "port": 8765,
       "result": {
@@ -45,30 +47,36 @@
         "total": 0,
         "breakpoints": []
       },
-      "duration_ms": 1517.18
+      "duration_ms": 1575.43
     },
     {
-      "timestamp": "2025-12-04T17:31:34.768364",
+      "timestamp": "2025-12-04T18:47:26.045152",
       "category": "debug",
-      "tool": "dbg_enable_breakpoint",
+      "tool": "dbg_enable_bp",
       "params": {
-        "address": 5368714144,
-        "enable": true
+        "items": [
+          {
+            "address": "0x1400013a0",
+            "enable": true
+          }
+        ]
       },
       "port": 8765,
-      "result": {
-        "ok": false,
-        "ea": 5368714144,
-        "existed": false,
-        "enabled": false,
-        "changed": false
-      },
-      "duration_ms": 1523.75
+      "result": [
+        {
+          "ok": false,
+          "ea": 5368714144,
+          "existed": false,
+          "enabled": false,
+          "changed": false
+        }
+      ],
+      "duration_ms": 1542.38
     },
     {
-      "timestamp": "2025-12-04T17:31:41.086859",
+      "timestamp": "2025-12-04T18:47:34.711585",
       "category": "debug",
-      "tool": "dbg_start_process",
+      "tool": "dbg_start",
       "params": {},
       "port": 8765,
       "result": {
@@ -77,12 +85,12 @@
         "pid": null,
         "suspended": true
       },
-      "duration_ms": 6316.66
+      "duration_ms": 8661.98
     },
     {
-      "timestamp": "2025-12-04T17:31:42.587153",
+      "timestamp": "2025-12-04T18:47:36.217790",
       "category": "debug",
-      "tool": "dbg_get_registers",
+      "tool": "dbg_regs",
       "params": {},
       "port": 8765,
       "result": {
@@ -100,8 +108,8 @@
           },
           {
             "name": "RCX",
-            "value": "0x000000FA929A0000",
-            "int": 1076201390080
+            "value": "0x000000D27ADF9000",
+            "int": 904004603904
           },
           {
             "name": "RDX",
@@ -125,13 +133,13 @@
           },
           {
             "name": "RSP",
-            "value": "0x000000FA9270FCA8",
-            "int": 1076198702248
+            "value": "0x000000D27ABDF738",
+            "int": 904002402104
           },
           {
             "name": "R8",
-            "value": "0x000000FA929A0000",
-            "int": 1076201390080
+            "value": "0x000000D27ADF9000",
+            "int": 904004603904
           },
           {
             "name": "R9",
@@ -208,12 +216,12 @@
           "using hardcoded x64 register names"
         ]
       },
-      "duration_ms": 1498.54
+      "duration_ms": 1503.46
     },
     {
-      "timestamp": "2025-12-04T17:31:44.112375",
+      "timestamp": "2025-12-04T18:47:37.751766",
       "category": "debug",
-      "tool": "dbg_get_registers",
+      "tool": "dbg_regs",
       "params": {},
       "port": 8765,
       "result": {
@@ -231,8 +239,8 @@
           },
           {
             "name": "RCX",
-            "value": "0x000000FA929A0000",
-            "int": 1076201390080
+            "value": "0x000000D27ADF9000",
+            "int": 904004603904
           },
           {
             "name": "RDX",
@@ -256,13 +264,13 @@
           },
           {
             "name": "RSP",
-            "value": "0x000000FA9270FCA8",
-            "int": 1076198702248
+            "value": "0x000000D27ABDF738",
+            "int": 904002402104
           },
           {
             "name": "R8",
-            "value": "0x000000FA929A0000",
-            "int": 1076201390080
+            "value": "0x000000D27ADF9000",
+            "int": 904004603904
           },
           {
             "name": "R9",
@@ -339,12 +347,12 @@
           "using hardcoded x64 register names"
         ]
       },
-      "duration_ms": 1522.48
+      "duration_ms": 1532.99
     },
     {
-      "timestamp": "2025-12-04T17:31:45.646524",
+      "timestamp": "2025-12-04T18:47:39.269242",
       "category": "debug",
-      "tool": "dbg_get_call_stack",
+      "tool": "dbg_callstack",
       "params": {},
       "port": 8765,
       "result": {
@@ -352,10 +360,10 @@
         "frames": [],
         "note": "call stack API unavailable or empty"
       },
-      "duration_ms": 1532.95
+      "duration_ms": 1514.04
     },
     {
-      "timestamp": "2025-12-04T17:31:47.200617",
+      "timestamp": "2025-12-04T18:47:40.780343",
       "category": "debug",
       "tool": "dbg_step_into",
       "params": {},
@@ -364,10 +372,10 @@
         "ok": true,
         "stepped": true
       },
-      "duration_ms": 1551.44
+      "duration_ms": 1523.22
     },
     {
-      "timestamp": "2025-12-04T17:31:48.820117",
+      "timestamp": "2025-12-04T18:47:42.389226",
       "category": "debug",
       "tool": "dbg_step_over",
       "params": {},
@@ -376,37 +384,39 @@
         "ok": true,
         "stepped": true
       },
-      "duration_ms": 1517.13
+      "duration_ms": 1502.89
     },
     {
-      "timestamp": "2025-12-04T17:31:50.477774",
+      "timestamp": "2025-12-04T18:47:43.995233",
       "category": "debug",
-      "tool": "dbg_delete_breakpoint",
+      "tool": "dbg_delete_bp",
       "params": {
-        "address": 5368714144
+        "addr": "0x1400013a0"
       },
       "port": 8765,
-      "result": {
-        "query": "5368714144",
-        "ok": true,
-        "ea": 5368714144,
-        "existed": false,
-        "deleted": false,
-        "error": null
-      },
-      "duration_ms": 1555.09
+      "result": [
+        {
+          "query": "0x1400013a0",
+          "ok": true,
+          "ea": 5368714144,
+          "existed": false,
+          "deleted": false,
+          "error": null
+        }
+      ],
+      "duration_ms": 1504.36
     },
     {
-      "timestamp": "2025-12-04T17:31:52.010953",
+      "timestamp": "2025-12-04T18:47:45.536715",
       "category": "debug",
-      "tool": "dbg_exit_process",
+      "tool": "dbg_exit",
       "params": {},
       "port": 8765,
       "result": {
         "ok": true,
         "exited": true
       },
-      "duration_ms": 1531.47
+      "duration_ms": 1537.85
     }
   ]
 }

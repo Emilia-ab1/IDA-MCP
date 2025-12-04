@@ -7,7 +7,7 @@
 """
 from __future__ import annotations
 
-from typing import Annotated, Optional, List, Dict, Any
+from typing import Annotated, Optional, List, Dict, Any, Union
 
 from .rpc import tool
 from .sync import idaread
@@ -25,7 +25,7 @@ import ida_bytes  # type: ignore
 @tool
 @idaread
 def get_bytes(
-    addr: Annotated[str, "Address(es) to read from - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) to read from - single or comma-separated"],
     size: Annotated[int, "Number of bytes to read (1..4096)"] = 16,
 ) -> List[dict]:
     """Read raw bytes at address(es)."""
@@ -74,7 +74,7 @@ def get_bytes(
 @tool
 @idaread
 def get_u8(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Read 8-bit unsigned integer(s)."""
     return _read_int(addr, 1, signed=False)
@@ -83,7 +83,7 @@ def get_u8(
 @tool
 @idaread
 def get_u16(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Read 16-bit unsigned integer(s)."""
     return _read_int(addr, 2, signed=False)
@@ -92,7 +92,7 @@ def get_u16(
 @tool
 @idaread
 def get_u32(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Read 32-bit unsigned integer(s)."""
     return _read_int(addr, 4, signed=False)
@@ -101,13 +101,13 @@ def get_u32(
 @tool
 @idaread
 def get_u64(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
 ) -> List[dict]:
     """Read 64-bit unsigned integer(s)."""
     return _read_int(addr, 8, signed=False)
 
 
-def _read_int(addr: str, size: int, signed: bool = False) -> List[dict]:
+def _read_int(addr: Union[int, str], size: int, signed: bool = False) -> List[dict]:
     """内部: 读取整数。"""
     queries = normalize_list_input(addr)
     results = []
@@ -148,7 +148,7 @@ def _read_int(addr: str, size: int, signed: bool = False) -> List[dict]:
 @tool
 @idaread
 def get_string(
-    addr: Annotated[str, "Address(es) - single or comma-separated"],
+    addr: Annotated[Union[int, str], "Address(es) - single or comma-separated"],
     max_len: Annotated[int, "Maximum string length"] = 256,
 ) -> List[dict]:
     """Read null-terminated string(s)."""

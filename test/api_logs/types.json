@@ -1,10 +1,10 @@
 {
   "category": "types",
-  "generated_at": "2025-12-04T17:12:25.723803",
-  "total_calls": 16,
+  "generated_at": "2025-12-04T19:02:43.563242",
+  "total_calls": 22,
   "calls": [
     {
-      "timestamp": "2025-12-04T17:12:02.332057",
+      "timestamp": "2025-12-04T19:02:08.158554",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -21,10 +21,10 @@
           "// struct TestStruct\n\n"
         ]
       },
-      "duration_ms": 1657.65
+      "duration_ms": 1537.1
     },
     {
-      "timestamp": "2025-12-04T17:12:03.916267",
+      "timestamp": "2025-12-04T19:02:09.669107",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -39,10 +39,10 @@
           "// unsigned int\n\n"
         ]
       },
-      "duration_ms": 1572.12
+      "duration_ms": 1504.97
     },
     {
-      "timestamp": "2025-12-04T17:12:05.516134",
+      "timestamp": "2025-12-04T19:02:11.237483",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -59,10 +59,10 @@
           "// enum TestEnum\n\n"
         ]
       },
-      "duration_ms": 1598.04
+      "duration_ms": 1563.11
     },
     {
-      "timestamp": "2025-12-04T17:12:07.064660",
+      "timestamp": "2025-12-04T19:02:12.805502",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -80,10 +80,10 @@
           "// struct tag: 'ComplexStruct'\n"
         ]
       },
-      "duration_ms": 1546.69
+      "duration_ms": 1565.6
     },
     {
-      "timestamp": "2025-12-04T17:12:08.570714",
+      "timestamp": "2025-12-04T19:02:14.551603",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -96,10 +96,10 @@
           "Syntax error near: invalid\n"
         ]
       },
-      "duration_ms": 1503.67
+      "duration_ms": 1743.97
     },
     {
-      "timestamp": "2025-12-04T17:12:10.125715",
+      "timestamp": "2025-12-04T19:02:16.080317",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -109,10 +109,10 @@
       "result": {
         "error": "empty declaration"
       },
-      "duration_ms": 1552.86
+      "duration_ms": 1526.62
     },
     {
-      "timestamp": "2025-12-04T17:12:11.632696",
+      "timestamp": "2025-12-04T19:02:19.309435",
       "category": "types",
       "tool": "set_function_prototype",
       "params": {
@@ -124,10 +124,10 @@
         "error": "parse failed or not a function type",
         "details": []
       },
-      "duration_ms": 1502.96
+      "duration_ms": 1531.14
     },
     {
-      "timestamp": "2025-12-04T17:12:13.139876",
+      "timestamp": "2025-12-04T19:02:20.796612",
       "category": "types",
       "tool": "set_function_prototype",
       "params": {
@@ -138,10 +138,10 @@
       "result": {
         "error": "function not found"
       },
-      "duration_ms": 1505.01
+      "duration_ms": 1487.96
     },
     {
-      "timestamp": "2025-12-04T17:12:14.708915",
+      "timestamp": "2025-12-04T19:02:22.375280",
       "category": "types",
       "tool": "set_function_prototype",
       "params": {
@@ -152,10 +152,10 @@
       "result": {
         "error": "empty prototype"
       },
-      "duration_ms": 1566.71
+      "duration_ms": 1580.76
     },
     {
-      "timestamp": "2025-12-04T17:12:16.243053",
+      "timestamp": "2025-12-04T19:02:23.889390",
       "category": "types",
       "tool": "set_function_prototype",
       "params": {
@@ -167,10 +167,10 @@
         "error": "parse failed or not a function type",
         "details": []
       },
-      "duration_ms": 1532.51
+      "duration_ms": 1505.5
     },
     {
-      "timestamp": "2025-12-04T17:12:17.784412",
+      "timestamp": "2025-12-04T19:02:25.419222",
       "category": "types",
       "tool": "set_local_variable_type",
       "params": {
@@ -182,10 +182,10 @@
       "result": {
         "error": "local variable not found"
       },
-      "duration_ms": 1539.11
+      "duration_ms": 1527.52
     },
     {
-      "timestamp": "2025-12-04T17:12:19.345914",
+      "timestamp": "2025-12-04T19:02:26.916194",
       "category": "types",
       "tool": "set_local_variable_type",
       "params": {
@@ -197,10 +197,10 @@
       "result": {
         "error": "local variable not found"
       },
-      "duration_ms": 1559.56
+      "duration_ms": 1495.08
     },
     {
-      "timestamp": "2025-12-04T17:12:20.821155",
+      "timestamp": "2025-12-04T19:02:29.913568",
       "category": "types",
       "tool": "set_global_variable_type",
       "params": {
@@ -215,10 +215,10 @@
         "new_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
         "applied": false
       },
-      "duration_ms": 1473.5
+      "duration_ms": 1490.02
     },
     {
-      "timestamp": "2025-12-04T17:12:22.345283",
+      "timestamp": "2025-12-04T19:02:31.484030",
       "category": "types",
       "tool": "set_global_variable_type",
       "params": {
@@ -229,10 +229,10 @@
       "result": {
         "error": "global not found"
       },
-      "duration_ms": 1521.87
+      "duration_ms": 1568.14
     },
     {
-      "timestamp": "2025-12-04T17:12:23.856641",
+      "timestamp": "2025-12-04T19:02:32.969858",
       "category": "types",
       "tool": "declare_type",
       "params": {
@@ -249,10 +249,10 @@
           "// struct TestGlobalType\n\n"
         ]
       },
-      "duration_ms": 1509.53
+      "duration_ms": 1489.9
     },
     {
-      "timestamp": "2025-12-04T17:12:25.308861",
+      "timestamp": "2025-12-04T19:02:34.461631",
       "category": "types",
       "tool": "set_global_variable_type",
       "params": {
@@ -267,7 +267,597 @@
         "new_type": "long __fastcall(EXCEPTION_POINTERS *exception_data)",
         "applied": false
       },
-      "duration_ms": 1452.43
+      "duration_ms": 1479.87
+    },
+    {
+      "timestamp": "2025-12-04T19:02:35.967057",
+      "category": "types",
+      "tool": "list_structs",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "total": 66,
+        "items": [
+          {
+            "ordinal": 4,
+            "name": "threadlocaleinfostruct",
+            "kind": "struct",
+            "size": 16,
+            "members": 3
+          },
+          {
+            "ordinal": 7,
+            "name": "localeinfo_struct",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 8,
+            "name": "_iobuf",
+            "kind": "struct",
+            "size": 8,
+            "members": 1
+          },
+          {
+            "ordinal": 9,
+            "name": "FILE",
+            "kind": "struct",
+            "size": 8,
+            "members": 1
+          },
+          {
+            "ordinal": 13,
+            "name": "IMAGE_IMPORT_DESCRIPTOR",
+            "kind": "struct",
+            "size": 20,
+            "members": 5
+          },
+          {
+            "ordinal": 14,
+            "name": "_IMAGE_SECTION_HEADER",
+            "kind": "struct",
+            "size": 40,
+            "members": 10
+          },
+          {
+            "ordinal": 15,
+            "name": "IMAGE_DATA_DIRECTORY",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 18,
+            "name": "IMAGE_OPTIONAL_HEADER64",
+            "kind": "struct",
+            "size": 240,
+            "members": 30
+          },
+          {
+            "ordinal": 19,
+            "name": "IMAGE_FILE_HEADER",
+            "kind": "struct",
+            "size": 20,
+            "members": 7
+          },
+          {
+            "ordinal": 21,
+            "name": "_IMAGE_NT_HEADERS64",
+            "kind": "struct",
+            "size": 264,
+            "members": 3
+          },
+          {
+            "ordinal": 26,
+            "name": "_IMAGE_DOS_HEADER",
+            "kind": "struct",
+            "size": 64,
+            "members": 19
+          },
+          {
+            "ordinal": 28,
+            "name": "__mingwthr_key_t",
+            "kind": "struct",
+            "size": 24,
+            "members": 3
+          },
+          {
+            "ordinal": 29,
+            "name": "LIST_ENTRY",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 30,
+            "name": "_RTL_CRITICAL_SECTION_DEBUG",
+            "kind": "struct",
+            "size": 48,
+            "members": 9
+          },
+          {
+            "ordinal": 34,
+            "name": "_RTL_CRITICAL_SECTION",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 35,
+            "name": "RTL_CRITICAL_SECTION",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 36,
+            "name": "_startupinfo",
+            "kind": "struct",
+            "size": 4,
+            "members": 1
+          },
+          {
+            "ordinal": 37,
+            "name": "runtime_pseudo_reloc_item_v2",
+            "kind": "struct",
+            "size": 12,
+            "members": 3
+          },
+          {
+            "ordinal": 38,
+            "name": "runtime_pseudo_reloc_item_v1",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 39,
+            "name": "runtime_pseudo_reloc_v2",
+            "kind": "struct",
+            "size": 12,
+            "members": 3
+          },
+          {
+            "ordinal": 44,
+            "name": "sSecInfo",
+            "kind": "struct",
+            "size": 40,
+            "members": 5
+          },
+          {
+            "ordinal": 45,
+            "name": "_exception",
+            "kind": "struct",
+            "size": 40,
+            "members": 5
+          },
+          {
+            "ordinal": 46,
+            "name": "_iobuf_0",
+            "kind": "struct",
+            "size": 48,
+            "members": 8
+          },
+          {
+            "ordinal": 47,
+            "name": "FILE_0",
+            "kind": "struct",
+            "size": 48,
+            "members": 8
+          },
+          {
+            "ordinal": 51,
+            "name": "EXCEPTION_POINTERS",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 53,
+            "name": "_M128A",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 54,
+            "name": "M128A",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 56,
+            "name": "XMM_SAVE_AREA32",
+            "kind": "struct",
+            "size": 512,
+            "members": 16
+          },
+          {
+            "ordinal": 57,
+            "name": "_CONTEXT",
+            "kind": "struct",
+            "size": 1232,
+            "members": 46
+          },
+          {
+            "ordinal": 58,
+            "name": "EXCEPTION_RECORD",
+            "kind": "struct",
+            "size": 152,
+            "members": 6
+          },
+          {
+            "ordinal": 61,
+            "name": "_EXCEPTION_POINTERS",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 64,
+            "name": "IMAGE_TLS_DIRECTORY",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 68,
+            "name": "_IMAGE_OPTIONAL_HEADER",
+            "kind": "struct",
+            "size": 224,
+            "members": 31
+          },
+          {
+            "ordinal": 70,
+            "name": "_EXCEPTION_RECORD",
+            "kind": "struct",
+            "size": 152,
+            "members": 6
+          },
+          {
+            "ordinal": 73,
+            "name": "_EXCEPTION_REGISTRATION_RECORD",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 74,
+            "name": "NT_TIB",
+            "kind": "struct",
+            "size": 56,
+            "members": 7
+          },
+          {
+            "ordinal": 77,
+            "name": "_IMAGE_IMPORT_DESCRIPTOR",
+            "kind": "struct",
+            "size": 20,
+            "members": 5
+          },
+          {
+            "ordinal": 78,
+            "name": "_IMAGE_IMPORT_DESCRIPTOR::$6AD513163D7E1ED317197F815B889A38",
+            "kind": "union",
+            "size": 4,
+            "members": 2
+          },
+          {
+            "ordinal": 79,
+            "name": "_IMAGE_OPTIONAL_HEADER64",
+            "kind": "struct",
+            "size": 240,
+            "members": 30
+          },
+          {
+            "ordinal": 81,
+            "name": "_IMAGE_DATA_DIRECTORY",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 82,
+            "name": "_IMAGE_FILE_HEADER",
+            "kind": "struct",
+            "size": 20,
+            "members": 7
+          },
+          {
+            "ordinal": 83,
+            "name": "__mingwthr_key",
+            "kind": "struct",
+            "size": 24,
+            "members": 3
+          },
+          {
+            "ordinal": 84,
+            "name": "_LIST_ENTRY",
+            "kind": "struct",
+            "size": 16,
+            "members": 2
+          },
+          {
+            "ordinal": 87,
+            "name": "_MEMORY_BASIC_INFORMATION",
+            "kind": "struct",
+            "size": 48,
+            "members": 8
+          },
+          {
+            "ordinal": 90,
+            "name": "_XMM_SAVE_AREA32",
+            "kind": "struct",
+            "size": 512,
+            "members": 16
+          },
+          {
+            "ordinal": 92,
+            "name": "_IMAGE_TLS_DIRECTORY64",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 93,
+            "name": "IMAGE_TLS_DIRECTORY64",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 94,
+            "name": "_NT_TIB",
+            "kind": "struct",
+            "size": 56,
+            "members": 7
+          },
+          {
+            "ordinal": 95,
+            "name": "_NT_TIB::$0349ADB4452EC09BEC08E2292695FBBA",
+            "kind": "union",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 98,
+            "name": "_IMAGE_SECTION_HEADER::$39DFBA39B6D121CDFC1ACE66C995549C",
+            "kind": "union",
+            "size": 4,
+            "members": 2
+          },
+          {
+            "ordinal": 103,
+            "name": "CRITICAL_SECTION",
+            "kind": "struct",
+            "size": 40,
+            "members": 6
+          },
+          {
+            "ordinal": 106,
+            "name": "MEMORY_BASIC_INFORMATION",
+            "kind": "struct",
+            "size": 48,
+            "members": 8
+          },
+          {
+            "ordinal": 109,
+            "name": "_CONTEXT::$44C714363AF9670D0ED74680122B59F8::$897D11C01F73F7E79A06B0B9ED9B9414",
+            "kind": "struct",
+            "size": 416,
+            "members": 18
+          },
+          {
+            "ordinal": 110,
+            "name": "_CONTEXT::$44C714363AF9670D0ED74680122B59F8",
+            "kind": "union",
+            "size": 512,
+            "members": 3
+          },
+          {
+            "ordinal": 116,
+            "name": "_EXCEPTION_REGISTRATION_RECORD::$173F1B12F4A2BAA4E019087D49639569",
+            "kind": "union",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 117,
+            "name": "_EXCEPTION_REGISTRATION_RECORD::$280DA94713431D99A4D65F7BB4D4E726",
+            "kind": "union",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 119,
+            "name": "_GUID",
+            "kind": "struct",
+            "size": 16,
+            "members": 4
+          },
+          {
+            "ordinal": 120,
+            "name": "GUID",
+            "kind": "struct",
+            "size": 16,
+            "members": 4
+          },
+          {
+            "ordinal": 121,
+            "name": "RUNTIME_FUNCTION",
+            "kind": "struct",
+            "size": 12,
+            "members": 3
+          },
+          {
+            "ordinal": 122,
+            "name": "UNWIND_INFO_HDR",
+            "kind": "struct",
+            "size": 4,
+            "members": 6
+          },
+          {
+            "ordinal": 123,
+            "name": "UNWIND_CODE",
+            "kind": "struct",
+            "size": 2,
+            "members": 3
+          },
+          {
+            "ordinal": 124,
+            "name": "C_SCOPE_TABLE",
+            "kind": "struct",
+            "size": 16,
+            "members": 4
+          },
+          {
+            "ordinal": 125,
+            "name": "TestStruct",
+            "kind": "struct",
+            "size": 6,
+            "members": 2
+          },
+          {
+            "ordinal": 128,
+            "name": "ComplexStruct::$CDF557A927ED2BFF93B09908D4EFCA76",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          },
+          {
+            "ordinal": 129,
+            "name": "ComplexStruct",
+            "kind": "struct",
+            "size": 52,
+            "members": 4
+          },
+          {
+            "ordinal": 130,
+            "name": "TestGlobalType",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          }
+        ]
+      },
+      "duration_ms": 1503.76
+    },
+    {
+      "timestamp": "2025-12-04T19:02:37.477560",
+      "category": "types",
+      "tool": "list_structs",
+      "params": {
+        "pattern": "test"
+      },
+      "port": 8765,
+      "result": {
+        "total": 2,
+        "items": [
+          {
+            "ordinal": 125,
+            "name": "TestStruct",
+            "kind": "struct",
+            "size": 6,
+            "members": 2
+          },
+          {
+            "ordinal": 130,
+            "name": "TestGlobalType",
+            "kind": "struct",
+            "size": 8,
+            "members": 2
+          }
+        ]
+      },
+      "duration_ms": 1509.11
+    },
+    {
+      "timestamp": "2025-12-04T19:02:38.963031",
+      "category": "types",
+      "tool": "declare_type",
+      "params": {
+        "decl": "struct TestStructInfo { int field1; char field2; void* field3; };"
+      },
+      "port": 8765,
+      "result": {
+        "decl": "struct TestStructInfo { int field1; char field2; void* field3; };",
+        "ok": true,
+        "messages": [
+          "// struct tag: 'TestStructInfo'\n",
+          "// struct\n// {\n//   int field1;\n//   char field2;\n//   void *field3;\n// }\n\n",
+          "// struct tag: 'TestStructInfo'\n",
+          "// struct TestStructInfo\n\n"
+        ]
+      },
+      "duration_ms": 1497.0
+    },
+    {
+      "timestamp": "2025-12-04T19:02:40.483707",
+      "category": "types",
+      "tool": "get_struct_info",
+      "params": {
+        "name": "TestStructInfo"
+      },
+      "port": 8765,
+      "result": {
+        "name": "TestStructInfo",
+        "kind": "struct",
+        "size": 14,
+        "members": [
+          {
+            "index": 0,
+            "name": "field1",
+            "type": "int",
+            "offset": 0,
+            "size": 4
+          },
+          {
+            "index": 1,
+            "name": "field2",
+            "type": "char",
+            "offset": 4,
+            "size": 1
+          },
+          {
+            "index": 2,
+            "name": "field3",
+            "type": "void *",
+            "offset": 6,
+            "size": 8
+          }
+        ],
+        "member_count": 3
+      },
+      "duration_ms": 1513.61
+    },
+    {
+      "timestamp": "2025-12-04T19:02:42.063711",
+      "category": "types",
+      "tool": "get_struct_info",
+      "params": {
+        "name": "__nonexistent_struct_12345__"
+      },
+      "port": 8765,
+      "result": {
+        "error": "type not found",
+        "name": "__nonexistent_struct_12345__"
+      },
+      "duration_ms": 1572.11
+    },
+    {
+      "timestamp": "2025-12-04T19:02:43.548234",
+      "category": "types",
+      "tool": "get_struct_info",
+      "params": {
+        "name": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty name"
+      },
+      "duration_ms": 1494.19
     }
   ]
 }

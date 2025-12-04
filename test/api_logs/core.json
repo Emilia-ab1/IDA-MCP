@@ -1,10 +1,10 @@
 {
   "category": "core",
-  "generated_at": "2025-12-04T17:31:52.034966",
-  "total_calls": 1,
+  "generated_at": "2025-12-04T19:02:43.582144",
+  "total_calls": 2,
   "calls": [
     {
-      "timestamp": "2025-12-04T17:31:30.242799",
+      "timestamp": "2025-12-04T19:02:17.778321",
       "category": "core",
       "tool": "list_functions",
       "params": {
@@ -519,7 +519,525 @@
           }
         ]
       },
-      "duration_ms": 1501.1
+      "duration_ms": 1695.44
+    },
+    {
+      "timestamp": "2025-12-04T19:02:28.427330",
+      "category": "core",
+      "tool": "list_globals",
+      "params": {
+        "offset": 0,
+        "count": 100
+      },
+      "port": 8765,
+      "result": {
+        "total": 155,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "name": "_gnu_exception_handler",
+            "ea": "0x140002120",
+            "size": 1
+          },
+          {
+            "name": "def_140002173",
+            "ea": "0x1400021DC",
+            "size": 5
+          },
+          {
+            "name": "def_140002584",
+            "ea": "0x140002644",
+            "size": 8
+          },
+          {
+            "name": "def_140002AC2",
+            "ea": "0x140002C23",
+            "size": 5
+          },
+          {
+            "name": "First",
+            "ea": "0x140004068",
+            "size": 8
+          },
+          {
+            "name": "Last",
+            "ea": "0x140004070",
+            "size": 8
+          },
+          {
+            "name": "aSuccess",
+            "ea": "0x1400040A8",
+            "size": 8
+          },
+          {
+            "name": "aOutOfMemory",
+            "ea": "0x1400040B0",
+            "size": 14
+          },
+          {
+            "name": "aInvalidArgumen",
+            "ea": "0x1400040BE",
+            "size": 17
+          },
+          {
+            "name": "aNotFound",
+            "ea": "0x1400040CF",
+            "size": 10
+          },
+          {
+            "name": "aAlreadyExists",
+            "ea": "0x1400040D9",
+            "size": 15
+          },
+          {
+            "name": "Source",
+            "ea": "0x1400040E8",
+            "size": 14
+          },
+          {
+            "name": "_Format",
+            "ea": "0x1400040F6",
+            "size": 44
+          },
+          {
+            "name": "aItemDD",
+            "ea": "0x140004122",
+            "size": 15
+          },
+          {
+            "name": "aIdaMcpComplexT",
+            "ea": "0x140004131",
+            "size": 39
+          },
+          {
+            "name": "aRectangleTest",
+            "ea": "0x140004158",
+            "size": 22
+          },
+          {
+            "name": "aTestrect",
+            "ea": "0x14000416E",
+            "size": 9
+          },
+          {
+            "name": "aRectSAreaDWidt",
+            "ea": "0x140004177",
+            "size": 41
+          },
+          {
+            "name": "aPoint5040InRec",
+            "ea": "0x1400041A0",
+            "size": 27
+          },
+          {
+            "name": "aYes",
+            "ea": "0x1400041BB",
+            "size": 4
+          },
+          {
+            "name": "aNo",
+            "ea": "0x1400041BF",
+            "size": 3
+          },
+          {
+            "name": "aLinkedlistTest",
+            "ea": "0x1400041C2",
+            "size": 24
+          },
+          {
+            "name": "aListItems",
+            "ea": "0x1400041DA",
+            "size": 13
+          },
+          {
+            "name": "aSumOfAllItemsD",
+            "ea": "0x1400041E7",
+            "size": 22
+          },
+          {
+            "name": "aFunctionPointe",
+            "ea": "0x1400041FD",
+            "size": 30
+          },
+          {
+            "name": "aAdd105D",
+            "ea": "0x14000421B",
+            "size": 17
+          },
+          {
+            "name": "aSub105D",
+            "ea": "0x14000422C",
+            "size": 17
+          },
+          {
+            "name": "aMul105D",
+            "ea": "0x14000423D",
+            "size": 17
+          },
+          {
+            "name": "aDiv105D",
+            "ea": "0x14000424E",
+            "size": 17
+          },
+          {
+            "name": "aStackHeavyTest",
+            "ea": "0x14000425F",
+            "size": 25
+          },
+          {
+            "name": "aTestCompleted",
+            "ea": "0x1400042A0",
+            "size": 25
+          },
+          {
+            "name": "_tls_used",
+            "ea": "0x1400042C0",
+            "size": 40
+          },
+          {
+            "name": "__dyn_tls_init_callback",
+            "ea": "0x1400042E8",
+            "size": 8
+          },
+          {
+            "name": "jpt_140002173",
+            "ea": "0x140004300",
+            "size": 44
+          },
+          {
+            "name": "aArgumentDomain",
+            "ea": "0x14000432C",
+            "size": 31
+          },
+          {
+            "name": "aArgumentSingul",
+            "ea": "0x14000434B",
+            "size": 28
+          },
+          {
+            "name": "aOverflowRangeE",
+            "ea": "0x140004367",
+            "size": 32
+          },
+          {
+            "name": "aPartialLossOfS",
+            "ea": "0x140004387",
+            "size": 37
+          },
+          {
+            "name": "aTotalLossOfSig",
+            "ea": "0x1400043AC",
+            "size": 35
+          },
+          {
+            "name": "aTheResultIsToo",
+            "ea": "0x1400043CF",
+            "size": 54
+          },
+          {
+            "name": "aUnknownError",
+            "ea": "0x140004405",
+            "size": 14
+          },
+          {
+            "name": "aMatherrSInSGGR",
+            "ea": "0x140004413",
+            "size": 43
+          },
+          {
+            "name": "jpt_140002584",
+            "ea": "0x140004458",
+            "size": 32
+          },
+          {
+            "name": "aUnknownPseudoR",
+            "ea": "0x140004478",
+            "size": 50
+          },
+          {
+            "name": "aUnknownPseudoR_0",
+            "ea": "0x1400044AA",
+            "size": 42
+          },
+          {
+            "name": "msg",
+            "ea": "0x1400044D4",
+            "size": 83
+          },
+          {
+            "name": "aAddressPHasNoI",
+            "ea": "0x140004527",
+            "size": 32
+          },
+          {
+            "name": "aVirtualqueryFa",
+            "ea": "0x140004547",
+            "size": 49
+          },
+          {
+            "name": "aVirtualprotect",
+            "ea": "0x140004578",
+            "size": 39
+          },
+          {
+            "name": "aMingwW64Runtim",
+            "ea": "0x14000459F",
+            "size": 28
+          },
+          {
+            "name": "aRuntimeErrorD",
+            "ea": "0x140004618",
+            "size": 18
+          },
+          {
+            "name": "jpt_140002AC2",
+            "ea": "0x14000462C",
+            "size": 16
+          },
+          {
+            "name": "_load_config_used",
+            "ea": "0x140004640",
+            "size": 4
+          },
+          {
+            "name": "__RUNTIME_PSEUDO_RELOC_LIST__",
+            "ea": "0x140004778",
+            "size": 1
+          },
+          {
+            "name": "__guard_dispatch_icall_fptr",
+            "ea": "0x140004780",
+            "size": 8
+          },
+          {
+            "name": "__xc_a",
+            "ea": "0x140004788",
+            "size": 8
+          },
+          {
+            "name": "__xc_z",
+            "ea": "0x140004790",
+            "size": 8
+          },
+          {
+            "name": "__xd_a",
+            "ea": "0x140004798",
+            "size": 8
+          },
+          {
+            "name": "__xd_z",
+            "ea": "0x1400047A0",
+            "size": 8
+          },
+          {
+            "name": "__xi_a",
+            "ea": "0x1400047A8",
+            "size": 8
+          },
+          {
+            "name": "__xi_z",
+            "ea": "0x1400047B0",
+            "size": 8
+          },
+          {
+            "name": "__xl_a",
+            "ea": "0x1400047B8",
+            "size": 8
+          },
+          {
+            "name": "__xl_c",
+            "ea": "0x1400047C0",
+            "size": 8
+          },
+          {
+            "name": "__xl_d",
+            "ea": "0x1400047C8",
+            "size": 8
+          },
+          {
+            "name": "__xl_z",
+            "ea": "0x1400047D0",
+            "size": 8
+          },
+          {
+            "name": "__IMPORT_DESCRIPTOR_KERNEL32",
+            "ea": "0x140004870",
+            "size": 4
+          },
+          {
+            "name": "__imp___C_specific_handler",
+            "ea": "0x140004A58",
+            "size": 8
+          },
+          {
+            "name": "__imp_memcpy",
+            "ea": "0x140004A60",
+            "size": 8
+          },
+          {
+            "name": "__imp___acrt_iob_func",
+            "ea": "0x140004A70",
+            "size": 8
+          },
+          {
+            "name": "__imp___p__commode",
+            "ea": "0x140004A78",
+            "size": 8
+          },
+          {
+            "name": "__imp___p__fmode",
+            "ea": "0x140004A80",
+            "size": 8
+          },
+          {
+            "name": "__imp___stdio_common_vfprintf",
+            "ea": "0x140004A88",
+            "size": 8
+          },
+          {
+            "name": "__imp___p___argc",
+            "ea": "0x140004A98",
+            "size": 8
+          },
+          {
+            "name": "__imp___p___argv",
+            "ea": "0x140004AA0",
+            "size": 8
+          },
+          {
+            "name": "__imp__cexit",
+            "ea": "0x140004AA8",
+            "size": 8
+          },
+          {
+            "name": "__imp__configure_narrow_argv",
+            "ea": "0x140004AB0",
+            "size": 8
+          },
+          {
+            "name": "__imp__crt_atexit",
+            "ea": "0x140004AB8",
+            "size": 8
+          },
+          {
+            "name": "__imp__exit",
+            "ea": "0x140004AC0",
+            "size": 8
+          },
+          {
+            "name": "__imp__initialize_narrow_environment",
+            "ea": "0x140004AC8",
+            "size": 8
+          },
+          {
+            "name": "__imp__initterm",
+            "ea": "0x140004AD0",
+            "size": 8
+          },
+          {
+            "name": "__imp__initterm_e",
+            "ea": "0x140004AD8",
+            "size": 8
+          },
+          {
+            "name": "__imp__set_app_type",
+            "ea": "0x140004AE0",
+            "size": 8
+          },
+          {
+            "name": "__imp__set_invalid_parameter_handler",
+            "ea": "0x140004AE8",
+            "size": 8
+          },
+          {
+            "name": "__imp_abort",
+            "ea": "0x140004AF0",
+            "size": 8
+          },
+          {
+            "name": "__imp_exit",
+            "ea": "0x140004AF8",
+            "size": 8
+          },
+          {
+            "name": "__imp_signal",
+            "ea": "0x140004B00",
+            "size": 8
+          },
+          {
+            "name": "__imp__configthreadlocale",
+            "ea": "0x140004B10",
+            "size": 8
+          },
+          {
+            "name": "__imp__set_new_mode",
+            "ea": "0x140004B20",
+            "size": 8
+          },
+          {
+            "name": "__imp_calloc",
+            "ea": "0x140004B28",
+            "size": 8
+          },
+          {
+            "name": "__imp_free",
+            "ea": "0x140004B30",
+            "size": 8
+          },
+          {
+            "name": "__imp_malloc",
+            "ea": "0x140004B38",
+            "size": 8
+          },
+          {
+            "name": "__imp_memset",
+            "ea": "0x140004B48",
+            "size": 8
+          },
+          {
+            "name": "__imp_strcpy",
+            "ea": "0x140004B50",
+            "size": 8
+          },
+          {
+            "name": "__imp_strlen",
+            "ea": "0x140004B58",
+            "size": 8
+          },
+          {
+            "name": "__imp_strncmp",
+            "ea": "0x140004B60",
+            "size": 8
+          },
+          {
+            "name": "__imp_strncpy",
+            "ea": "0x140004B68",
+            "size": 8
+          },
+          {
+            "name": "__imp_DeleteCriticalSection",
+            "ea": "0x140004B78",
+            "size": 8
+          },
+          {
+            "name": "__imp_EnterCriticalSection",
+            "ea": "0x140004B80",
+            "size": 8
+          },
+          {
+            "name": "__imp_GetLastError",
+            "ea": "0x140004B88",
+            "size": 8
+          },
+          {
+            "name": "__imp_InitializeCriticalSection",
+            "ea": "0x140004B90",
+            "size": 8
+          }
+        ]
+      },
+      "duration_ms": 1511.04
     }
   ]
 }

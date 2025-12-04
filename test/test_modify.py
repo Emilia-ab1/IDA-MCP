@@ -10,8 +10,15 @@ API 参数对应：
 - rename_function: function_address (str), new_name
 - rename_local_variable: function_address (str), old_name, new_name
 - rename_global_variable: old_name, new_name
+- patch_bytes: items (List of {address, bytes})
+
+运行方式：
+    pytest -m modify        # 只运行 modify 模块测试
+    pytest test_modify.py   # 运行此文件所有测试
 """
 import pytest
+
+pytestmark = pytest.mark.modify
 
 
 class TestSetComment:
@@ -194,3 +201,88 @@ class TestRenameGlobalVariable:
             "new_name": "new_name"
         })
         assert "error" in result
+
+
+class TestPatchBytes:
+    """字节补丁测试。
+    
+    注意：这些测试会修改数据库，使用先读后恢复的策略。
+    """
+    
+    def test_patch_bytes_and_restore(self, tool_caller, first_function_address):
+        """测试补丁并恢复字节。"""
+        addr = first_function_address
+        
+        # 1. 读取原始字节
+        read_result = tool_caller("get_bytes", {
+            "addr": hex(addr),
+            "size": 4
+        })
+        
+        if not isinstance(read_result, list) or not read_result:
+            pytest.skip("Cannot read bytes")
+        
+        original_bytes = read_result[0].get("bytes", [])
+        if not original_bytes:
+            pytest.skip("No bytes read")
+        
+        # 2. 打补丁 (NOP: 0x90)
+        nop_bytes = [0x90] * len(original_bytes)
+        patch_result = tool_caller("patch_bytes", {
+            "items": [{"address": addr, "bytes": nop_bytes}]
+        })
+        
+        assert isinstance(patch_result, list)
+        assert len(patch_result) == 1
+        
+        # 3. 恢复原始字节
+        restore_result = tool_caller("patch_bytes", {
+            "items": [{"address": addr, "bytes": original_bytes}]
+        })
+        
+        assert isinstance(restore_result, list)
+    
+    def test_patch_bytes_hex_string(self, tool_caller, first_function_address):
+        """测试使用十六进制字符串补丁。"""
+        addr = first_function_address
+        
+        # 读取原始
+        read_result = tool_caller("get_bytes", {
+            "addr": hex(addr),
+            "size": 2
+        })
+        
+        if not isinstance(read_result, list) or not read_result:
+            pytest.skip("Cannot read bytes")
+        
+        original = read_result[0].get("bytes", [])
+        
+        # 用 hex string 格式打补丁
+        result = tool_caller("patch_bytes", {
+            "items": [{"address": addr, "bytes": "90 90"}]
+        })
+        
+        assert isinstance(result, list)
+        
+        # 恢复
+        tool_caller("patch_bytes", {
+            "items": [{"address": addr, "bytes": original}]
+        })
+    
+    def test_patch_bytes_invalid_address(self, tool_caller):
+        """测试无效地址。"""
+        result = tool_caller("patch_bytes", {
+            "items": [{"address": "invalid", "bytes": [0x90]}]
+        })
+        
+        assert isinstance(result, list)
+        assert result[0].get("error") is not None
+    
+    def test_patch_bytes_empty_bytes(self, tool_caller, first_function_address):
+        """测试空字节。"""
+        result = tool_caller("patch_bytes", {
+            "items": [{"address": first_function_address, "bytes": []}]
+        })
+        
+        assert isinstance(result, list)
+        assert result[0].get("error") is not None

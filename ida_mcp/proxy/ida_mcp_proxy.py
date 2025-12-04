@@ -103,8 +103,8 @@ server = FastMCP(
 - set_func_type, set_local_type, set_global_type, declare_type
 
 调试工具:
-- dbg_start, dbg_continue, dbg_step_into, dbg_step_over, dbg_regs
-- dbg_set_bp, dbg_del_bp, dbg_list_breakpoints
+- dbg_start, dbg_exit, dbg_continue, dbg_step_into, dbg_step_over
+- dbg_regs, dbg_stack, dbg_set_bp, dbg_del_bp, dbg_list_breakpoints
 
 栈帧工具:
 - stack_frame, declare_stack, delete_stack

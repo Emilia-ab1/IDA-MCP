@@ -58,6 +58,10 @@ The project uses a modular architecture:
 * `list_local_types` – Local type definitions
 * `get_entry_points` – Program entry points
 * `convert_number` – Number format conversion
+* `list_imports` – List imported functions with module names
+* `list_exports` – List exported functions/symbols
+* `list_segments` – List memory segments with permissions
+* `get_cursor` – Get current cursor position and context
 
 ### Analysis Tools (`api_analysis.py`)
 
@@ -65,7 +69,10 @@ The project uses a modular architecture:
 * `disasm` – Batch disassemble functions
 * `linear_disassemble` – Linear disassembly from arbitrary address
 * `xrefs_to` – Batch cross-references to addresses
+* `xrefs_from` – Batch cross-references from addresses
 * `xrefs_to_field` – Heuristic struct field references
+* `find_bytes` – Search for byte patterns with wildcards
+* `get_basic_blocks` – Get basic blocks with control flow
 
 ### Memory Tools (`api_memory.py`)
 
@@ -79,6 +86,8 @@ The project uses a modular architecture:
 * `set_function_prototype` – Set function signature
 * `set_local_variable_type` – Set local variable type (Hex-Rays)
 * `set_global_variable_type` – Set global variable type
+* `list_structs` – List all structures/unions
+* `get_struct_info` – Get structure definition with fields
 
 ### Modify Tools (`api_modify.py`)
 
@@ -86,6 +95,7 @@ The project uses a modular architecture:
 * `rename_function` – Rename function
 * `rename_local_variable` – Rename local variable (Hex-Rays)
 * `rename_global_variable` – Rename global symbol
+* `patch_bytes` – Patch bytes at addresses
 
 ### Stack Tools (`api_stack.py`)
 
@@ -95,16 +105,16 @@ The project uses a modular architecture:
 
 ### Debug Tools (`api_debug.py`) - Unsafe
 
-* `dbg_get_registers` – Get all registers
-* `dbg_get_call_stack` – Get call stack
-* `dbg_list_breakpoints` – List breakpoints
-* `dbg_start_process` – Start debugging
-* `dbg_exit_process` – Terminate debug
-* `dbg_continue_process` – Continue execution
+* `dbg_regs` – Get all registers
+* `dbg_callstack` – Get call stack
+* `dbg_list_bps` – List breakpoints
+* `dbg_start` – Start debugging
+* `dbg_exit` – Terminate debug
+* `dbg_continue` – Continue execution
 * `dbg_run_to` – Run to address
-* `dbg_set_breakpoint` – Set breakpoint
-* `dbg_delete_breakpoint` – Delete breakpoint
-* `dbg_enable_breakpoint` – Enable/disable breakpoint
+* `dbg_add_bp` – Add breakpoint
+* `dbg_delete_bp` – Delete breakpoint
+* `dbg_enable_bp` – Enable/disable breakpoint
 * `dbg_step_into` – Step into instruction
 * `dbg_step_over` – Step over instruction
 * `dbg_read_mem` – Read debugger memory
@@ -232,25 +242,9 @@ Need to install using IDA's Python environment:
 python -m pip install -r requirements.txt
 ```
 
-## Changelog
+## Development
 
-### v0.2.0 (2025-01)
-
-* **Refactored architecture**: Modular API structure with separate `api_*.py` modules
-* **Modular proxy**: Split proxy into `proxy_*.py` modules by category
-* **Unified naming**: Removed all alias functions, one name per tool
-* **IDA 8.x/9.x compatibility**: Added `compat.py` layer for `ida_struct` API changes
-* **Decorator chain pattern**: `@tool` + `@idaread`/`@idawrite` for clean definitions
-* **Batch operations**: Most tools now accept list inputs
-* **MCP Resources**: Added `ida://` URI patterns for REST-like data access
-* **Port validation**: Proxy validates instance ports exist before forwarding
-* **Improved type safety**: Better parameter annotations and validation
-* **Enhanced debug tools**: Full debugger control with memory read/write
-
-### v0.1.0
-
-* Initial release with monolithic server.py
-* Basic IDA tools and multi-instance coordinator
+It's not about having many tools, but about having precise ones; the power of the API is what truly matters. Additionally, the tools should be comprehensive, and the more tools there are, the more obstacles there are for the model to call them. If certain tools can be achieved through existing ones, then those tools are unnecessary. What I need are the missing tools—the ones that existing tools cannot accomplish.
 
 ## Future Plans
 

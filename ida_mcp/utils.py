@@ -109,13 +109,13 @@ def hex_addr(addr: int) -> str:
     return f"0x{addr:X}"
 
 
-def normalize_list_input(input_value: Union[str, List[Any]]) -> List[str]:
+def normalize_list_input(input_value: Union[int, str, List[Any]]) -> List[str]:
     """批量输入标准化。
     
-    将逗号分隔的字符串或列表转换为字符串列表。
+    将逗号分隔的字符串、整数或列表转换为字符串列表。
     
     参数:
-        input_value: "0x401000, main" 或 ["0x401000", "main"]
+        input_value: "0x401000, main" 或 ["0x401000", "main"] 或 0x401000
     
     返回:
         ["0x401000", "main"]
