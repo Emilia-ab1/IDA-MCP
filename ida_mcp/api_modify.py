@@ -21,6 +21,18 @@ import idaapi  # type: ignore
 import ida_funcs  # type: ignore
 import ida_hexrays  # type: ignore
 import ida_bytes  # type: ignore
+import ida_kernwin  # type: ignore
+from contextlib import contextmanager
+
+@contextmanager
+def suppress_ida_warnings():
+    """临时启用 batch 模式以禁用 IDA 的警告弹窗。"""
+    old_batch = ida_kernwin.cvar.batch
+    ida_kernwin.cvar.batch = 1
+    try:
+        yield
+    finally:
+        ida_kernwin.cvar.batch = old_batch
 
 @tool
 @idawrite
@@ -95,55 +107,69 @@ def rename_function(
     if not is_valid_c_identifier(new_name_clean):
         return {"error": "new_name not a valid C identifier"}
     
-    f = None
-    addr = None
-    
-    # 方法 1: 尝试作为函数名查找
-    if isinstance(function_address, str):
-        try:
-            ea = idaapi.get_name_ea(idaapi.BADADDR, function_address)
-            if ea != idaapi.BADADDR:
-                f = ida_funcs.get_func(ea)
-                if f:
-                    addr = ea
-        except Exception:
-            pass
-    
-    # 方法 2: 尝试作为地址解析
-    if not f:
-        parsed = parse_address(str(function_address))
-        if parsed["ok"] and parsed["value"] is not None:
-            addr = parsed["value"]
+    # 使用 batch 模式包裹整个操作以抑制所有警告消息
+    with suppress_ida_warnings():
+        f = None
+        addr = None
+        
+        # 方法 1: 尝试作为函数名查找
+        if isinstance(function_address, str):
             try:
-                f = ida_funcs.get_func(addr)
+                ea = idaapi.get_name_ea(idaapi.BADADDR, function_address)
+                if ea != idaapi.BADADDR:
+                    f = ida_funcs.get_func(ea)
+                    if f:
+                        addr = ea
             except Exception:
                 pass
-    
-    if not f:
+        
+        # 方法 2: 尝试作为地址解析
+        if not f:
+            parsed = parse_address(str(function_address))
+            if parsed["ok"] and parsed["value"] is not None:
+                addr = parsed["value"]
+                try:
+                    f = ida_funcs.get_func(addr)
+                except Exception:
+                    pass
+        
+        if not f:
+            return {
+                "error": "function not found",
+                "query": str(function_address),
+                "parsed_addr": hex_addr(addr) if addr is not None else None,
+            }
+        
+        start_ea = int(f.start_ea)
+        
+        try:
+            old_name = idaapi.get_func_name(f.start_ea)
+        except Exception:
+            old_name = None
+        
+        # 如果新旧名称相同，跳过重命名
+        if old_name == new_name_clean:
+            return {
+                "start_ea": hex_addr(start_ea),
+                "old_name": old_name,
+                "new_name": new_name_clean,
+                "changed": False,
+                "note": "name unchanged",
+            }
+        
+        try:
+            # SN_NOWARN | SN_NOCHECK 用于进一步确保无警告
+            flags = idaapi.SN_NOWARN | idaapi.SN_NOCHECK
+            ok = idaapi.set_name(start_ea, new_name_clean, flags)
+        except Exception as e:
+            return {"error": f"set_name failed: {e}"}
+        
         return {
-            "error": "function not found",
-            "query": str(function_address),
-            "parsed_addr": hex_addr(addr) if addr is not None else None,
+            "start_ea": hex_addr(start_ea),
+            "old_name": old_name,
+            "new_name": new_name_clean,
+            "changed": bool(ok) and old_name != new_name_clean,
         }
-    
-    start_ea = int(f.start_ea)
-    
-    try:
-        old_name = idaapi.get_func_name(f.start_ea)
-    except Exception:
-        old_name = None
-    
-    try:
-        ok = idaapi.set_name(start_ea, new_name_clean, idaapi.SN_NOWARN)
-    except Exception as e:
-        return {"error": f"set_name failed: {e}"}
-    
-    return {
-        "start_ea": hex_addr(start_ea),
-        "old_name": old_name,
-        "new_name": new_name_clean,
-        "changed": bool(ok) and old_name != new_name_clean,
-    }
 
 
 @tool
@@ -266,8 +292,21 @@ def rename_global_variable(
     except Exception:
         pass
     
+    # 如果新旧名称相同，跳过重命名
+    if old_name == new_name_clean:
+        return {
+            "ea": hex_addr(ea),
+            "old_name": old_name,
+            "new_name": new_name_clean,
+            "changed": False,
+            "note": "name unchanged",
+        }
+    
     try:
-        ok = idaapi.set_name(ea, new_name_clean, idaapi.SN_NOWARN)
+        # 使用 batch 模式完全禁用弹窗
+        with suppress_ida_warnings():
+            flags = idaapi.SN_NOWARN | idaapi.SN_NOCHECK
+            ok = idaapi.set_name(ea, new_name_clean, flags)
     except Exception as e:
         return {"error": f"set_name failed: {e}"}
     
