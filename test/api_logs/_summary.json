@@ -1,12 +1,11 @@
 {
-  "generated_at": "2025-12-04T19:02:43.594630",
-  "total_calls": 24,
+  "generated_at": "2025-12-05T17:43:47.770463",
+  "total_calls": 45,
   "stats_by_category": {
-    "types": 22,
-    "core": 2
+    "core": 45
   },
   "files": [
     "core.json",
-    "types.json"
+    "uri.json"
   ]
 }

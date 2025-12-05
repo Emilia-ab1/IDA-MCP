@@ -155,12 +155,16 @@ def _save_api_log() -> None:
         
         # 保存汇总文件
         summary_file = os.path.join(_LOG_DIR, "_summary.json")
+        # 检查是否存在 uri.json（由 test_resources.py 生成）
+        all_files = [f"{cat}.json" for cat in sorted(categorized.keys())]
+        if os.path.exists(os.path.join(_LOG_DIR, "uri.json")):
+            all_files.append("uri.json")
         with open(summary_file, "w", encoding="utf-8") as f:
             json.dump({
                 "generated_at": datetime.now().isoformat(),
                 "total_calls": len(_api_call_log),
                 "stats_by_category": stats,
-                "files": [f"{cat}.json" for cat in sorted(categorized.keys())],
+                "files": sorted(all_files),
             }, f, indent=2, ensure_ascii=False, default=str)
         
         print(f"\n[API Log] Saved {len(_api_call_log)} calls to {_LOG_DIR}/")

@@ -64,11 +64,10 @@ from . import api_resources
 # 导入协调器模块
 from . import registry
 
-
 def create_mcp_server(
     name: Optional[str] = None,
     enable_unsafe: bool = True,  # 默认启用调试器工具 (与原行为一致)
-) -> "FastMCP":
+) -> "FastMCP": # type: ignore
     """创建配置好的 FastMCP 服务器实例。
     
     参数:

@@ -1,10 +1,55 @@
 {
   "category": "core",
-  "generated_at": "2025-12-04T19:02:43.582144",
-  "total_calls": 2,
+  "generated_at": "2025-12-05T17:43:47.758891",
+  "total_calls": 45,
   "calls": [
     {
-      "timestamp": "2025-12-04T19:02:17.778321",
+      "timestamp": "2025-12-05T17:43:22.071134",
+      "category": "core",
+      "tool": "check_connection",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ok": true,
+        "count": 1
+      },
+      "duration_ms": 559.23
+    },
+    {
+      "timestamp": "2025-12-05T17:43:22.692819",
+      "category": "core",
+      "tool": "list_instances",
+      "params": {},
+      "port": 8765,
+      "result": [
+        {
+          "pid": 63088,
+          "port": 8765,
+          "input_file": "E:\\ttl\\_C8352R_N200RE.web.extracted\\squashfs-root\\usr\\sbin\\cloudupdate_check",
+          "idb": "E:\\ttl\\_C8352R_N200RE.web.extracted\\squashfs-root\\usr\\sbin\\cloudupdate_check.i64",
+          "started": 1764926529.545733,
+          "python": "3.12.10"
+        }
+      ],
+      "duration_ms": 620.02
+    },
+    {
+      "timestamp": "2025-12-05T17:43:23.235917",
+      "category": "core",
+      "tool": "get_metadata",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "input_file": "E:\\ttl\\_C8352R_N200RE.web.extracted\\squashfs-root\\usr\\sbin\\cloudupdate_check",
+        "arch": "mips",
+        "bits": 32,
+        "endian": null,
+        "hash": "742b5e1979a756826dd7884724b9ccb26e408fe3d5d39e2065ca77db9173b0ea"
+      },
+      "duration_ms": 541.55
+    },
+    {
+      "timestamp": "2025-12-05T17:43:23.888525",
       "category": "core",
       "tool": "list_functions",
       "params": {
@@ -13,516 +58,1803 @@
       },
       "port": 8765,
       "result": {
-        "total": 107,
+        "total": 138,
         "offset": 0,
         "count": 100,
         "items": [
           {
-            "name": "WinMainCRTStartup",
-            "start_ea": "0x140001000",
-            "end_ea": "0x14000101E"
+            "name": ".init_proc",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90"
           },
           {
-            "name": "__tmainCRTStartup",
-            "start_ea": "0x140001020",
-            "end_ea": "0x14000139B"
+            "name": "_ftext",
+            "start_ea": "0x400B90",
+            "end_ea": "0x400BEC"
           },
           {
-            "name": "mainCRTStartup",
-            "start_ea": "0x1400013A0",
-            "end_ea": "0x1400013BE"
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
           },
           {
-            "name": "atexit",
-            "start_ea": "0x1400013C0",
-            "end_ea": "0x1400013C5"
+            "name": "sub_400CA0",
+            "start_ea": "0x400CA0",
+            "end_ea": "0x400ED8"
           },
           {
-            "name": "__mingw_invalidParameterHandler",
-            "start_ea": "0x1400013D0",
-            "end_ea": "0x1400013D1"
+            "name": "sub_400ED8",
+            "start_ea": "0x400ED8",
+            "end_ea": "0x401018"
           },
           {
-            "name": "sub_1400013E0",
-            "start_ea": "0x1400013E0",
-            "end_ea": "0x140001404"
+            "name": "sub_401018",
+            "start_ea": "0x401018",
+            "end_ea": "0x4010B4"
           },
           {
-            "name": "sub_140001410",
-            "start_ea": "0x140001410",
-            "end_ea": "0x14000145A"
+            "name": "sub_4010B4",
+            "start_ea": "0x4010B4",
+            "end_ea": "0x40125C"
           },
           {
-            "name": "sub_140001460",
-            "start_ea": "0x140001460",
-            "end_ea": "0x140001491"
+            "name": "sub_40125C",
+            "start_ea": "0x40125C",
+            "end_ea": "0x401394"
           },
           {
-            "name": "sub_1400014A0",
-            "start_ea": "0x1400014A0",
-            "end_ea": "0x14000158E"
+            "name": "sub_401394",
+            "start_ea": "0x401394",
+            "end_ea": "0x4013E4"
           },
           {
-            "name": "sub_140001590",
-            "start_ea": "0x140001590",
-            "end_ea": "0x1400015A4"
+            "name": "sub_4013E4",
+            "start_ea": "0x4013E4",
+            "end_ea": "0x401544"
           },
           {
-            "name": "sub_1400015B0",
-            "start_ea": "0x1400015B0",
-            "end_ea": "0x1400015C5"
+            "name": "sub_401544",
+            "start_ea": "0x401544",
+            "end_ea": "0x401608"
           },
           {
-            "name": "sub_1400015D0",
-            "start_ea": "0x1400015D0",
-            "end_ea": "0x1400015FF"
+            "name": "sub_401608",
+            "start_ea": "0x401608",
+            "end_ea": "0x401A20"
           },
           {
-            "name": "sub_140001600",
-            "start_ea": "0x140001600",
-            "end_ea": "0x140001678"
+            "name": "sub_401A20",
+            "start_ea": "0x401A20",
+            "end_ea": "0x401A48"
           },
           {
-            "name": "sub_140001680",
-            "start_ea": "0x140001680",
-            "end_ea": "0x1400016E3"
+            "name": "sub_401A48",
+            "start_ea": "0x401A48",
+            "end_ea": "0x401AC8"
           },
           {
-            "name": "sub_1400016F0",
-            "start_ea": "0x1400016F0",
-            "end_ea": "0x140001792"
+            "name": "sub_401AC8",
+            "start_ea": "0x401AC8",
+            "end_ea": "0x401B48"
           },
           {
-            "name": "sub_1400017A0",
-            "start_ea": "0x1400017A0",
-            "end_ea": "0x14000183E"
+            "name": "sub_401B48",
+            "start_ea": "0x401B48",
+            "end_ea": "0x401C80"
           },
           {
-            "name": "sub_140001840",
-            "start_ea": "0x140001840",
-            "end_ea": "0x1400018DA"
+            "name": "sub_401C80",
+            "start_ea": "0x401C80",
+            "end_ea": "0x401D0C"
           },
           {
-            "name": "sub_1400018E0",
-            "start_ea": "0x1400018E0",
-            "end_ea": "0x140001938"
+            "name": "sub_401D0C",
+            "start_ea": "0x401D0C",
+            "end_ea": "0x401DD4"
           },
           {
-            "name": "sub_140001940",
-            "start_ea": "0x140001940",
-            "end_ea": "0x140001965"
+            "name": "sub_401DD4",
+            "start_ea": "0x401DD4",
+            "end_ea": "0x401EC8"
           },
           {
-            "name": "sub_140001970",
-            "start_ea": "0x140001970",
-            "end_ea": "0x1400019C0"
+            "name": "sub_401EC8",
+            "start_ea": "0x401EC8",
+            "end_ea": "0x401FCC"
           },
           {
-            "name": "sub_1400019C0",
-            "start_ea": "0x1400019C0",
-            "end_ea": "0x1400019D1"
+            "name": "sub_401FCC",
+            "start_ea": "0x401FCC",
+            "end_ea": "0x40223C"
           },
           {
-            "name": "sub_1400019E0",
-            "start_ea": "0x1400019E0",
-            "end_ea": "0x1400019F1"
+            "name": "sub_40223C",
+            "start_ea": "0x40223C",
+            "end_ea": "0x402318"
           },
           {
-            "name": "sub_140001A00",
-            "start_ea": "0x140001A00",
-            "end_ea": "0x140001A12"
+            "name": "sub_402318",
+            "start_ea": "0x402318",
+            "end_ea": "0x402634"
           },
           {
-            "name": "sub_140001A20",
-            "start_ea": "0x140001A20",
-            "end_ea": "0x140001A53"
+            "name": "sub_402634",
+            "start_ea": "0x402634",
+            "end_ea": "0x40280C"
           },
           {
-            "name": "sub_140001A60",
-            "start_ea": "0x140001A60",
-            "end_ea": "0x140001AB0"
+            "name": "sub_40280C",
+            "start_ea": "0x40280C",
+            "end_ea": "0x402B28"
           },
           {
-            "name": "sub_140001AB0",
-            "start_ea": "0x140001AB0",
-            "end_ea": "0x140001C1D"
+            "name": "sub_402B28",
+            "start_ea": "0x402B28",
+            "end_ea": "0x402BC8"
           },
           {
-            "name": "sub_140001C20",
-            "start_ea": "0x140001C20",
-            "end_ea": "0x140001C5C"
+            "name": "main",
+            "start_ea": "0x402BC8",
+            "end_ea": "0x402EC0"
           },
           {
-            "name": "sub_140001C60",
-            "start_ea": "0x140001C60",
-            "end_ea": "0x140001C87"
+            "name": "__bswapsi2",
+            "start_ea": "0x402EC0",
+            "end_ea": "0x402EE8"
           },
           {
-            "name": "sub_140001C90",
-            "start_ea": "0x140001C90",
-            "end_ea": "0x140001F28"
+            "name": "sub_402EF0",
+            "start_ea": "0x402EF0",
+            "end_ea": "0x402F48"
           },
           {
-            "name": "__dyn_tls_init",
-            "start_ea": "0x140001F30",
-            "end_ea": "0x140001F99"
+            "name": ".strcpy",
+            "start_ea": "0x402F50",
+            "end_ea": "0x402F60"
           },
           {
-            "name": "__tlregdtor",
-            "start_ea": "0x140001FA0",
-            "end_ea": "0x140001FA3"
+            "name": ".nvram_safe_get",
+            "start_ea": "0x402F60",
+            "end_ea": "0x402F70"
           },
           {
-            "name": "__dyn_tls_dtor",
-            "start_ea": "0x140001FB0",
-            "end_ea": "0x140001FC2"
+            "name": ".ioctl",
+            "start_ea": "0x402F70",
+            "end_ea": "0x402F80"
           },
           {
-            "name": "__do_global_dtors",
-            "start_ea": "0x140001FD0",
-            "end_ea": "0x140002016"
+            "name": ".printf",
+            "start_ea": "0x402F80",
+            "end_ea": "0x402F90"
           },
           {
-            "name": "__do_global_ctors",
-            "start_ea": "0x140002020",
-            "end_ea": "0x140002088"
+            "name": ".recv",
+            "start_ea": "0x402F90",
+            "end_ea": "0x402FA0"
           },
           {
-            "name": "__main",
-            "start_ea": "0x140002090",
-            "end_ea": "0x140002118"
+            "name": ".connect",
+            "start_ea": "0x402FA0",
+            "end_ea": "0x402FB0"
           },
           {
-            "name": "__mingw_raise_matherr",
-            "start_ea": "0x140002280",
-            "end_ea": "0x1400022C2"
+            "name": ".sigemptyset",
+            "start_ea": "0x402FB0",
+            "end_ea": "0x402FC0"
           },
           {
-            "name": "__mingw_setusermatherr",
-            "start_ea": "0x1400022D0",
-            "end_ea": "0x1400022DC"
+            "name": ".snprintf",
+            "start_ea": "0x402FC0",
+            "end_ea": "0x402FD0"
           },
           {
-            "name": "_fpreset",
-            "start_ea": "0x1400022E0",
-            "end_ea": "0x1400022E3"
+            "name": ".nvram_set_int_temp",
+            "start_ea": "0x402FD0",
+            "end_ea": "0x402FE0"
           },
           {
-            "name": "_matherr",
-            "start_ea": "0x1400022F0",
-            "end_ea": "0x140002358"
+            "name": ".nvram_get_int",
+            "start_ea": "0x402FE0",
+            "end_ea": "0x402FF0"
           },
           {
-            "name": "_pei386_runtime_relocator",
-            "start_ea": "0x140002360",
-            "end_ea": "0x14000266C"
+            "name": ".fgets",
+            "start_ea": "0x402FF0",
+            "end_ea": "0x403000"
           },
           {
-            "name": "__write_memory",
-            "start_ea": "0x140002670",
-            "end_ea": "0x140002807"
+            "name": ".perror",
+            "start_ea": "0x403000",
+            "end_ea": "0x403010"
           },
           {
-            "name": "__report_error",
-            "start_ea": "0x140002810",
-            "end_ea": "0x14000286A"
+            "name": ".puts",
+            "start_ea": "0x403010",
+            "end_ea": "0x403020"
           },
           {
-            "name": "_setargv",
-            "start_ea": "0x140002870",
-            "end_ea": "0x140002873"
+            "name": ".system",
+            "start_ea": "0x403020",
+            "end_ea": "0x403030"
           },
           {
-            "name": "__guard_check_icall_dummy",
-            "start_ea": "0x140002880",
-            "end_ea": "0x140002881"
+            "name": ".malloc",
+            "start_ea": "0x403030",
+            "end_ea": "0x403040"
           },
           {
-            "name": "__getmainargs",
-            "start_ea": "0x140002890",
-            "end_ea": "0x1400028F7"
+            "name": ".siglongjmp",
+            "start_ea": "0x403040",
+            "end_ea": "0x403050"
           },
           {
-            "name": "__p___initenv",
-            "start_ea": "0x140002900",
-            "end_ea": "0x14000290B"
+            "name": ".strtoul",
+            "start_ea": "0x403050",
+            "end_ea": "0x403060"
           },
           {
-            "name": "_amsg_exit",
-            "start_ea": "0x140002910",
-            "end_ea": "0x14000293E"
+            "name": ".socket",
+            "start_ea": "0x403060",
+            "end_ea": "0x403070"
           },
           {
-            "name": "printf",
-            "start_ea": "0x140002940",
-            "end_ea": "0x140002997"
+            "name": ".select",
+            "start_ea": "0x403070",
+            "end_ea": "0x403080"
           },
           {
-            "name": "___w64_mingwthr_add_key_dtor",
-            "start_ea": "0x1400029A0",
-            "end_ea": "0x140002A10"
+            "name": ".send",
+            "start_ea": "0x403080",
+            "end_ea": "0x403090"
           },
           {
-            "name": "___w64_mingwthr_remove_key_dtor",
-            "start_ea": "0x140002A10",
-            "end_ea": "0x140002A97"
+            "name": ".cJSON_Parse",
+            "start_ea": "0x403090",
+            "end_ea": "0x4030A0"
           },
           {
-            "name": "__mingw_TLScallback",
-            "start_ea": "0x140002AA0",
-            "end_ea": "0x140002C32"
+            "name": ".alarm",
+            "start_ea": "0x4030A0",
+            "end_ea": "0x4030B0"
           },
           {
-            "name": "fprintf",
-            "start_ea": "0x140002C40",
-            "end_ea": "0x140002C88"
+            "name": ".__sigsetjmp",
+            "start_ea": "0x4030B0",
+            "end_ea": "0x4030C0"
           },
           {
-            "name": "_ValidateImageBase",
-            "start_ea": "0x140002C90",
-            "end_ea": "0x140002CB3"
+            "name": ".get_internet_state_cached",
+            "start_ea": "0x4030C0",
+            "end_ea": "0x4030D0"
           },
           {
-            "name": "_FindPESection",
-            "start_ea": "0x140002CC0",
-            "end_ea": "0x140002CFD"
+            "name": ".cJSON_GetObjectItem",
+            "start_ea": "0x4030D0",
+            "end_ea": "0x4030E0"
           },
           {
-            "name": "_FindPESectionByName",
-            "start_ea": "0x140002D00",
-            "end_ea": "0x140002D91"
+            "name": ".fprintf",
+            "start_ea": "0x4030E0",
+            "end_ea": "0x4030F0"
           },
           {
-            "name": "__mingw_GetSectionForAddress",
-            "start_ea": "0x140002DA0",
-            "end_ea": "0x140002E0E"
+            "name": ".kill",
+            "start_ea": "0x4030F0",
+            "end_ea": "0x403100"
           },
           {
-            "name": "__mingw_GetSectionCount",
-            "start_ea": "0x140002E10",
-            "end_ea": "0x140002E3C"
+            "name": ".strcat",
+            "start_ea": "0x403100",
+            "end_ea": "0x403110"
           },
           {
-            "name": "_FindPESectionExec",
-            "start_ea": "0x140002E40",
-            "end_ea": "0x140002E9B"
+            "name": ".inet_addr",
+            "start_ea": "0x403110",
+            "end_ea": "0x403120"
           },
           {
-            "name": "_GetPEImageBase",
-            "start_ea": "0x140002EA0",
-            "end_ea": "0x140002EC7"
+            "name": ".setsockopt",
+            "start_ea": "0x403120",
+            "end_ea": "0x403130"
           },
           {
-            "name": "_IsNonwritableInCurrentImage",
-            "start_ea": "0x140002ED0",
-            "end_ea": "0x140002F5A"
+            "name": ".strstr",
+            "start_ea": "0x403130",
+            "end_ea": "0x403140"
           },
           {
-            "name": "__mingw_enum_import_library_names",
-            "start_ea": "0x140002F60",
-            "end_ea": "0x140003020"
+            "name": ".signal",
+            "start_ea": "0x403140",
+            "end_ea": "0x403150"
           },
           {
-            "name": "sub_140003020",
-            "start_ea": "0x140003020",
-            "end_ea": "0x140003050"
+            "name": ".strncmp",
+            "start_ea": "0x403150",
+            "end_ea": "0x403160"
           },
           {
-            "name": "vfprintf",
-            "start_ea": "0x140003050",
-            "end_ea": "0x140003084"
+            "name": ".strncpy",
+            "start_ea": "0x403160",
+            "end_ea": "0x403170"
           },
           {
-            "name": "_guard_dispatch_icall_dummy",
-            "start_ea": "0x140003090",
-            "end_ea": "0x140003092"
+            "name": ".sigaction",
+            "start_ea": "0x403170",
+            "end_ea": "0x403180"
           },
           {
-            "name": "__local_stdio_printf_options",
-            "start_ea": "0x1400030A0",
-            "end_ea": "0x1400030A8"
+            "name": ".__uClibc_main",
+            "start_ea": "0x403180",
+            "end_ea": "0x403190"
           },
           {
-            "name": "__C_specific_handler",
-            "start_ea": "0x1400030B0",
-            "end_ea": "0x1400030B6"
+            "name": ".gettimeofday",
+            "start_ea": "0x403190",
+            "end_ea": "0x4031A0"
           },
           {
-            "name": "__p__commode",
-            "start_ea": "0x1400030C0",
-            "end_ea": "0x1400030C6"
+            "name": ".cJSON_Delete",
+            "start_ea": "0x4031A0",
+            "end_ea": "0x4031B0"
           },
           {
-            "name": "__p__fmode",
-            "start_ea": "0x1400030D0",
-            "end_ea": "0x1400030D6"
+            "name": ".fopen",
+            "start_ea": "0x4031B0",
+            "end_ea": "0x4031C0"
           },
           {
-            "name": "_cexit",
-            "start_ea": "0x1400030E0",
-            "end_ea": "0x1400030E6"
+            "name": ".memset",
+            "start_ea": "0x4031C0",
+            "end_ea": "0x4031D0"
           },
           {
-            "name": "_configthreadlocale",
-            "start_ea": "0x1400030F0",
-            "end_ea": "0x1400030F6"
+            "name": ".fclose",
+            "start_ea": "0x4031D0",
+            "end_ea": "0x4031E0"
           },
           {
-            "name": "_crt_atexit",
-            "start_ea": "0x140003100",
-            "end_ea": "0x140003106"
+            "name": ".inet_ntoa",
+            "start_ea": "0x4031E0",
+            "end_ea": "0x4031F0"
           },
           {
-            "name": "_initterm",
-            "start_ea": "0x140003110",
-            "end_ea": "0x140003116"
+            "name": ".strcmp",
+            "start_ea": "0x4031F0",
+            "end_ea": "0x403200"
           },
           {
-            "name": "_initterm_e",
-            "start_ea": "0x140003120",
-            "end_ea": "0x140003126"
+            "name": ".gethostbyname",
+            "start_ea": "0x403200",
+            "end_ea": "0x403210"
           },
           {
-            "name": "_set_invalid_parameter_handler",
-            "start_ea": "0x140003130",
-            "end_ea": "0x140003136"
+            "name": ".sprintf",
+            "start_ea": "0x403210",
+            "end_ea": "0x403220"
           },
           {
-            "name": "exit",
-            "start_ea": "0x140003140",
-            "end_ea": "0x140003146"
+            "name": ".nvram_set_temp",
+            "start_ea": "0x403220",
+            "end_ea": "0x403230"
+          },
+          {
+            "name": ".exit",
+            "start_ea": "0x403230",
+            "end_ea": "0x403240"
+          },
+          {
+            "name": ".atoi",
+            "start_ea": "0x403240",
+            "end_ea": "0x403250"
+          },
+          {
+            "name": ".daemon",
+            "start_ea": "0x403250",
+            "end_ea": "0x403260"
+          },
+          {
+            "name": ".strlen",
+            "start_ea": "0x403260",
+            "end_ea": "0x403270"
+          },
+          {
+            "name": ".__assert",
+            "start_ea": "0x403270",
+            "end_ea": "0x403280"
+          },
+          {
+            "name": ".strchr",
+            "start_ea": "0x403280",
+            "end_ea": "0x403290"
+          },
+          {
+            "name": ".close",
+            "start_ea": "0x403290",
+            "end_ea": "0x4032A0"
+          },
+          {
+            "name": ".free",
+            "start_ea": "0x4032A0",
+            "end_ea": "0x4032C0"
+          },
+          {
+            "name": ".term_proc",
+            "start_ea": "0x4032C0",
+            "end_ea": "0x40330C"
           },
           {
             "name": "free",
-            "start_ea": "0x140003150",
-            "end_ea": "0x140003156"
+            "start_ea": "0x413E34",
+            "end_ea": "0x413E38"
           },
           {
-            "name": "malloc",
-            "start_ea": "0x140003160",
-            "end_ea": "0x140003166"
+            "name": "close",
+            "start_ea": "0x413E38",
+            "end_ea": "0x413E3C"
           },
           {
-            "name": "memcpy",
-            "start_ea": "0x140003170",
-            "end_ea": "0x140003176"
+            "name": "strchr",
+            "start_ea": "0x413E3C",
+            "end_ea": "0x413E40"
           },
           {
-            "name": "memset",
-            "start_ea": "0x140003180",
-            "end_ea": "0x140003186"
-          },
-          {
-            "name": "strcpy",
-            "start_ea": "0x140003190",
-            "end_ea": "0x140003196"
+            "name": "__assert",
+            "start_ea": "0x413E40",
+            "end_ea": "0x413E44"
           },
           {
             "name": "strlen",
-            "start_ea": "0x1400031A0",
-            "end_ea": "0x1400031A6"
+            "start_ea": "0x413E44",
+            "end_ea": "0x413E48"
           },
           {
-            "name": "strncpy",
-            "start_ea": "0x1400031B0",
-            "end_ea": "0x1400031B6"
+            "name": "daemon",
+            "start_ea": "0x413E48",
+            "end_ea": "0x413E4C"
           },
           {
-            "name": "SetUnhandledExceptionFilter",
-            "start_ea": "0x1400031C0",
-            "end_ea": "0x1400031C6"
+            "name": "atoi",
+            "start_ea": "0x413E4C",
+            "end_ea": "0x413E50"
           },
           {
-            "name": "Sleep",
-            "start_ea": "0x1400031D0",
-            "end_ea": "0x1400031D6"
+            "name": "exit",
+            "start_ea": "0x413E50",
+            "end_ea": "0x413E54"
           },
           {
-            "name": "signal",
-            "start_ea": "0x1400031E0",
-            "end_ea": "0x1400031E6"
+            "name": "nvram_set_temp",
+            "start_ea": "0x413E54",
+            "end_ea": "0x413E58"
           },
           {
-            "name": "__setusermatherr",
-            "start_ea": "0x1400031F0",
-            "end_ea": "0x1400031F6"
+            "name": "sprintf",
+            "start_ea": "0x413E5C",
+            "end_ea": "0x413E60"
           },
           {
-            "name": "__acrt_iob_func",
-            "start_ea": "0x140003200",
-            "end_ea": "0x140003206"
+            "name": "gethostbyname",
+            "start_ea": "0x413E60",
+            "end_ea": "0x413E64"
           },
           {
-            "name": "VirtualProtect",
-            "start_ea": "0x140003210",
-            "end_ea": "0x140003216"
+            "name": "strcmp",
+            "start_ea": "0x413E64",
+            "end_ea": "0x413E68"
           },
           {
-            "name": "VirtualQuery",
-            "start_ea": "0x140003220",
-            "end_ea": "0x140003226"
+            "name": "inet_ntoa",
+            "start_ea": "0x413E68",
+            "end_ea": "0x413E6C"
           },
           {
-            "name": "GetLastError",
-            "start_ea": "0x140003230",
-            "end_ea": "0x140003236"
+            "name": "fclose",
+            "start_ea": "0x413E6C",
+            "end_ea": "0x413E70"
           },
           {
-            "name": "abort",
-            "start_ea": "0x140003240",
-            "end_ea": "0x140003246"
+            "name": "memset",
+            "start_ea": "0x413E70",
+            "end_ea": "0x413E74"
           },
           {
-            "name": "_initialize_narrow_environment",
-            "start_ea": "0x140003250",
-            "end_ea": "0x140003256"
-          },
-          {
-            "name": "_configure_narrow_argv",
-            "start_ea": "0x140003260",
-            "end_ea": "0x140003266"
-          },
-          {
-            "name": "__p___argc",
-            "start_ea": "0x140003270",
-            "end_ea": "0x140003276"
-          },
-          {
-            "name": "__p___argv",
-            "start_ea": "0x140003280",
-            "end_ea": "0x140003286"
-          },
-          {
-            "name": "__p__environ",
-            "start_ea": "0x140003290",
-            "end_ea": "0x140003296"
-          },
-          {
-            "name": "_set_new_mode",
-            "start_ea": "0x1400032A0",
-            "end_ea": "0x1400032A6"
-          },
-          {
-            "name": "_set_app_type",
-            "start_ea": "0x1400032B0",
-            "end_ea": "0x1400032B6"
-          },
-          {
-            "name": "_exit",
-            "start_ea": "0x1400032C0",
-            "end_ea": "0x1400032C6"
-          },
-          {
-            "name": "__stdio_common_vfprintf",
-            "start_ea": "0x1400032D0",
-            "end_ea": "0x1400032D6"
+            "name": "fopen",
+            "start_ea": "0x413E74",
+            "end_ea": "0x413E78"
           }
         ]
       },
-      "duration_ms": 1695.44
+      "duration_ms": 648.32
     },
     {
-      "timestamp": "2025-12-04T19:02:28.427330",
+      "timestamp": "2025-12-05T17:43:24.438825",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 10
+      },
+      "port": 8765,
+      "result": {
+        "total": 138,
+        "offset": 0,
+        "count": 10,
+        "items": [
+          {
+            "name": ".init_proc",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90"
+          },
+          {
+            "name": "_ftext",
+            "start_ea": "0x400B90",
+            "end_ea": "0x400BEC"
+          },
+          {
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
+          },
+          {
+            "name": "sub_400CA0",
+            "start_ea": "0x400CA0",
+            "end_ea": "0x400ED8"
+          },
+          {
+            "name": "sub_400ED8",
+            "start_ea": "0x400ED8",
+            "end_ea": "0x401018"
+          },
+          {
+            "name": "sub_401018",
+            "start_ea": "0x401018",
+            "end_ea": "0x4010B4"
+          },
+          {
+            "name": "sub_4010B4",
+            "start_ea": "0x4010B4",
+            "end_ea": "0x40125C"
+          },
+          {
+            "name": "sub_40125C",
+            "start_ea": "0x40125C",
+            "end_ea": "0x401394"
+          },
+          {
+            "name": "sub_401394",
+            "start_ea": "0x401394",
+            "end_ea": "0x4013E4"
+          },
+          {
+            "name": "sub_4013E4",
+            "start_ea": "0x4013E4",
+            "end_ea": "0x401544"
+          }
+        ]
+      },
+      "duration_ms": 548.01
+    },
+    {
+      "timestamp": "2025-12-05T17:43:25.064877",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 100
+      },
+      "port": 8765,
+      "result": {
+        "total": 138,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "name": ".init_proc",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90"
+          },
+          {
+            "name": "_ftext",
+            "start_ea": "0x400B90",
+            "end_ea": "0x400BEC"
+          },
+          {
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
+          },
+          {
+            "name": "sub_400CA0",
+            "start_ea": "0x400CA0",
+            "end_ea": "0x400ED8"
+          },
+          {
+            "name": "sub_400ED8",
+            "start_ea": "0x400ED8",
+            "end_ea": "0x401018"
+          },
+          {
+            "name": "sub_401018",
+            "start_ea": "0x401018",
+            "end_ea": "0x4010B4"
+          },
+          {
+            "name": "sub_4010B4",
+            "start_ea": "0x4010B4",
+            "end_ea": "0x40125C"
+          },
+          {
+            "name": "sub_40125C",
+            "start_ea": "0x40125C",
+            "end_ea": "0x401394"
+          },
+          {
+            "name": "sub_401394",
+            "start_ea": "0x401394",
+            "end_ea": "0x4013E4"
+          },
+          {
+            "name": "sub_4013E4",
+            "start_ea": "0x4013E4",
+            "end_ea": "0x401544"
+          },
+          {
+            "name": "sub_401544",
+            "start_ea": "0x401544",
+            "end_ea": "0x401608"
+          },
+          {
+            "name": "sub_401608",
+            "start_ea": "0x401608",
+            "end_ea": "0x401A20"
+          },
+          {
+            "name": "sub_401A20",
+            "start_ea": "0x401A20",
+            "end_ea": "0x401A48"
+          },
+          {
+            "name": "sub_401A48",
+            "start_ea": "0x401A48",
+            "end_ea": "0x401AC8"
+          },
+          {
+            "name": "sub_401AC8",
+            "start_ea": "0x401AC8",
+            "end_ea": "0x401B48"
+          },
+          {
+            "name": "sub_401B48",
+            "start_ea": "0x401B48",
+            "end_ea": "0x401C80"
+          },
+          {
+            "name": "sub_401C80",
+            "start_ea": "0x401C80",
+            "end_ea": "0x401D0C"
+          },
+          {
+            "name": "sub_401D0C",
+            "start_ea": "0x401D0C",
+            "end_ea": "0x401DD4"
+          },
+          {
+            "name": "sub_401DD4",
+            "start_ea": "0x401DD4",
+            "end_ea": "0x401EC8"
+          },
+          {
+            "name": "sub_401EC8",
+            "start_ea": "0x401EC8",
+            "end_ea": "0x401FCC"
+          },
+          {
+            "name": "sub_401FCC",
+            "start_ea": "0x401FCC",
+            "end_ea": "0x40223C"
+          },
+          {
+            "name": "sub_40223C",
+            "start_ea": "0x40223C",
+            "end_ea": "0x402318"
+          },
+          {
+            "name": "sub_402318",
+            "start_ea": "0x402318",
+            "end_ea": "0x402634"
+          },
+          {
+            "name": "sub_402634",
+            "start_ea": "0x402634",
+            "end_ea": "0x40280C"
+          },
+          {
+            "name": "sub_40280C",
+            "start_ea": "0x40280C",
+            "end_ea": "0x402B28"
+          },
+          {
+            "name": "sub_402B28",
+            "start_ea": "0x402B28",
+            "end_ea": "0x402BC8"
+          },
+          {
+            "name": "main",
+            "start_ea": "0x402BC8",
+            "end_ea": "0x402EC0"
+          },
+          {
+            "name": "__bswapsi2",
+            "start_ea": "0x402EC0",
+            "end_ea": "0x402EE8"
+          },
+          {
+            "name": "sub_402EF0",
+            "start_ea": "0x402EF0",
+            "end_ea": "0x402F48"
+          },
+          {
+            "name": ".strcpy",
+            "start_ea": "0x402F50",
+            "end_ea": "0x402F60"
+          },
+          {
+            "name": ".nvram_safe_get",
+            "start_ea": "0x402F60",
+            "end_ea": "0x402F70"
+          },
+          {
+            "name": ".ioctl",
+            "start_ea": "0x402F70",
+            "end_ea": "0x402F80"
+          },
+          {
+            "name": ".printf",
+            "start_ea": "0x402F80",
+            "end_ea": "0x402F90"
+          },
+          {
+            "name": ".recv",
+            "start_ea": "0x402F90",
+            "end_ea": "0x402FA0"
+          },
+          {
+            "name": ".connect",
+            "start_ea": "0x402FA0",
+            "end_ea": "0x402FB0"
+          },
+          {
+            "name": ".sigemptyset",
+            "start_ea": "0x402FB0",
+            "end_ea": "0x402FC0"
+          },
+          {
+            "name": ".snprintf",
+            "start_ea": "0x402FC0",
+            "end_ea": "0x402FD0"
+          },
+          {
+            "name": ".nvram_set_int_temp",
+            "start_ea": "0x402FD0",
+            "end_ea": "0x402FE0"
+          },
+          {
+            "name": ".nvram_get_int",
+            "start_ea": "0x402FE0",
+            "end_ea": "0x402FF0"
+          },
+          {
+            "name": ".fgets",
+            "start_ea": "0x402FF0",
+            "end_ea": "0x403000"
+          },
+          {
+            "name": ".perror",
+            "start_ea": "0x403000",
+            "end_ea": "0x403010"
+          },
+          {
+            "name": ".puts",
+            "start_ea": "0x403010",
+            "end_ea": "0x403020"
+          },
+          {
+            "name": ".system",
+            "start_ea": "0x403020",
+            "end_ea": "0x403030"
+          },
+          {
+            "name": ".malloc",
+            "start_ea": "0x403030",
+            "end_ea": "0x403040"
+          },
+          {
+            "name": ".siglongjmp",
+            "start_ea": "0x403040",
+            "end_ea": "0x403050"
+          },
+          {
+            "name": ".strtoul",
+            "start_ea": "0x403050",
+            "end_ea": "0x403060"
+          },
+          {
+            "name": ".socket",
+            "start_ea": "0x403060",
+            "end_ea": "0x403070"
+          },
+          {
+            "name": ".select",
+            "start_ea": "0x403070",
+            "end_ea": "0x403080"
+          },
+          {
+            "name": ".send",
+            "start_ea": "0x403080",
+            "end_ea": "0x403090"
+          },
+          {
+            "name": ".cJSON_Parse",
+            "start_ea": "0x403090",
+            "end_ea": "0x4030A0"
+          },
+          {
+            "name": ".alarm",
+            "start_ea": "0x4030A0",
+            "end_ea": "0x4030B0"
+          },
+          {
+            "name": ".__sigsetjmp",
+            "start_ea": "0x4030B0",
+            "end_ea": "0x4030C0"
+          },
+          {
+            "name": ".get_internet_state_cached",
+            "start_ea": "0x4030C0",
+            "end_ea": "0x4030D0"
+          },
+          {
+            "name": ".cJSON_GetObjectItem",
+            "start_ea": "0x4030D0",
+            "end_ea": "0x4030E0"
+          },
+          {
+            "name": ".fprintf",
+            "start_ea": "0x4030E0",
+            "end_ea": "0x4030F0"
+          },
+          {
+            "name": ".kill",
+            "start_ea": "0x4030F0",
+            "end_ea": "0x403100"
+          },
+          {
+            "name": ".strcat",
+            "start_ea": "0x403100",
+            "end_ea": "0x403110"
+          },
+          {
+            "name": ".inet_addr",
+            "start_ea": "0x403110",
+            "end_ea": "0x403120"
+          },
+          {
+            "name": ".setsockopt",
+            "start_ea": "0x403120",
+            "end_ea": "0x403130"
+          },
+          {
+            "name": ".strstr",
+            "start_ea": "0x403130",
+            "end_ea": "0x403140"
+          },
+          {
+            "name": ".signal",
+            "start_ea": "0x403140",
+            "end_ea": "0x403150"
+          },
+          {
+            "name": ".strncmp",
+            "start_ea": "0x403150",
+            "end_ea": "0x403160"
+          },
+          {
+            "name": ".strncpy",
+            "start_ea": "0x403160",
+            "end_ea": "0x403170"
+          },
+          {
+            "name": ".sigaction",
+            "start_ea": "0x403170",
+            "end_ea": "0x403180"
+          },
+          {
+            "name": ".__uClibc_main",
+            "start_ea": "0x403180",
+            "end_ea": "0x403190"
+          },
+          {
+            "name": ".gettimeofday",
+            "start_ea": "0x403190",
+            "end_ea": "0x4031A0"
+          },
+          {
+            "name": ".cJSON_Delete",
+            "start_ea": "0x4031A0",
+            "end_ea": "0x4031B0"
+          },
+          {
+            "name": ".fopen",
+            "start_ea": "0x4031B0",
+            "end_ea": "0x4031C0"
+          },
+          {
+            "name": ".memset",
+            "start_ea": "0x4031C0",
+            "end_ea": "0x4031D0"
+          },
+          {
+            "name": ".fclose",
+            "start_ea": "0x4031D0",
+            "end_ea": "0x4031E0"
+          },
+          {
+            "name": ".inet_ntoa",
+            "start_ea": "0x4031E0",
+            "end_ea": "0x4031F0"
+          },
+          {
+            "name": ".strcmp",
+            "start_ea": "0x4031F0",
+            "end_ea": "0x403200"
+          },
+          {
+            "name": ".gethostbyname",
+            "start_ea": "0x403200",
+            "end_ea": "0x403210"
+          },
+          {
+            "name": ".sprintf",
+            "start_ea": "0x403210",
+            "end_ea": "0x403220"
+          },
+          {
+            "name": ".nvram_set_temp",
+            "start_ea": "0x403220",
+            "end_ea": "0x403230"
+          },
+          {
+            "name": ".exit",
+            "start_ea": "0x403230",
+            "end_ea": "0x403240"
+          },
+          {
+            "name": ".atoi",
+            "start_ea": "0x403240",
+            "end_ea": "0x403250"
+          },
+          {
+            "name": ".daemon",
+            "start_ea": "0x403250",
+            "end_ea": "0x403260"
+          },
+          {
+            "name": ".strlen",
+            "start_ea": "0x403260",
+            "end_ea": "0x403270"
+          },
+          {
+            "name": ".__assert",
+            "start_ea": "0x403270",
+            "end_ea": "0x403280"
+          },
+          {
+            "name": ".strchr",
+            "start_ea": "0x403280",
+            "end_ea": "0x403290"
+          },
+          {
+            "name": ".close",
+            "start_ea": "0x403290",
+            "end_ea": "0x4032A0"
+          },
+          {
+            "name": ".free",
+            "start_ea": "0x4032A0",
+            "end_ea": "0x4032C0"
+          },
+          {
+            "name": ".term_proc",
+            "start_ea": "0x4032C0",
+            "end_ea": "0x40330C"
+          },
+          {
+            "name": "free",
+            "start_ea": "0x413E34",
+            "end_ea": "0x413E38"
+          },
+          {
+            "name": "close",
+            "start_ea": "0x413E38",
+            "end_ea": "0x413E3C"
+          },
+          {
+            "name": "strchr",
+            "start_ea": "0x413E3C",
+            "end_ea": "0x413E40"
+          },
+          {
+            "name": "__assert",
+            "start_ea": "0x413E40",
+            "end_ea": "0x413E44"
+          },
+          {
+            "name": "strlen",
+            "start_ea": "0x413E44",
+            "end_ea": "0x413E48"
+          },
+          {
+            "name": "daemon",
+            "start_ea": "0x413E48",
+            "end_ea": "0x413E4C"
+          },
+          {
+            "name": "atoi",
+            "start_ea": "0x413E4C",
+            "end_ea": "0x413E50"
+          },
+          {
+            "name": "exit",
+            "start_ea": "0x413E50",
+            "end_ea": "0x413E54"
+          },
+          {
+            "name": "nvram_set_temp",
+            "start_ea": "0x413E54",
+            "end_ea": "0x413E58"
+          },
+          {
+            "name": "sprintf",
+            "start_ea": "0x413E5C",
+            "end_ea": "0x413E60"
+          },
+          {
+            "name": "gethostbyname",
+            "start_ea": "0x413E60",
+            "end_ea": "0x413E64"
+          },
+          {
+            "name": "strcmp",
+            "start_ea": "0x413E64",
+            "end_ea": "0x413E68"
+          },
+          {
+            "name": "inet_ntoa",
+            "start_ea": "0x413E68",
+            "end_ea": "0x413E6C"
+          },
+          {
+            "name": "fclose",
+            "start_ea": "0x413E6C",
+            "end_ea": "0x413E70"
+          },
+          {
+            "name": "memset",
+            "start_ea": "0x413E70",
+            "end_ea": "0x413E74"
+          },
+          {
+            "name": "fopen",
+            "start_ea": "0x413E74",
+            "end_ea": "0x413E78"
+          }
+        ]
+      },
+      "duration_ms": 624.92
+    },
+    {
+      "timestamp": "2025-12-05T17:43:25.606643",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 3
+      },
+      "port": 8765,
+      "result": {
+        "total": 138,
+        "offset": 0,
+        "count": 3,
+        "items": [
+          {
+            "name": ".init_proc",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90"
+          },
+          {
+            "name": "_ftext",
+            "start_ea": "0x400B90",
+            "end_ea": "0x400BEC"
+          },
+          {
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
+          }
+        ]
+      },
+      "duration_ms": 540.87
+    },
+    {
+      "timestamp": "2025-12-05T17:43:26.267452",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 2,
+        "count": 3
+      },
+      "port": 8765,
+      "result": {
+        "total": 138,
+        "offset": 2,
+        "count": 3,
+        "items": [
+          {
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
+          },
+          {
+            "name": "sub_400CA0",
+            "start_ea": "0x400CA0",
+            "end_ea": "0x400ED8"
+          },
+          {
+            "name": "sub_400ED8",
+            "start_ea": "0x400ED8",
+            "end_ea": "0x401018"
+          }
+        ]
+      },
+      "duration_ms": 661.23
+    },
+    {
+      "timestamp": "2025-12-05T17:43:26.816609",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 100,
+        "pattern": "*"
+      },
+      "port": 8765,
+      "result": {
+        "total": 138,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "name": ".init_proc",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90"
+          },
+          {
+            "name": "_ftext",
+            "start_ea": "0x400B90",
+            "end_ea": "0x400BEC"
+          },
+          {
+            "name": "sub_400BF0",
+            "start_ea": "0x400BF0",
+            "end_ea": "0x400C94"
+          },
+          {
+            "name": "sub_400CA0",
+            "start_ea": "0x400CA0",
+            "end_ea": "0x400ED8"
+          },
+          {
+            "name": "sub_400ED8",
+            "start_ea": "0x400ED8",
+            "end_ea": "0x401018"
+          },
+          {
+            "name": "sub_401018",
+            "start_ea": "0x401018",
+            "end_ea": "0x4010B4"
+          },
+          {
+            "name": "sub_4010B4",
+            "start_ea": "0x4010B4",
+            "end_ea": "0x40125C"
+          },
+          {
+            "name": "sub_40125C",
+            "start_ea": "0x40125C",
+            "end_ea": "0x401394"
+          },
+          {
+            "name": "sub_401394",
+            "start_ea": "0x401394",
+            "end_ea": "0x4013E4"
+          },
+          {
+            "name": "sub_4013E4",
+            "start_ea": "0x4013E4",
+            "end_ea": "0x401544"
+          },
+          {
+            "name": "sub_401544",
+            "start_ea": "0x401544",
+            "end_ea": "0x401608"
+          },
+          {
+            "name": "sub_401608",
+            "start_ea": "0x401608",
+            "end_ea": "0x401A20"
+          },
+          {
+            "name": "sub_401A20",
+            "start_ea": "0x401A20",
+            "end_ea": "0x401A48"
+          },
+          {
+            "name": "sub_401A48",
+            "start_ea": "0x401A48",
+            "end_ea": "0x401AC8"
+          },
+          {
+            "name": "sub_401AC8",
+            "start_ea": "0x401AC8",
+            "end_ea": "0x401B48"
+          },
+          {
+            "name": "sub_401B48",
+            "start_ea": "0x401B48",
+            "end_ea": "0x401C80"
+          },
+          {
+            "name": "sub_401C80",
+            "start_ea": "0x401C80",
+            "end_ea": "0x401D0C"
+          },
+          {
+            "name": "sub_401D0C",
+            "start_ea": "0x401D0C",
+            "end_ea": "0x401DD4"
+          },
+          {
+            "name": "sub_401DD4",
+            "start_ea": "0x401DD4",
+            "end_ea": "0x401EC8"
+          },
+          {
+            "name": "sub_401EC8",
+            "start_ea": "0x401EC8",
+            "end_ea": "0x401FCC"
+          },
+          {
+            "name": "sub_401FCC",
+            "start_ea": "0x401FCC",
+            "end_ea": "0x40223C"
+          },
+          {
+            "name": "sub_40223C",
+            "start_ea": "0x40223C",
+            "end_ea": "0x402318"
+          },
+          {
+            "name": "sub_402318",
+            "start_ea": "0x402318",
+            "end_ea": "0x402634"
+          },
+          {
+            "name": "sub_402634",
+            "start_ea": "0x402634",
+            "end_ea": "0x40280C"
+          },
+          {
+            "name": "sub_40280C",
+            "start_ea": "0x40280C",
+            "end_ea": "0x402B28"
+          },
+          {
+            "name": "sub_402B28",
+            "start_ea": "0x402B28",
+            "end_ea": "0x402BC8"
+          },
+          {
+            "name": "main",
+            "start_ea": "0x402BC8",
+            "end_ea": "0x402EC0"
+          },
+          {
+            "name": "__bswapsi2",
+            "start_ea": "0x402EC0",
+            "end_ea": "0x402EE8"
+          },
+          {
+            "name": "sub_402EF0",
+            "start_ea": "0x402EF0",
+            "end_ea": "0x402F48"
+          },
+          {
+            "name": ".strcpy",
+            "start_ea": "0x402F50",
+            "end_ea": "0x402F60"
+          },
+          {
+            "name": ".nvram_safe_get",
+            "start_ea": "0x402F60",
+            "end_ea": "0x402F70"
+          },
+          {
+            "name": ".ioctl",
+            "start_ea": "0x402F70",
+            "end_ea": "0x402F80"
+          },
+          {
+            "name": ".printf",
+            "start_ea": "0x402F80",
+            "end_ea": "0x402F90"
+          },
+          {
+            "name": ".recv",
+            "start_ea": "0x402F90",
+            "end_ea": "0x402FA0"
+          },
+          {
+            "name": ".connect",
+            "start_ea": "0x402FA0",
+            "end_ea": "0x402FB0"
+          },
+          {
+            "name": ".sigemptyset",
+            "start_ea": "0x402FB0",
+            "end_ea": "0x402FC0"
+          },
+          {
+            "name": ".snprintf",
+            "start_ea": "0x402FC0",
+            "end_ea": "0x402FD0"
+          },
+          {
+            "name": ".nvram_set_int_temp",
+            "start_ea": "0x402FD0",
+            "end_ea": "0x402FE0"
+          },
+          {
+            "name": ".nvram_get_int",
+            "start_ea": "0x402FE0",
+            "end_ea": "0x402FF0"
+          },
+          {
+            "name": ".fgets",
+            "start_ea": "0x402FF0",
+            "end_ea": "0x403000"
+          },
+          {
+            "name": ".perror",
+            "start_ea": "0x403000",
+            "end_ea": "0x403010"
+          },
+          {
+            "name": ".puts",
+            "start_ea": "0x403010",
+            "end_ea": "0x403020"
+          },
+          {
+            "name": ".system",
+            "start_ea": "0x403020",
+            "end_ea": "0x403030"
+          },
+          {
+            "name": ".malloc",
+            "start_ea": "0x403030",
+            "end_ea": "0x403040"
+          },
+          {
+            "name": ".siglongjmp",
+            "start_ea": "0x403040",
+            "end_ea": "0x403050"
+          },
+          {
+            "name": ".strtoul",
+            "start_ea": "0x403050",
+            "end_ea": "0x403060"
+          },
+          {
+            "name": ".socket",
+            "start_ea": "0x403060",
+            "end_ea": "0x403070"
+          },
+          {
+            "name": ".select",
+            "start_ea": "0x403070",
+            "end_ea": "0x403080"
+          },
+          {
+            "name": ".send",
+            "start_ea": "0x403080",
+            "end_ea": "0x403090"
+          },
+          {
+            "name": ".cJSON_Parse",
+            "start_ea": "0x403090",
+            "end_ea": "0x4030A0"
+          },
+          {
+            "name": ".alarm",
+            "start_ea": "0x4030A0",
+            "end_ea": "0x4030B0"
+          },
+          {
+            "name": ".__sigsetjmp",
+            "start_ea": "0x4030B0",
+            "end_ea": "0x4030C0"
+          },
+          {
+            "name": ".get_internet_state_cached",
+            "start_ea": "0x4030C0",
+            "end_ea": "0x4030D0"
+          },
+          {
+            "name": ".cJSON_GetObjectItem",
+            "start_ea": "0x4030D0",
+            "end_ea": "0x4030E0"
+          },
+          {
+            "name": ".fprintf",
+            "start_ea": "0x4030E0",
+            "end_ea": "0x4030F0"
+          },
+          {
+            "name": ".kill",
+            "start_ea": "0x4030F0",
+            "end_ea": "0x403100"
+          },
+          {
+            "name": ".strcat",
+            "start_ea": "0x403100",
+            "end_ea": "0x403110"
+          },
+          {
+            "name": ".inet_addr",
+            "start_ea": "0x403110",
+            "end_ea": "0x403120"
+          },
+          {
+            "name": ".setsockopt",
+            "start_ea": "0x403120",
+            "end_ea": "0x403130"
+          },
+          {
+            "name": ".strstr",
+            "start_ea": "0x403130",
+            "end_ea": "0x403140"
+          },
+          {
+            "name": ".signal",
+            "start_ea": "0x403140",
+            "end_ea": "0x403150"
+          },
+          {
+            "name": ".strncmp",
+            "start_ea": "0x403150",
+            "end_ea": "0x403160"
+          },
+          {
+            "name": ".strncpy",
+            "start_ea": "0x403160",
+            "end_ea": "0x403170"
+          },
+          {
+            "name": ".sigaction",
+            "start_ea": "0x403170",
+            "end_ea": "0x403180"
+          },
+          {
+            "name": ".__uClibc_main",
+            "start_ea": "0x403180",
+            "end_ea": "0x403190"
+          },
+          {
+            "name": ".gettimeofday",
+            "start_ea": "0x403190",
+            "end_ea": "0x4031A0"
+          },
+          {
+            "name": ".cJSON_Delete",
+            "start_ea": "0x4031A0",
+            "end_ea": "0x4031B0"
+          },
+          {
+            "name": ".fopen",
+            "start_ea": "0x4031B0",
+            "end_ea": "0x4031C0"
+          },
+          {
+            "name": ".memset",
+            "start_ea": "0x4031C0",
+            "end_ea": "0x4031D0"
+          },
+          {
+            "name": ".fclose",
+            "start_ea": "0x4031D0",
+            "end_ea": "0x4031E0"
+          },
+          {
+            "name": ".inet_ntoa",
+            "start_ea": "0x4031E0",
+            "end_ea": "0x4031F0"
+          },
+          {
+            "name": ".strcmp",
+            "start_ea": "0x4031F0",
+            "end_ea": "0x403200"
+          },
+          {
+            "name": ".gethostbyname",
+            "start_ea": "0x403200",
+            "end_ea": "0x403210"
+          },
+          {
+            "name": ".sprintf",
+            "start_ea": "0x403210",
+            "end_ea": "0x403220"
+          },
+          {
+            "name": ".nvram_set_temp",
+            "start_ea": "0x403220",
+            "end_ea": "0x403230"
+          },
+          {
+            "name": ".exit",
+            "start_ea": "0x403230",
+            "end_ea": "0x403240"
+          },
+          {
+            "name": ".atoi",
+            "start_ea": "0x403240",
+            "end_ea": "0x403250"
+          },
+          {
+            "name": ".daemon",
+            "start_ea": "0x403250",
+            "end_ea": "0x403260"
+          },
+          {
+            "name": ".strlen",
+            "start_ea": "0x403260",
+            "end_ea": "0x403270"
+          },
+          {
+            "name": ".__assert",
+            "start_ea": "0x403270",
+            "end_ea": "0x403280"
+          },
+          {
+            "name": ".strchr",
+            "start_ea": "0x403280",
+            "end_ea": "0x403290"
+          },
+          {
+            "name": ".close",
+            "start_ea": "0x403290",
+            "end_ea": "0x4032A0"
+          },
+          {
+            "name": ".free",
+            "start_ea": "0x4032A0",
+            "end_ea": "0x4032C0"
+          },
+          {
+            "name": ".term_proc",
+            "start_ea": "0x4032C0",
+            "end_ea": "0x40330C"
+          },
+          {
+            "name": "free",
+            "start_ea": "0x413E34",
+            "end_ea": "0x413E38"
+          },
+          {
+            "name": "close",
+            "start_ea": "0x413E38",
+            "end_ea": "0x413E3C"
+          },
+          {
+            "name": "strchr",
+            "start_ea": "0x413E3C",
+            "end_ea": "0x413E40"
+          },
+          {
+            "name": "__assert",
+            "start_ea": "0x413E40",
+            "end_ea": "0x413E44"
+          },
+          {
+            "name": "strlen",
+            "start_ea": "0x413E44",
+            "end_ea": "0x413E48"
+          },
+          {
+            "name": "daemon",
+            "start_ea": "0x413E48",
+            "end_ea": "0x413E4C"
+          },
+          {
+            "name": "atoi",
+            "start_ea": "0x413E4C",
+            "end_ea": "0x413E50"
+          },
+          {
+            "name": "exit",
+            "start_ea": "0x413E50",
+            "end_ea": "0x413E54"
+          },
+          {
+            "name": "nvram_set_temp",
+            "start_ea": "0x413E54",
+            "end_ea": "0x413E58"
+          },
+          {
+            "name": "sprintf",
+            "start_ea": "0x413E5C",
+            "end_ea": "0x413E60"
+          },
+          {
+            "name": "gethostbyname",
+            "start_ea": "0x413E60",
+            "end_ea": "0x413E64"
+          },
+          {
+            "name": "strcmp",
+            "start_ea": "0x413E64",
+            "end_ea": "0x413E68"
+          },
+          {
+            "name": "inet_ntoa",
+            "start_ea": "0x413E68",
+            "end_ea": "0x413E6C"
+          },
+          {
+            "name": "fclose",
+            "start_ea": "0x413E6C",
+            "end_ea": "0x413E70"
+          },
+          {
+            "name": "memset",
+            "start_ea": "0x413E70",
+            "end_ea": "0x413E74"
+          },
+          {
+            "name": "fopen",
+            "start_ea": "0x413E74",
+            "end_ea": "0x413E78"
+          }
+        ]
+      },
+      "duration_ms": 547.07
+    },
+    {
+      "timestamp": "2025-12-05T17:43:27.428196",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": -1
+      },
+      "port": 8765,
+      "result": {
+        "error": "offset < 0"
+      },
+      "duration_ms": 609.36
+    },
+    {
+      "timestamp": "2025-12-05T17:43:27.991894",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 0
+      },
+      "port": 8765,
+      "result": {
+        "error": "count must be > 0"
+      },
+      "duration_ms": 562.84
+    },
+    {
+      "timestamp": "2025-12-05T17:43:28.541478",
+      "category": "core",
+      "tool": "list_functions",
+      "params": {
+        "offset": 0,
+        "count": 10000
+      },
+      "port": 8765,
+      "result": {
+        "error": "count too large (max 1000)"
+      },
+      "duration_ms": 547.62
+    },
+    {
+      "timestamp": "2025-12-05T17:43:29.168580",
+      "category": "core",
+      "tool": "get_function",
+      "params": {
+        "query": ".init_proc"
+      },
+      "port": 8765,
+      "result": {
+        "name": ".init_proc",
+        "start_ea": "0x400B44",
+        "end_ea": "0x400B90",
+        "query": ".init_proc"
+      },
+      "duration_ms": 625.31
+    },
+    {
+      "timestamp": "2025-12-05T17:43:29.739737",
+      "category": "core",
+      "tool": "get_function",
+      "params": {
+        "query": "0x400b44"
+      },
+      "port": 8765,
+      "result": {
+        "name": ".init_proc",
+        "start_ea": "0x400B44",
+        "end_ea": "0x400B90",
+        "query": "0x400b44"
+      },
+      "duration_ms": 568.55
+    },
+    {
+      "timestamp": "2025-12-05T17:43:30.307349",
+      "category": "core",
+      "tool": "get_function",
+      "params": {
+        "query": "0x400b48"
+      },
+      "port": 8765,
+      "result": {
+        "name": ".init_proc",
+        "start_ea": "0x400B44",
+        "end_ea": "0x400B90",
+        "query": "0x400b48"
+      },
+      "duration_ms": 565.71
+    },
+    {
+      "timestamp": "2025-12-05T17:43:30.880680",
+      "category": "core",
+      "tool": "get_function",
+      "params": {
+        "query": "nonexistent_function_xyz123456"
+      },
+      "port": 8765,
+      "result": {
+        "error": "not found",
+        "query": "nonexistent_function_xyz123456"
+      },
+      "duration_ms": 571.89
+    },
+    {
+      "timestamp": "2025-12-05T17:43:31.476729",
+      "category": "core",
+      "tool": "get_function",
+      "params": {
+        "query": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty query"
+      },
+      "duration_ms": 594.61
+    },
+    {
+      "timestamp": "2025-12-05T17:43:32.079871",
       "category": "core",
       "tool": "list_globals",
       "params": {
@@ -531,513 +1863,3607 @@
       },
       "port": 8765,
       "result": {
-        "total": 155,
+        "total": 239,
         "offset": 0,
         "count": 100,
         "items": [
           {
-            "name": "_gnu_exception_handler",
-            "ea": "0x140002120",
-            "size": 1
+            "name": "aLibLdUclibcSo0",
+            "ea": "0x400134",
+            "size": 20
           },
           {
-            "name": "def_140002173",
-            "ea": "0x1400021DC",
-            "size": 5
+            "name": "elf_hash_nbucket",
+            "ea": "0x400240",
+            "size": 4
           },
           {
-            "name": "def_140002584",
-            "ea": "0x140002644",
-            "size": 8
+            "name": "elf_hash_nchain",
+            "ea": "0x400244",
+            "size": 4
           },
           {
-            "name": "def_140002AC2",
-            "ea": "0x140002C23",
-            "size": 5
+            "name": "elf_hash_bucket",
+            "ea": "0x400248",
+            "size": 268
           },
           {
-            "name": "First",
-            "ea": "0x140004068",
-            "size": 8
+            "name": "elf_hash_chain",
+            "ea": "0x400354",
+            "size": 276
           },
           {
-            "name": "Last",
-            "ea": "0x140004070",
-            "size": 8
+            "name": "aInit",
+            "ea": "0x4008B9",
+            "size": 6
           },
           {
-            "name": "aSuccess",
-            "ea": "0x1400040A8",
-            "size": 8
+            "name": "aFini",
+            "ea": "0x4008BF",
+            "size": 6
           },
           {
-            "name": "aOutOfMemory",
-            "ea": "0x1400040B0",
+            "name": "aUclibcMain",
+            "ea": "0x4008C5",
             "size": 14
           },
           {
-            "name": "aInvalidArgumen",
-            "ea": "0x1400040BE",
-            "size": 17
+            "name": "aMemset",
+            "ea": "0x4008D3",
+            "size": 7
           },
           {
-            "name": "aNotFound",
-            "ea": "0x1400040CF",
-            "size": 10
-          },
-          {
-            "name": "aAlreadyExists",
-            "ea": "0x1400040D9",
+            "name": "aNvramSafeGet",
+            "ea": "0x4008DA",
             "size": 15
           },
           {
-            "name": "Source",
-            "ea": "0x1400040E8",
-            "size": 14
+            "name": "aStrcpy",
+            "ea": "0x4008E9",
+            "size": 7
           },
           {
-            "name": "_Format",
-            "ea": "0x1400040F6",
-            "size": 44
+            "name": "aStrncmp",
+            "ea": "0x4008F0",
+            "size": 8
           },
           {
-            "name": "aItemDD",
-            "ea": "0x140004122",
-            "size": 15
+            "name": "aStrchr",
+            "ea": "0x4008F8",
+            "size": 7
           },
           {
-            "name": "aIdaMcpComplexT",
-            "ea": "0x140004131",
-            "size": 39
+            "name": "aStrlen",
+            "ea": "0x4008FF",
+            "size": 7
           },
           {
-            "name": "aRectangleTest",
-            "ea": "0x140004158",
-            "size": 22
+            "name": "aStrncpy",
+            "ea": "0x400906",
+            "size": 8
           },
           {
-            "name": "aTestrect",
-            "ea": "0x14000416E",
+            "name": "aAtoi",
+            "ea": "0x40090E",
+            "size": 5
+          },
+          {
+            "name": "aSnprintf",
+            "ea": "0x400913",
             "size": 9
           },
           {
-            "name": "aRectSAreaDWidt",
-            "ea": "0x140004177",
-            "size": 41
-          },
-          {
-            "name": "aPoint5040InRec",
-            "ea": "0x1400041A0",
-            "size": 27
-          },
-          {
-            "name": "aYes",
-            "ea": "0x1400041BB",
+            "name": "aCfg",
+            "ea": "0x40091C",
             "size": 4
           },
           {
-            "name": "aNo",
-            "ea": "0x1400041BF",
-            "size": 3
+            "name": "aFopen",
+            "ea": "0x400920",
+            "size": 6
           },
           {
-            "name": "aLinkedlistTest",
-            "ea": "0x1400041C2",
-            "size": 24
-          },
-          {
-            "name": "aListItems",
-            "ea": "0x1400041DA",
-            "size": 13
-          },
-          {
-            "name": "aSumOfAllItemsD",
-            "ea": "0x1400041E7",
-            "size": 22
-          },
-          {
-            "name": "aFunctionPointe",
-            "ea": "0x1400041FD",
-            "size": 30
-          },
-          {
-            "name": "aAdd105D",
-            "ea": "0x14000421B",
-            "size": 17
-          },
-          {
-            "name": "aSub105D",
-            "ea": "0x14000422C",
-            "size": 17
-          },
-          {
-            "name": "aMul105D",
-            "ea": "0x14000423D",
-            "size": 17
-          },
-          {
-            "name": "aDiv105D",
-            "ea": "0x14000424E",
-            "size": 17
-          },
-          {
-            "name": "aStackHeavyTest",
-            "ea": "0x14000425F",
-            "size": 25
-          },
-          {
-            "name": "aTestCompleted",
-            "ea": "0x1400042A0",
-            "size": 25
-          },
-          {
-            "name": "_tls_used",
-            "ea": "0x1400042C0",
-            "size": 40
-          },
-          {
-            "name": "__dyn_tls_init_callback",
-            "ea": "0x1400042E8",
+            "name": "aFprintf",
+            "ea": "0x400926",
             "size": 8
           },
           {
-            "name": "jpt_140002173",
-            "ea": "0x140004300",
-            "size": 44
+            "name": "aFclose",
+            "ea": "0x40092E",
+            "size": 7
           },
           {
-            "name": "aArgumentDomain",
-            "ea": "0x14000432C",
-            "size": 31
+            "name": "aPuts",
+            "ea": "0x400935",
+            "size": 5
           },
           {
-            "name": "aArgumentSingul",
-            "ea": "0x14000434B",
-            "size": 28
+            "name": "aStrcmp",
+            "ea": "0x40093A",
+            "size": 7
           },
           {
-            "name": "aOverflowRangeE",
-            "ea": "0x140004367",
-            "size": 32
+            "name": "aStderr",
+            "ea": "0x400941",
+            "size": 7
           },
           {
-            "name": "aPartialLossOfS",
-            "ea": "0x140004387",
-            "size": 37
+            "name": "aFgets",
+            "ea": "0x400948",
+            "size": 6
           },
           {
-            "name": "aTotalLossOfSig",
-            "ea": "0x1400043AC",
-            "size": 35
+            "name": "aKill",
+            "ea": "0x40094E",
+            "size": 5
           },
           {
-            "name": "aTheResultIsToo",
-            "ea": "0x1400043CF",
-            "size": 54
+            "name": "aExit",
+            "ea": "0x400953",
+            "size": 5
           },
           {
-            "name": "aUnknownError",
-            "ea": "0x140004405",
+            "name": "aStrtoul",
+            "ea": "0x400958",
+            "size": 8
+          },
+          {
+            "name": "aSignal",
+            "ea": "0x400960",
+            "size": 7
+          },
+          {
+            "name": "aSigsetjmp",
+            "ea": "0x400967",
+            "size": 12
+          },
+          {
+            "name": "aAlarm",
+            "ea": "0x400973",
+            "size": 6
+          },
+          {
+            "name": "aGethostbyname",
+            "ea": "0x400979",
             "size": 14
           },
           {
-            "name": "aMatherrSInSGGR",
-            "ea": "0x140004413",
-            "size": 43
+            "name": "aSocket",
+            "ea": "0x400987",
+            "size": 7
           },
           {
-            "name": "jpt_140002584",
-            "ea": "0x140004458",
-            "size": 32
+            "name": "aPerror",
+            "ea": "0x40098E",
+            "size": 7
           },
           {
-            "name": "aUnknownPseudoR",
-            "ea": "0x140004478",
-            "size": 50
+            "name": "aInetNtoa",
+            "ea": "0x400995",
+            "size": 10
           },
           {
-            "name": "aUnknownPseudoR_0",
-            "ea": "0x1400044AA",
-            "size": 42
+            "name": "aInetAddr",
+            "ea": "0x40099F",
+            "size": 10
           },
           {
-            "name": "msg",
-            "ea": "0x1400044D4",
-            "size": 83
+            "name": "aConnect",
+            "ea": "0x4009A9",
+            "size": 8
           },
           {
-            "name": "aAddressPHasNoI",
-            "ea": "0x140004527",
-            "size": 32
+            "name": "aSetsockopt",
+            "ea": "0x4009B1",
+            "size": 11
           },
           {
-            "name": "aVirtualqueryFa",
-            "ea": "0x140004547",
-            "size": 49
+            "name": "aSiglongjmp",
+            "ea": "0x4009BC",
+            "size": 11
           },
           {
-            "name": "aVirtualprotect",
-            "ea": "0x140004578",
-            "size": 39
+            "name": "aSprintf",
+            "ea": "0x4009C7",
+            "size": 8
           },
           {
-            "name": "aMingwW64Runtim",
-            "ea": "0x14000459F",
-            "size": 28
+            "name": "aNvramSetTemp",
+            "ea": "0x4009CF",
+            "size": 15
           },
           {
-            "name": "aRuntimeErrorD",
-            "ea": "0x140004618",
-            "size": 18
+            "name": "aSystem",
+            "ea": "0x4009DE",
+            "size": 7
           },
           {
-            "name": "jpt_140002AC2",
-            "ea": "0x14000462C",
+            "name": "aNvramSetIntTem",
+            "ea": "0x4009E5",
+            "size": 19
+          },
+          {
+            "name": "aGettimeofday",
+            "ea": "0x4009F8",
+            "size": 13
+          },
+          {
+            "name": "aSend",
+            "ea": "0x400A05",
+            "size": 5
+          },
+          {
+            "name": "aSelect",
+            "ea": "0x400A0A",
+            "size": 7
+          },
+          {
+            "name": "aIoctl",
+            "ea": "0x400A11",
+            "size": 6
+          },
+          {
+            "name": "aCjsonGetobject",
+            "ea": "0x400A17",
+            "size": 20
+          },
+          {
+            "name": "aAssert",
+            "ea": "0x400A2B",
+            "size": 9
+          },
+          {
+            "name": "aStrstr",
+            "ea": "0x400A34",
+            "size": 7
+          },
+          {
+            "name": "aMalloc",
+            "ea": "0x400A3B",
+            "size": 7
+          },
+          {
+            "name": "aCjsonParse",
+            "ea": "0x400A42",
+            "size": 12
+          },
+          {
+            "name": "aCjsonDelete",
+            "ea": "0x400A4E",
+            "size": 13
+          },
+          {
+            "name": "aFree",
+            "ea": "0x400A5B",
+            "size": 5
+          },
+          {
+            "name": "aStrcat",
+            "ea": "0x400A60",
+            "size": 7
+          },
+          {
+            "name": "aRecv",
+            "ea": "0x400A67",
+            "size": 5
+          },
+          {
+            "name": "aNvramGetInt",
+            "ea": "0x400A6C",
+            "size": 14
+          },
+          {
+            "name": "aSigemptyset",
+            "ea": "0x400A7A",
+            "size": 12
+          },
+          {
+            "name": "aSigaction",
+            "ea": "0x400A86",
+            "size": 10
+          },
+          {
+            "name": "aDaemon",
+            "ea": "0x400A90",
+            "size": 7
+          },
+          {
+            "name": "aGetInternetSta",
+            "ea": "0x400A97",
+            "size": 26
+          },
+          {
+            "name": "aLibsharedSo",
+            "ea": "0x400AB1",
+            "size": 13
+          },
+          {
+            "name": "aDynamicLinking",
+            "ea": "0x400ABE",
+            "size": 17
+          },
+          {
+            "name": "aRldMap",
+            "ea": "0x400ACF",
+            "size": 10
+          },
+          {
+            "name": "aLibcjsonSo",
+            "ea": "0x400AD9",
+            "size": 12
+          },
+          {
+            "name": "aLibpthreadSo0",
+            "ea": "0x400AE5",
             "size": 16
           },
           {
-            "name": "_load_config_used",
-            "ea": "0x140004640",
+            "name": "aLibrtSo0",
+            "ea": "0x400AF5",
+            "size": 11
+          },
+          {
+            "name": "aBswapsi2",
+            "ea": "0x400B00",
+            "size": 11
+          },
+          {
+            "name": "aLibcSo0",
+            "ea": "0x400B0B",
+            "size": 10
+          },
+          {
+            "name": "aFtext",
+            "ea": "0x400B15",
+            "size": 7
+          },
+          {
+            "name": "aFdata",
+            "ea": "0x400B1C",
+            "size": 7
+          },
+          {
+            "name": "aEdata",
+            "ea": "0x400B23",
+            "size": 7
+          },
+          {
+            "name": "aBssStart",
+            "ea": "0x400B2A",
+            "size": 12
+          },
+          {
+            "name": "aFbss",
+            "ea": "0x400B36",
+            "size": 6
+          },
+          {
+            "name": "aEnd",
+            "ea": "0x400B3C",
+            "size": 5
+          },
+          {
+            "name": "cloudupg_timestamp",
+            "ea": "0x403310",
+            "size": 16
+          },
+          {
+            "name": "http:__",
+            "ea": "0x403320",
+            "size": 9
+          },
+          {
+            "name": "aHttp",
+            "ea": "0x403330",
+            "size": 8
+          },
+          {
+            "name": "a80",
+            "ea": "0x403338",
+            "size": 3
+          },
+          {
+            "name": "%s",
+            "ea": "0x40333C",
+            "size": 3
+          },
+          {
+            "name": "aUpdateCarystud",
+            "ea": "0x403340",
+            "size": 22
+          },
+          {
+            "name": "aDeviceUpgradeC",
+            "ea": "0x403358",
+            "size": 22
+          },
+          {
+            "name": "aD_0",
+            "ea": "0x403370",
+            "size": 3
+          },
+          {
+            "name": "aDevConsole",
+            "ea": "0x403374",
+            "size": 13
+          },
+          {
+            "name": "aW",
+            "ea": "0x403384",
+            "size": 2
+          },
+          {
+            "name": "aSDSSSD",
+            "ea": "0x403388",
+            "size": 24
+          },
+          {
+            "name": "CS_cloud_upgrade_version_:_%s_n",
+            "ea": "0x4033A0",
+            "size": 31
+          },
+          {
+            "name": "a30",
+            "ea": "0x4033C0",
             "size": 4
           },
           {
-            "name": "__RUNTIME_PSEUDO_RELOC_LIST__",
-            "ea": "0x140004778",
-            "size": 1
+            "name": "aCloudupgForChe",
+            "ea": "0x4033C4",
+            "size": 37
           },
           {
-            "name": "__guard_dispatch_icall_fptr",
-            "ea": "0x140004780",
+            "name": "aUsageCloudupda",
+            "ea": "0x4033EC",
+            "size": 34
+          },
+          {
+            "name": "aDDaemon",
+            "ea": "0x403410",
+            "size": 12
+          },
+          {
+            "name": "aVDebugVerbose",
+            "ea": "0x40341C",
+            "size": 19
+          },
+          {
+            "name": "aNNetworkCheck",
+            "ea": "0x403430",
+            "size": 19
+          },
+          {
+            "name": "aD",
+            "ea": "0x403444",
+            "size": 3
+          },
+          {
+            "name": "aDebug",
+            "ea": "0x403448",
             "size": 8
           },
           {
-            "name": "__xc_a",
-            "ea": "0x140004788",
-            "size": 8
+            "name": "aV",
+            "ea": "0x403450",
+            "size": 3
           },
           {
-            "name": "__xc_z",
-            "ea": "0x140004790",
-            "size": 8
+            "name": "aVerbose",
+            "ea": "0x403454",
+            "size": 10
           },
           {
-            "name": "__xd_a",
-            "ea": "0x140004798",
-            "size": 8
+            "name": "aN",
+            "ea": "0x403460",
+            "size": 3
           },
           {
-            "name": "__xd_z",
-            "ea": "0x1400047A0",
-            "size": 8
+            "name": "aNetwork",
+            "ea": "0x403464",
+            "size": 10
           },
           {
-            "name": "__xi_a",
-            "ea": "0x1400047A8",
-            "size": 8
-          },
-          {
-            "name": "__xi_z",
-            "ea": "0x1400047B0",
-            "size": 8
-          },
-          {
-            "name": "__xl_a",
-            "ea": "0x1400047B8",
-            "size": 8
-          },
-          {
-            "name": "__xl_c",
-            "ea": "0x1400047C0",
-            "size": 8
-          },
-          {
-            "name": "__xl_d",
-            "ea": "0x1400047C8",
-            "size": 8
-          },
-          {
-            "name": "__xl_z",
-            "ea": "0x1400047D0",
-            "size": 8
-          },
-          {
-            "name": "__IMPORT_DESCRIPTOR_KERNEL32",
-            "ea": "0x140004870",
-            "size": 4
-          },
-          {
-            "name": "__imp___C_specific_handler",
-            "ea": "0x140004A58",
-            "size": 8
-          },
-          {
-            "name": "__imp_memcpy",
-            "ea": "0x140004A60",
-            "size": 8
-          },
-          {
-            "name": "__imp___acrt_iob_func",
-            "ea": "0x140004A70",
-            "size": 8
-          },
-          {
-            "name": "__imp___p__commode",
-            "ea": "0x140004A78",
-            "size": 8
-          },
-          {
-            "name": "__imp___p__fmode",
-            "ea": "0x140004A80",
-            "size": 8
-          },
-          {
-            "name": "__imp___stdio_common_vfprintf",
-            "ea": "0x140004A88",
-            "size": 8
-          },
-          {
-            "name": "__imp___p___argc",
-            "ea": "0x140004A98",
-            "size": 8
-          },
-          {
-            "name": "__imp___p___argv",
-            "ea": "0x140004AA0",
-            "size": 8
-          },
-          {
-            "name": "__imp__cexit",
-            "ea": "0x140004AA8",
-            "size": 8
-          },
-          {
-            "name": "__imp__configure_narrow_argv",
-            "ea": "0x140004AB0",
-            "size": 8
-          },
-          {
-            "name": "__imp__crt_atexit",
-            "ea": "0x140004AB8",
-            "size": 8
-          },
-          {
-            "name": "__imp__exit",
-            "ea": "0x140004AC0",
-            "size": 8
-          },
-          {
-            "name": "__imp__initialize_narrow_environment",
-            "ea": "0x140004AC8",
-            "size": 8
-          },
-          {
-            "name": "__imp__initterm",
-            "ea": "0x140004AD0",
-            "size": 8
-          },
-          {
-            "name": "__imp__initterm_e",
-            "ea": "0x140004AD8",
-            "size": 8
-          },
-          {
-            "name": "__imp__set_app_type",
-            "ea": "0x140004AE0",
-            "size": 8
-          },
-          {
-            "name": "__imp__set_invalid_parameter_handler",
-            "ea": "0x140004AE8",
-            "size": 8
-          },
-          {
-            "name": "__imp_abort",
-            "ea": "0x140004AF0",
-            "size": 8
-          },
-          {
-            "name": "__imp_exit",
-            "ea": "0x140004AF8",
-            "size": 8
-          },
-          {
-            "name": "__imp_signal",
-            "ea": "0x140004B00",
-            "size": 8
-          },
-          {
-            "name": "__imp__configthreadlocale",
-            "ea": "0x140004B10",
-            "size": 8
-          },
-          {
-            "name": "__imp__set_new_mode",
-            "ea": "0x140004B20",
-            "size": 8
-          },
-          {
-            "name": "__imp_calloc",
-            "ea": "0x140004B28",
-            "size": 8
-          },
-          {
-            "name": "__imp_free",
-            "ea": "0x140004B30",
-            "size": 8
-          },
-          {
-            "name": "__imp_malloc",
-            "ea": "0x140004B38",
-            "size": 8
-          },
-          {
-            "name": "__imp_memset",
-            "ea": "0x140004B48",
-            "size": 8
-          },
-          {
-            "name": "__imp_strcpy",
-            "ea": "0x140004B50",
-            "size": 8
-          },
-          {
-            "name": "__imp_strlen",
-            "ea": "0x140004B58",
-            "size": 8
-          },
-          {
-            "name": "__imp_strncmp",
-            "ea": "0x140004B60",
-            "size": 8
-          },
-          {
-            "name": "__imp_strncpy",
-            "ea": "0x140004B68",
-            "size": 8
-          },
-          {
-            "name": "__imp_DeleteCriticalSection",
-            "ea": "0x140004B78",
-            "size": 8
-          },
-          {
-            "name": "__imp_EnterCriticalSection",
-            "ea": "0x140004B80",
-            "size": 8
-          },
-          {
-            "name": "__imp_GetLastError",
-            "ea": "0x140004B88",
-            "size": 8
-          },
-          {
-            "name": "__imp_InitializeCriticalSection",
-            "ea": "0x140004B90",
-            "size": 8
+            "name": "aErrorUnknownOp",
+            "ea": "0x403470",
+            "size": 29
           }
         ]
       },
-      "duration_ms": 1511.04
+      "duration_ms": 601.42
+    },
+    {
+      "timestamp": "2025-12-05T17:43:32.676064",
+      "category": "core",
+      "tool": "list_globals",
+      "params": {
+        "offset": 0,
+        "count": 5
+      },
+      "port": 8765,
+      "result": {
+        "total": 239,
+        "offset": 0,
+        "count": 5,
+        "items": [
+          {
+            "name": "aLibLdUclibcSo0",
+            "ea": "0x400134",
+            "size": 20
+          },
+          {
+            "name": "elf_hash_nbucket",
+            "ea": "0x400240",
+            "size": 4
+          },
+          {
+            "name": "elf_hash_nchain",
+            "ea": "0x400244",
+            "size": 4
+          },
+          {
+            "name": "elf_hash_bucket",
+            "ea": "0x400248",
+            "size": 268
+          },
+          {
+            "name": "elf_hash_chain",
+            "ea": "0x400354",
+            "size": 276
+          }
+        ]
+      },
+      "duration_ms": 593.25
+    },
+    {
+      "timestamp": "2025-12-05T17:43:33.234870",
+      "category": "core",
+      "tool": "list_globals",
+      "params": {
+        "offset": 0,
+        "count": 100,
+        "pattern": "*"
+      },
+      "port": 8765,
+      "result": {
+        "total": 239,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "name": "aLibLdUclibcSo0",
+            "ea": "0x400134",
+            "size": 20
+          },
+          {
+            "name": "elf_hash_nbucket",
+            "ea": "0x400240",
+            "size": 4
+          },
+          {
+            "name": "elf_hash_nchain",
+            "ea": "0x400244",
+            "size": 4
+          },
+          {
+            "name": "elf_hash_bucket",
+            "ea": "0x400248",
+            "size": 268
+          },
+          {
+            "name": "elf_hash_chain",
+            "ea": "0x400354",
+            "size": 276
+          },
+          {
+            "name": "aInit",
+            "ea": "0x4008B9",
+            "size": 6
+          },
+          {
+            "name": "aFini",
+            "ea": "0x4008BF",
+            "size": 6
+          },
+          {
+            "name": "aUclibcMain",
+            "ea": "0x4008C5",
+            "size": 14
+          },
+          {
+            "name": "aMemset",
+            "ea": "0x4008D3",
+            "size": 7
+          },
+          {
+            "name": "aNvramSafeGet",
+            "ea": "0x4008DA",
+            "size": 15
+          },
+          {
+            "name": "aStrcpy",
+            "ea": "0x4008E9",
+            "size": 7
+          },
+          {
+            "name": "aStrncmp",
+            "ea": "0x4008F0",
+            "size": 8
+          },
+          {
+            "name": "aStrchr",
+            "ea": "0x4008F8",
+            "size": 7
+          },
+          {
+            "name": "aStrlen",
+            "ea": "0x4008FF",
+            "size": 7
+          },
+          {
+            "name": "aStrncpy",
+            "ea": "0x400906",
+            "size": 8
+          },
+          {
+            "name": "aAtoi",
+            "ea": "0x40090E",
+            "size": 5
+          },
+          {
+            "name": "aSnprintf",
+            "ea": "0x400913",
+            "size": 9
+          },
+          {
+            "name": "aCfg",
+            "ea": "0x40091C",
+            "size": 4
+          },
+          {
+            "name": "aFopen",
+            "ea": "0x400920",
+            "size": 6
+          },
+          {
+            "name": "aFprintf",
+            "ea": "0x400926",
+            "size": 8
+          },
+          {
+            "name": "aFclose",
+            "ea": "0x40092E",
+            "size": 7
+          },
+          {
+            "name": "aPuts",
+            "ea": "0x400935",
+            "size": 5
+          },
+          {
+            "name": "aStrcmp",
+            "ea": "0x40093A",
+            "size": 7
+          },
+          {
+            "name": "aStderr",
+            "ea": "0x400941",
+            "size": 7
+          },
+          {
+            "name": "aFgets",
+            "ea": "0x400948",
+            "size": 6
+          },
+          {
+            "name": "aKill",
+            "ea": "0x40094E",
+            "size": 5
+          },
+          {
+            "name": "aExit",
+            "ea": "0x400953",
+            "size": 5
+          },
+          {
+            "name": "aStrtoul",
+            "ea": "0x400958",
+            "size": 8
+          },
+          {
+            "name": "aSignal",
+            "ea": "0x400960",
+            "size": 7
+          },
+          {
+            "name": "aSigsetjmp",
+            "ea": "0x400967",
+            "size": 12
+          },
+          {
+            "name": "aAlarm",
+            "ea": "0x400973",
+            "size": 6
+          },
+          {
+            "name": "aGethostbyname",
+            "ea": "0x400979",
+            "size": 14
+          },
+          {
+            "name": "aSocket",
+            "ea": "0x400987",
+            "size": 7
+          },
+          {
+            "name": "aPerror",
+            "ea": "0x40098E",
+            "size": 7
+          },
+          {
+            "name": "aInetNtoa",
+            "ea": "0x400995",
+            "size": 10
+          },
+          {
+            "name": "aInetAddr",
+            "ea": "0x40099F",
+            "size": 10
+          },
+          {
+            "name": "aConnect",
+            "ea": "0x4009A9",
+            "size": 8
+          },
+          {
+            "name": "aSetsockopt",
+            "ea": "0x4009B1",
+            "size": 11
+          },
+          {
+            "name": "aSiglongjmp",
+            "ea": "0x4009BC",
+            "size": 11
+          },
+          {
+            "name": "aSprintf",
+            "ea": "0x4009C7",
+            "size": 8
+          },
+          {
+            "name": "aNvramSetTemp",
+            "ea": "0x4009CF",
+            "size": 15
+          },
+          {
+            "name": "aSystem",
+            "ea": "0x4009DE",
+            "size": 7
+          },
+          {
+            "name": "aNvramSetIntTem",
+            "ea": "0x4009E5",
+            "size": 19
+          },
+          {
+            "name": "aGettimeofday",
+            "ea": "0x4009F8",
+            "size": 13
+          },
+          {
+            "name": "aSend",
+            "ea": "0x400A05",
+            "size": 5
+          },
+          {
+            "name": "aSelect",
+            "ea": "0x400A0A",
+            "size": 7
+          },
+          {
+            "name": "aIoctl",
+            "ea": "0x400A11",
+            "size": 6
+          },
+          {
+            "name": "aCjsonGetobject",
+            "ea": "0x400A17",
+            "size": 20
+          },
+          {
+            "name": "aAssert",
+            "ea": "0x400A2B",
+            "size": 9
+          },
+          {
+            "name": "aStrstr",
+            "ea": "0x400A34",
+            "size": 7
+          },
+          {
+            "name": "aMalloc",
+            "ea": "0x400A3B",
+            "size": 7
+          },
+          {
+            "name": "aCjsonParse",
+            "ea": "0x400A42",
+            "size": 12
+          },
+          {
+            "name": "aCjsonDelete",
+            "ea": "0x400A4E",
+            "size": 13
+          },
+          {
+            "name": "aFree",
+            "ea": "0x400A5B",
+            "size": 5
+          },
+          {
+            "name": "aStrcat",
+            "ea": "0x400A60",
+            "size": 7
+          },
+          {
+            "name": "aRecv",
+            "ea": "0x400A67",
+            "size": 5
+          },
+          {
+            "name": "aNvramGetInt",
+            "ea": "0x400A6C",
+            "size": 14
+          },
+          {
+            "name": "aSigemptyset",
+            "ea": "0x400A7A",
+            "size": 12
+          },
+          {
+            "name": "aSigaction",
+            "ea": "0x400A86",
+            "size": 10
+          },
+          {
+            "name": "aDaemon",
+            "ea": "0x400A90",
+            "size": 7
+          },
+          {
+            "name": "aGetInternetSta",
+            "ea": "0x400A97",
+            "size": 26
+          },
+          {
+            "name": "aLibsharedSo",
+            "ea": "0x400AB1",
+            "size": 13
+          },
+          {
+            "name": "aDynamicLinking",
+            "ea": "0x400ABE",
+            "size": 17
+          },
+          {
+            "name": "aRldMap",
+            "ea": "0x400ACF",
+            "size": 10
+          },
+          {
+            "name": "aLibcjsonSo",
+            "ea": "0x400AD9",
+            "size": 12
+          },
+          {
+            "name": "aLibpthreadSo0",
+            "ea": "0x400AE5",
+            "size": 16
+          },
+          {
+            "name": "aLibrtSo0",
+            "ea": "0x400AF5",
+            "size": 11
+          },
+          {
+            "name": "aBswapsi2",
+            "ea": "0x400B00",
+            "size": 11
+          },
+          {
+            "name": "aLibcSo0",
+            "ea": "0x400B0B",
+            "size": 10
+          },
+          {
+            "name": "aFtext",
+            "ea": "0x400B15",
+            "size": 7
+          },
+          {
+            "name": "aFdata",
+            "ea": "0x400B1C",
+            "size": 7
+          },
+          {
+            "name": "aEdata",
+            "ea": "0x400B23",
+            "size": 7
+          },
+          {
+            "name": "aBssStart",
+            "ea": "0x400B2A",
+            "size": 12
+          },
+          {
+            "name": "aFbss",
+            "ea": "0x400B36",
+            "size": 6
+          },
+          {
+            "name": "aEnd",
+            "ea": "0x400B3C",
+            "size": 5
+          },
+          {
+            "name": "cloudupg_timestamp",
+            "ea": "0x403310",
+            "size": 16
+          },
+          {
+            "name": "http:__",
+            "ea": "0x403320",
+            "size": 9
+          },
+          {
+            "name": "aHttp",
+            "ea": "0x403330",
+            "size": 8
+          },
+          {
+            "name": "a80",
+            "ea": "0x403338",
+            "size": 3
+          },
+          {
+            "name": "%s",
+            "ea": "0x40333C",
+            "size": 3
+          },
+          {
+            "name": "aUpdateCarystud",
+            "ea": "0x403340",
+            "size": 22
+          },
+          {
+            "name": "aDeviceUpgradeC",
+            "ea": "0x403358",
+            "size": 22
+          },
+          {
+            "name": "aD_0",
+            "ea": "0x403370",
+            "size": 3
+          },
+          {
+            "name": "aDevConsole",
+            "ea": "0x403374",
+            "size": 13
+          },
+          {
+            "name": "aW",
+            "ea": "0x403384",
+            "size": 2
+          },
+          {
+            "name": "aSDSSSD",
+            "ea": "0x403388",
+            "size": 24
+          },
+          {
+            "name": "CS_cloud_upgrade_version_:_%s_n",
+            "ea": "0x4033A0",
+            "size": 31
+          },
+          {
+            "name": "a30",
+            "ea": "0x4033C0",
+            "size": 4
+          },
+          {
+            "name": "aCloudupgForChe",
+            "ea": "0x4033C4",
+            "size": 37
+          },
+          {
+            "name": "aUsageCloudupda",
+            "ea": "0x4033EC",
+            "size": 34
+          },
+          {
+            "name": "aDDaemon",
+            "ea": "0x403410",
+            "size": 12
+          },
+          {
+            "name": "aVDebugVerbose",
+            "ea": "0x40341C",
+            "size": 19
+          },
+          {
+            "name": "aNNetworkCheck",
+            "ea": "0x403430",
+            "size": 19
+          },
+          {
+            "name": "aD",
+            "ea": "0x403444",
+            "size": 3
+          },
+          {
+            "name": "aDebug",
+            "ea": "0x403448",
+            "size": 8
+          },
+          {
+            "name": "aV",
+            "ea": "0x403450",
+            "size": 3
+          },
+          {
+            "name": "aVerbose",
+            "ea": "0x403454",
+            "size": 10
+          },
+          {
+            "name": "aN",
+            "ea": "0x403460",
+            "size": 3
+          },
+          {
+            "name": "aNetwork",
+            "ea": "0x403464",
+            "size": 10
+          },
+          {
+            "name": "aErrorUnknownOp",
+            "ea": "0x403470",
+            "size": 29
+          }
+        ]
+      },
+      "duration_ms": 557.2
+    },
+    {
+      "timestamp": "2025-12-05T17:43:33.793944",
+      "category": "core",
+      "tool": "list_strings",
+      "params": {
+        "offset": 0,
+        "count": 100
+      },
+      "port": 8765,
+      "result": {
+        "total": 140,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "ea": 4194612,
+            "length": 20,
+            "type": 0,
+            "text": "/lib/ld-uClibc.so.0"
+          },
+          {
+            "ea": 4196537,
+            "length": 6,
+            "type": 0,
+            "text": "_init"
+          },
+          {
+            "ea": 4196543,
+            "length": 6,
+            "type": 0,
+            "text": "_fini"
+          },
+          {
+            "ea": 4196549,
+            "length": 14,
+            "type": 0,
+            "text": "__uClibc_main"
+          },
+          {
+            "ea": 4196563,
+            "length": 7,
+            "type": 0,
+            "text": "memset"
+          },
+          {
+            "ea": 4196570,
+            "length": 15,
+            "type": 0,
+            "text": "nvram_safe_get"
+          },
+          {
+            "ea": 4196585,
+            "length": 7,
+            "type": 0,
+            "text": "strcpy"
+          },
+          {
+            "ea": 4196592,
+            "length": 8,
+            "type": 0,
+            "text": "strncmp"
+          },
+          {
+            "ea": 4196600,
+            "length": 7,
+            "type": 0,
+            "text": "strchr"
+          },
+          {
+            "ea": 4196607,
+            "length": 7,
+            "type": 0,
+            "text": "strlen"
+          },
+          {
+            "ea": 4196614,
+            "length": 8,
+            "type": 0,
+            "text": "strncpy"
+          },
+          {
+            "ea": 4196627,
+            "length": 9,
+            "type": 0,
+            "text": "snprintf"
+          },
+          {
+            "ea": 4196640,
+            "length": 6,
+            "type": 0,
+            "text": "fopen"
+          },
+          {
+            "ea": 4196646,
+            "length": 8,
+            "type": 0,
+            "text": "fprintf"
+          },
+          {
+            "ea": 4196654,
+            "length": 7,
+            "type": 0,
+            "text": "fclose"
+          },
+          {
+            "ea": 4196666,
+            "length": 7,
+            "type": 0,
+            "text": "strcmp"
+          },
+          {
+            "ea": 4196673,
+            "length": 7,
+            "type": 0,
+            "text": "stderr"
+          },
+          {
+            "ea": 4196680,
+            "length": 6,
+            "type": 0,
+            "text": "fgets"
+          },
+          {
+            "ea": 4196696,
+            "length": 8,
+            "type": 0,
+            "text": "strtoul"
+          },
+          {
+            "ea": 4196704,
+            "length": 7,
+            "type": 0,
+            "text": "signal"
+          },
+          {
+            "ea": 4196711,
+            "length": 12,
+            "type": 0,
+            "text": "__sigsetjmp"
+          },
+          {
+            "ea": 4196723,
+            "length": 6,
+            "type": 0,
+            "text": "alarm"
+          },
+          {
+            "ea": 4196729,
+            "length": 14,
+            "type": 0,
+            "text": "gethostbyname"
+          },
+          {
+            "ea": 4196743,
+            "length": 7,
+            "type": 0,
+            "text": "socket"
+          },
+          {
+            "ea": 4196750,
+            "length": 7,
+            "type": 0,
+            "text": "perror"
+          },
+          {
+            "ea": 4196757,
+            "length": 10,
+            "type": 0,
+            "text": "inet_ntoa"
+          },
+          {
+            "ea": 4196767,
+            "length": 10,
+            "type": 0,
+            "text": "inet_addr"
+          },
+          {
+            "ea": 4196777,
+            "length": 8,
+            "type": 0,
+            "text": "connect"
+          },
+          {
+            "ea": 4196785,
+            "length": 11,
+            "type": 0,
+            "text": "setsockopt"
+          },
+          {
+            "ea": 4196796,
+            "length": 11,
+            "type": 0,
+            "text": "siglongjmp"
+          },
+          {
+            "ea": 4196807,
+            "length": 8,
+            "type": 0,
+            "text": "sprintf"
+          },
+          {
+            "ea": 4196815,
+            "length": 15,
+            "type": 0,
+            "text": "nvram_set_temp"
+          },
+          {
+            "ea": 4196830,
+            "length": 7,
+            "type": 0,
+            "text": "system"
+          },
+          {
+            "ea": 4196837,
+            "length": 19,
+            "type": 0,
+            "text": "nvram_set_int_temp"
+          },
+          {
+            "ea": 4196856,
+            "length": 13,
+            "type": 0,
+            "text": "gettimeofday"
+          },
+          {
+            "ea": 4196874,
+            "length": 7,
+            "type": 0,
+            "text": "select"
+          },
+          {
+            "ea": 4196881,
+            "length": 6,
+            "type": 0,
+            "text": "ioctl"
+          },
+          {
+            "ea": 4196887,
+            "length": 20,
+            "type": 0,
+            "text": "cJSON_GetObjectItem"
+          },
+          {
+            "ea": 4196907,
+            "length": 9,
+            "type": 0,
+            "text": "__assert"
+          },
+          {
+            "ea": 4196916,
+            "length": 7,
+            "type": 0,
+            "text": "strstr"
+          },
+          {
+            "ea": 4196923,
+            "length": 7,
+            "type": 0,
+            "text": "malloc"
+          },
+          {
+            "ea": 4196930,
+            "length": 12,
+            "type": 0,
+            "text": "cJSON_Parse"
+          },
+          {
+            "ea": 4196942,
+            "length": 13,
+            "type": 0,
+            "text": "cJSON_Delete"
+          },
+          {
+            "ea": 4196960,
+            "length": 7,
+            "type": 0,
+            "text": "strcat"
+          },
+          {
+            "ea": 4196972,
+            "length": 14,
+            "type": 0,
+            "text": "nvram_get_int"
+          },
+          {
+            "ea": 4196986,
+            "length": 12,
+            "type": 0,
+            "text": "sigemptyset"
+          },
+          {
+            "ea": 4196998,
+            "length": 10,
+            "type": 0,
+            "text": "sigaction"
+          },
+          {
+            "ea": 4197008,
+            "length": 7,
+            "type": 0,
+            "text": "daemon"
+          },
+          {
+            "ea": 4197015,
+            "length": 26,
+            "type": 0,
+            "text": "get_internet_state_cached"
+          },
+          {
+            "ea": 4197041,
+            "length": 13,
+            "type": 0,
+            "text": "libshared.so"
+          },
+          {
+            "ea": 4197054,
+            "length": 17,
+            "type": 0,
+            "text": "_DYNAMIC_LINKING"
+          },
+          {
+            "ea": 4197071,
+            "length": 10,
+            "type": 0,
+            "text": "__RLD_MAP"
+          },
+          {
+            "ea": 4197081,
+            "length": 12,
+            "type": 0,
+            "text": "libcjson.so"
+          },
+          {
+            "ea": 4197093,
+            "length": 16,
+            "type": 0,
+            "text": "libpthread.so.0"
+          },
+          {
+            "ea": 4197109,
+            "length": 11,
+            "type": 0,
+            "text": "librt.so.0"
+          },
+          {
+            "ea": 4197120,
+            "length": 11,
+            "type": 0,
+            "text": "__bswapsi2"
+          },
+          {
+            "ea": 4197131,
+            "length": 10,
+            "type": 0,
+            "text": "libc.so.0"
+          },
+          {
+            "ea": 4197141,
+            "length": 7,
+            "type": 0,
+            "text": "_ftext"
+          },
+          {
+            "ea": 4197148,
+            "length": 7,
+            "type": 0,
+            "text": "_fdata"
+          },
+          {
+            "ea": 4197155,
+            "length": 7,
+            "type": 0,
+            "text": "_edata"
+          },
+          {
+            "ea": 4197162,
+            "length": 12,
+            "type": 0,
+            "text": "__bss_start"
+          },
+          {
+            "ea": 4197174,
+            "length": 6,
+            "type": 0,
+            "text": "_fbss"
+          },
+          {
+            "ea": 4207376,
+            "length": 16,
+            "type": 0,
+            "text": "cloudupg_domain"
+          },
+          {
+            "ea": 4207392,
+            "length": 9,
+            "type": 0,
+            "text": "https://"
+          },
+          {
+            "ea": 4207408,
+            "length": 8,
+            "type": 0,
+            "text": "http://"
+          },
+          {
+            "ea": 4207424,
+            "length": 22,
+            "type": 0,
+            "text": "update.carystudio.com"
+          },
+          {
+            "ea": 4207448,
+            "length": 22,
+            "type": 0,
+            "text": "/device/upgrade/check"
+          },
+          {
+            "ea": 4207476,
+            "length": 13,
+            "type": 0,
+            "text": "/dev/console"
+          },
+          {
+            "ea": 4207496,
+            "length": 24,
+            "type": 0,
+            "text": "[%s:%d] %s, %s, %s, %d\n"
+          },
+          {
+            "ea": 4207520,
+            "length": 31,
+            "type": 0,
+            "text": "CS cloud upgrade version : %s\n"
+          },
+          {
+            "ea": 4207556,
+            "length": 37,
+            "type": 0,
+            "text": "cloudupg for check cloud new verson."
+          },
+          {
+            "ea": 4207596,
+            "length": 34,
+            "type": 0,
+            "text": "Usage: cloudupdate [-d] [-v] [-n]"
+          },
+          {
+            "ea": 4207632,
+            "length": 12,
+            "type": 0,
+            "text": " -d  daemon"
+          },
+          {
+            "ea": 4207644,
+            "length": 19,
+            "type": 0,
+            "text": " -v  debug verbose"
+          },
+          {
+            "ea": 4207664,
+            "length": 19,
+            "type": 0,
+            "text": " -n  network check"
+          },
+          {
+            "ea": 4207688,
+            "length": 8,
+            "type": 0,
+            "text": "--debug"
+          },
+          {
+            "ea": 4207700,
+            "length": 10,
+            "type": 0,
+            "text": "--verbose"
+          },
+          {
+            "ea": 4207716,
+            "length": 10,
+            "type": 0,
+            "text": "--network"
+          },
+          {
+            "ea": 4207728,
+            "length": 29,
+            "type": 0,
+            "text": "Error: Unknown option '%s'.\n"
+          },
+          {
+            "ea": 4207760,
+            "length": 25,
+            "type": 0,
+            "text": "/var/run/cloudupdate.pid"
+          },
+          {
+            "ea": 4207792,
+            "length": 17,
+            "type": 0,
+            "text": "no pid file[%s]\n"
+          },
+          {
+            "ea": 4207812,
+            "length": 12,
+            "type": 0,
+            "text": "[%s:%d] ok\n"
+          },
+          {
+            "ea": 4207824,
+            "length": 17,
+            "type": 0,
+            "text": "cloudupdate exit"
+          },
+          {
+            "ea": 4207844,
+            "length": 14,
+            "type": 0,
+            "text": "/proc/meminfo"
+          },
+          {
+            "ea": 4207860,
+            "length": 10,
+            "type": 0,
+            "text": "MemTotal:"
+          },
+          {
+            "ea": 4207872,
+            "length": 9,
+            "type": 0,
+            "text": "MemFree:"
+          },
+          {
+            "ea": 4207884,
+            "length": 33,
+            "type": 0,
+            "text": "[%s:%d] gngethostbyname %s fail\n"
+          },
+          {
+            "ea": 4207920,
+            "length": 7,
+            "type": 0,
+            "text": "socket"
+          },
+          {
+            "ea": 4207928,
+            "length": 22,
+            "type": 0,
+            "text": "[%s:%d] socket error\n"
+          },
+          {
+            "ea": 4207952,
+            "length": 8,
+            "type": 0,
+            "text": "connect"
+          },
+          {
+            "ea": 4207960,
+            "length": 23,
+            "type": 0,
+            "text": "[%s:%d] connect error\n"
+          },
+          {
+            "ea": 4207984,
+            "length": 39,
+            "type": 0,
+            "text": "[%s:%d] error ERROR_CLIENT_SET_SOCKET\n"
+          },
+          {
+            "ea": 4208024,
+            "length": 20,
+            "type": 0,
+            "text": "[%s:%d] connect OK\n"
+          },
+          {
+            "ea": 4208048,
+            "length": 19,
+            "type": 0,
+            "text": "cloudupg_timestamp"
+          },
+          {
+            "ea": 4208068,
+            "length": 17,
+            "type": 0,
+            "text": "wget -O %s %s -q"
+          },
+          {
+            "ea": 4208088,
+            "length": 15,
+            "type": 0,
+            "text": "/tmp/cloud.web"
+          },
+          {
+            "ea": 4208104,
+            "length": 34,
+            "type": 0,
+            "text": "After %d seconds auto update Fw!\n"
+          },
+          {
+            "ea": 4208140,
+            "length": 14,
+            "type": 0,
+            "text": "cloudupg_mode"
+          },
+          {
+            "ea": 4208156,
+            "length": 14,
+            "type": 0,
+            "text": "cloudupg_time"
+          },
+          {
+            "ea": 4208172,
+            "length": 23,
+            "type": 0,
+            "text": "At %d auto update Fw!\n"
+          }
+        ]
+      },
+      "duration_ms": 557.63
+    },
+    {
+      "timestamp": "2025-12-05T17:43:34.348534",
+      "category": "core",
+      "tool": "list_strings",
+      "params": {
+        "offset": 0,
+        "count": 10
+      },
+      "port": 8765,
+      "result": {
+        "total": 140,
+        "offset": 0,
+        "count": 10,
+        "items": [
+          {
+            "ea": 4194612,
+            "length": 20,
+            "type": 0,
+            "text": "/lib/ld-uClibc.so.0"
+          },
+          {
+            "ea": 4196537,
+            "length": 6,
+            "type": 0,
+            "text": "_init"
+          },
+          {
+            "ea": 4196543,
+            "length": 6,
+            "type": 0,
+            "text": "_fini"
+          },
+          {
+            "ea": 4196549,
+            "length": 14,
+            "type": 0,
+            "text": "__uClibc_main"
+          },
+          {
+            "ea": 4196563,
+            "length": 7,
+            "type": 0,
+            "text": "memset"
+          },
+          {
+            "ea": 4196570,
+            "length": 15,
+            "type": 0,
+            "text": "nvram_safe_get"
+          },
+          {
+            "ea": 4196585,
+            "length": 7,
+            "type": 0,
+            "text": "strcpy"
+          },
+          {
+            "ea": 4196592,
+            "length": 8,
+            "type": 0,
+            "text": "strncmp"
+          },
+          {
+            "ea": 4196600,
+            "length": 7,
+            "type": 0,
+            "text": "strchr"
+          },
+          {
+            "ea": 4196607,
+            "length": 7,
+            "type": 0,
+            "text": "strlen"
+          }
+        ]
+      },
+      "duration_ms": 553.01
+    },
+    {
+      "timestamp": "2025-12-05T17:43:34.894006",
+      "category": "core",
+      "tool": "list_strings",
+      "params": {
+        "offset": 0,
+        "count": 100
+      },
+      "port": 8765,
+      "result": {
+        "total": 140,
+        "offset": 0,
+        "count": 100,
+        "items": [
+          {
+            "ea": 4194612,
+            "length": 20,
+            "type": 0,
+            "text": "/lib/ld-uClibc.so.0"
+          },
+          {
+            "ea": 4196537,
+            "length": 6,
+            "type": 0,
+            "text": "_init"
+          },
+          {
+            "ea": 4196543,
+            "length": 6,
+            "type": 0,
+            "text": "_fini"
+          },
+          {
+            "ea": 4196549,
+            "length": 14,
+            "type": 0,
+            "text": "__uClibc_main"
+          },
+          {
+            "ea": 4196563,
+            "length": 7,
+            "type": 0,
+            "text": "memset"
+          },
+          {
+            "ea": 4196570,
+            "length": 15,
+            "type": 0,
+            "text": "nvram_safe_get"
+          },
+          {
+            "ea": 4196585,
+            "length": 7,
+            "type": 0,
+            "text": "strcpy"
+          },
+          {
+            "ea": 4196592,
+            "length": 8,
+            "type": 0,
+            "text": "strncmp"
+          },
+          {
+            "ea": 4196600,
+            "length": 7,
+            "type": 0,
+            "text": "strchr"
+          },
+          {
+            "ea": 4196607,
+            "length": 7,
+            "type": 0,
+            "text": "strlen"
+          },
+          {
+            "ea": 4196614,
+            "length": 8,
+            "type": 0,
+            "text": "strncpy"
+          },
+          {
+            "ea": 4196627,
+            "length": 9,
+            "type": 0,
+            "text": "snprintf"
+          },
+          {
+            "ea": 4196640,
+            "length": 6,
+            "type": 0,
+            "text": "fopen"
+          },
+          {
+            "ea": 4196646,
+            "length": 8,
+            "type": 0,
+            "text": "fprintf"
+          },
+          {
+            "ea": 4196654,
+            "length": 7,
+            "type": 0,
+            "text": "fclose"
+          },
+          {
+            "ea": 4196666,
+            "length": 7,
+            "type": 0,
+            "text": "strcmp"
+          },
+          {
+            "ea": 4196673,
+            "length": 7,
+            "type": 0,
+            "text": "stderr"
+          },
+          {
+            "ea": 4196680,
+            "length": 6,
+            "type": 0,
+            "text": "fgets"
+          },
+          {
+            "ea": 4196696,
+            "length": 8,
+            "type": 0,
+            "text": "strtoul"
+          },
+          {
+            "ea": 4196704,
+            "length": 7,
+            "type": 0,
+            "text": "signal"
+          },
+          {
+            "ea": 4196711,
+            "length": 12,
+            "type": 0,
+            "text": "__sigsetjmp"
+          },
+          {
+            "ea": 4196723,
+            "length": 6,
+            "type": 0,
+            "text": "alarm"
+          },
+          {
+            "ea": 4196729,
+            "length": 14,
+            "type": 0,
+            "text": "gethostbyname"
+          },
+          {
+            "ea": 4196743,
+            "length": 7,
+            "type": 0,
+            "text": "socket"
+          },
+          {
+            "ea": 4196750,
+            "length": 7,
+            "type": 0,
+            "text": "perror"
+          },
+          {
+            "ea": 4196757,
+            "length": 10,
+            "type": 0,
+            "text": "inet_ntoa"
+          },
+          {
+            "ea": 4196767,
+            "length": 10,
+            "type": 0,
+            "text": "inet_addr"
+          },
+          {
+            "ea": 4196777,
+            "length": 8,
+            "type": 0,
+            "text": "connect"
+          },
+          {
+            "ea": 4196785,
+            "length": 11,
+            "type": 0,
+            "text": "setsockopt"
+          },
+          {
+            "ea": 4196796,
+            "length": 11,
+            "type": 0,
+            "text": "siglongjmp"
+          },
+          {
+            "ea": 4196807,
+            "length": 8,
+            "type": 0,
+            "text": "sprintf"
+          },
+          {
+            "ea": 4196815,
+            "length": 15,
+            "type": 0,
+            "text": "nvram_set_temp"
+          },
+          {
+            "ea": 4196830,
+            "length": 7,
+            "type": 0,
+            "text": "system"
+          },
+          {
+            "ea": 4196837,
+            "length": 19,
+            "type": 0,
+            "text": "nvram_set_int_temp"
+          },
+          {
+            "ea": 4196856,
+            "length": 13,
+            "type": 0,
+            "text": "gettimeofday"
+          },
+          {
+            "ea": 4196874,
+            "length": 7,
+            "type": 0,
+            "text": "select"
+          },
+          {
+            "ea": 4196881,
+            "length": 6,
+            "type": 0,
+            "text": "ioctl"
+          },
+          {
+            "ea": 4196887,
+            "length": 20,
+            "type": 0,
+            "text": "cJSON_GetObjectItem"
+          },
+          {
+            "ea": 4196907,
+            "length": 9,
+            "type": 0,
+            "text": "__assert"
+          },
+          {
+            "ea": 4196916,
+            "length": 7,
+            "type": 0,
+            "text": "strstr"
+          },
+          {
+            "ea": 4196923,
+            "length": 7,
+            "type": 0,
+            "text": "malloc"
+          },
+          {
+            "ea": 4196930,
+            "length": 12,
+            "type": 0,
+            "text": "cJSON_Parse"
+          },
+          {
+            "ea": 4196942,
+            "length": 13,
+            "type": 0,
+            "text": "cJSON_Delete"
+          },
+          {
+            "ea": 4196960,
+            "length": 7,
+            "type": 0,
+            "text": "strcat"
+          },
+          {
+            "ea": 4196972,
+            "length": 14,
+            "type": 0,
+            "text": "nvram_get_int"
+          },
+          {
+            "ea": 4196986,
+            "length": 12,
+            "type": 0,
+            "text": "sigemptyset"
+          },
+          {
+            "ea": 4196998,
+            "length": 10,
+            "type": 0,
+            "text": "sigaction"
+          },
+          {
+            "ea": 4197008,
+            "length": 7,
+            "type": 0,
+            "text": "daemon"
+          },
+          {
+            "ea": 4197015,
+            "length": 26,
+            "type": 0,
+            "text": "get_internet_state_cached"
+          },
+          {
+            "ea": 4197041,
+            "length": 13,
+            "type": 0,
+            "text": "libshared.so"
+          },
+          {
+            "ea": 4197054,
+            "length": 17,
+            "type": 0,
+            "text": "_DYNAMIC_LINKING"
+          },
+          {
+            "ea": 4197071,
+            "length": 10,
+            "type": 0,
+            "text": "__RLD_MAP"
+          },
+          {
+            "ea": 4197081,
+            "length": 12,
+            "type": 0,
+            "text": "libcjson.so"
+          },
+          {
+            "ea": 4197093,
+            "length": 16,
+            "type": 0,
+            "text": "libpthread.so.0"
+          },
+          {
+            "ea": 4197109,
+            "length": 11,
+            "type": 0,
+            "text": "librt.so.0"
+          },
+          {
+            "ea": 4197120,
+            "length": 11,
+            "type": 0,
+            "text": "__bswapsi2"
+          },
+          {
+            "ea": 4197131,
+            "length": 10,
+            "type": 0,
+            "text": "libc.so.0"
+          },
+          {
+            "ea": 4197141,
+            "length": 7,
+            "type": 0,
+            "text": "_ftext"
+          },
+          {
+            "ea": 4197148,
+            "length": 7,
+            "type": 0,
+            "text": "_fdata"
+          },
+          {
+            "ea": 4197155,
+            "length": 7,
+            "type": 0,
+            "text": "_edata"
+          },
+          {
+            "ea": 4197162,
+            "length": 12,
+            "type": 0,
+            "text": "__bss_start"
+          },
+          {
+            "ea": 4197174,
+            "length": 6,
+            "type": 0,
+            "text": "_fbss"
+          },
+          {
+            "ea": 4207376,
+            "length": 16,
+            "type": 0,
+            "text": "cloudupg_domain"
+          },
+          {
+            "ea": 4207392,
+            "length": 9,
+            "type": 0,
+            "text": "https://"
+          },
+          {
+            "ea": 4207408,
+            "length": 8,
+            "type": 0,
+            "text": "http://"
+          },
+          {
+            "ea": 4207424,
+            "length": 22,
+            "type": 0,
+            "text": "update.carystudio.com"
+          },
+          {
+            "ea": 4207448,
+            "length": 22,
+            "type": 0,
+            "text": "/device/upgrade/check"
+          },
+          {
+            "ea": 4207476,
+            "length": 13,
+            "type": 0,
+            "text": "/dev/console"
+          },
+          {
+            "ea": 4207496,
+            "length": 24,
+            "type": 0,
+            "text": "[%s:%d] %s, %s, %s, %d\n"
+          },
+          {
+            "ea": 4207520,
+            "length": 31,
+            "type": 0,
+            "text": "CS cloud upgrade version : %s\n"
+          },
+          {
+            "ea": 4207556,
+            "length": 37,
+            "type": 0,
+            "text": "cloudupg for check cloud new verson."
+          },
+          {
+            "ea": 4207596,
+            "length": 34,
+            "type": 0,
+            "text": "Usage: cloudupdate [-d] [-v] [-n]"
+          },
+          {
+            "ea": 4207632,
+            "length": 12,
+            "type": 0,
+            "text": " -d  daemon"
+          },
+          {
+            "ea": 4207644,
+            "length": 19,
+            "type": 0,
+            "text": " -v  debug verbose"
+          },
+          {
+            "ea": 4207664,
+            "length": 19,
+            "type": 0,
+            "text": " -n  network check"
+          },
+          {
+            "ea": 4207688,
+            "length": 8,
+            "type": 0,
+            "text": "--debug"
+          },
+          {
+            "ea": 4207700,
+            "length": 10,
+            "type": 0,
+            "text": "--verbose"
+          },
+          {
+            "ea": 4207716,
+            "length": 10,
+            "type": 0,
+            "text": "--network"
+          },
+          {
+            "ea": 4207728,
+            "length": 29,
+            "type": 0,
+            "text": "Error: Unknown option '%s'.\n"
+          },
+          {
+            "ea": 4207760,
+            "length": 25,
+            "type": 0,
+            "text": "/var/run/cloudupdate.pid"
+          },
+          {
+            "ea": 4207792,
+            "length": 17,
+            "type": 0,
+            "text": "no pid file[%s]\n"
+          },
+          {
+            "ea": 4207812,
+            "length": 12,
+            "type": 0,
+            "text": "[%s:%d] ok\n"
+          },
+          {
+            "ea": 4207824,
+            "length": 17,
+            "type": 0,
+            "text": "cloudupdate exit"
+          },
+          {
+            "ea": 4207844,
+            "length": 14,
+            "type": 0,
+            "text": "/proc/meminfo"
+          },
+          {
+            "ea": 4207860,
+            "length": 10,
+            "type": 0,
+            "text": "MemTotal:"
+          },
+          {
+            "ea": 4207872,
+            "length": 9,
+            "type": 0,
+            "text": "MemFree:"
+          },
+          {
+            "ea": 4207884,
+            "length": 33,
+            "type": 0,
+            "text": "[%s:%d] gngethostbyname %s fail\n"
+          },
+          {
+            "ea": 4207920,
+            "length": 7,
+            "type": 0,
+            "text": "socket"
+          },
+          {
+            "ea": 4207928,
+            "length": 22,
+            "type": 0,
+            "text": "[%s:%d] socket error\n"
+          },
+          {
+            "ea": 4207952,
+            "length": 8,
+            "type": 0,
+            "text": "connect"
+          },
+          {
+            "ea": 4207960,
+            "length": 23,
+            "type": 0,
+            "text": "[%s:%d] connect error\n"
+          },
+          {
+            "ea": 4207984,
+            "length": 39,
+            "type": 0,
+            "text": "[%s:%d] error ERROR_CLIENT_SET_SOCKET\n"
+          },
+          {
+            "ea": 4208024,
+            "length": 20,
+            "type": 0,
+            "text": "[%s:%d] connect OK\n"
+          },
+          {
+            "ea": 4208048,
+            "length": 19,
+            "type": 0,
+            "text": "cloudupg_timestamp"
+          },
+          {
+            "ea": 4208068,
+            "length": 17,
+            "type": 0,
+            "text": "wget -O %s %s -q"
+          },
+          {
+            "ea": 4208088,
+            "length": 15,
+            "type": 0,
+            "text": "/tmp/cloud.web"
+          },
+          {
+            "ea": 4208104,
+            "length": 34,
+            "type": 0,
+            "text": "After %d seconds auto update Fw!\n"
+          },
+          {
+            "ea": 4208140,
+            "length": 14,
+            "type": 0,
+            "text": "cloudupg_mode"
+          },
+          {
+            "ea": 4208156,
+            "length": 14,
+            "type": 0,
+            "text": "cloudupg_time"
+          },
+          {
+            "ea": 4208172,
+            "length": 23,
+            "type": 0,
+            "text": "At %d auto update Fw!\n"
+          }
+        ]
+      },
+      "duration_ms": 544.06
+    },
+    {
+      "timestamp": "2025-12-05T17:43:35.464509",
+      "category": "core",
+      "tool": "list_strings",
+      "params": {
+        "offset": 0,
+        "count": 100,
+        "pattern": "/li"
+      },
+      "port": 8765,
+      "result": {
+        "total": 1,
+        "offset": 0,
+        "count": 1,
+        "items": [
+          {
+            "ea": 4194612,
+            "length": 20,
+            "type": 0,
+            "text": "/lib/ld-uClibc.so.0"
+          }
+        ]
+      },
+      "duration_ms": 569.19
+    },
+    {
+      "timestamp": "2025-12-05T17:43:36.021090",
+      "category": "core",
+      "tool": "list_local_types",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "total": 0,
+        "items": []
+      },
+      "duration_ms": 555.19
+    },
+    {
+      "timestamp": "2025-12-05T17:43:36.567069",
+      "category": "core",
+      "tool": "get_entry_points",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "total": 9,
+        "items": [
+          {
+            "ordinal": 4206272,
+            "ea": 4206272,
+            "name": "__bswapsi2"
+          },
+          {
+            "ordinal": 4197188,
+            "ea": 4197188,
+            "name": ".init_proc"
+          },
+          {
+            "ordinal": 4275060,
+            "ea": 4275060,
+            "name": "cfg"
+          },
+          {
+            "ordinal": 4274784,
+            "ea": 4274784,
+            "name": "__RLD_MAP"
+          },
+          {
+            "ordinal": 4205512,
+            "ea": 4205512,
+            "name": "main"
+          },
+          {
+            "ordinal": 4207296,
+            "ea": 4207296,
+            "name": ".term_proc"
+          },
+          {
+            "ordinal": 4274768,
+            "ea": 4274768,
+            "name": "_fdata"
+          },
+          {
+            "ordinal": 4197264,
+            "ea": 4197264,
+            "name": "_ftext"
+          },
+          {
+            "ordinal": 4275056,
+            "ea": 4275056,
+            "name": "_fbss"
+          }
+        ]
+      },
+      "duration_ms": 544.05
+    },
+    {
+      "timestamp": "2025-12-05T17:43:37.129088",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0x1234"
+      },
+      "port": 8765,
+      "result": {
+        "input": "0x1234",
+        "size": 64,
+        "value": 4660,
+        "hex": "0x0000000000001234",
+        "dec": "4660",
+        "unsigned": 4660,
+        "signed": 4660,
+        "bin": "0b0000000000000000000000000000000000000000000000000001001000110100",
+        "bytes_le": [
+          "34",
+          "12",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00"
+        ],
+        "bytes_be": [
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "12",
+          "34"
+        ]
+      },
+      "duration_ms": 560.38
+    },
+    {
+      "timestamp": "2025-12-05T17:43:37.694071",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0xABCD"
+      },
+      "port": 8765,
+      "result": {
+        "input": "0xABCD",
+        "size": 64,
+        "value": 43981,
+        "hex": "0x000000000000ABCD",
+        "dec": "43981",
+        "unsigned": 43981,
+        "signed": 43981,
+        "bin": "0b0000000000000000000000000000000000000000000000001010101111001101",
+        "bytes_le": [
+          "CD",
+          "AB",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00"
+        ],
+        "bytes_be": [
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "AB",
+          "CD"
+        ]
+      },
+      "duration_ms": 563.15
+    },
+    {
+      "timestamp": "2025-12-05T17:43:38.286776",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "1234"
+      },
+      "port": 8765,
+      "result": {
+        "input": "1234",
+        "size": 64,
+        "value": 1234,
+        "hex": "0x00000000000004D2",
+        "dec": "1234",
+        "unsigned": 1234,
+        "signed": 1234,
+        "bin": "0b0000000000000000000000000000000000000000000000000000010011010010",
+        "bytes_le": [
+          "D2",
+          "04",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00"
+        ],
+        "bytes_be": [
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "04",
+          "D2"
+        ]
+      },
+      "duration_ms": 591.21
+    },
+    {
+      "timestamp": "2025-12-05T17:43:38.855275",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "-100",
+        "size": 64
+      },
+      "port": 8765,
+      "result": {
+        "input": "-100",
+        "size": 64,
+        "value": 18446744073709551516,
+        "hex": "0xFFFFFFFFFFFFFF9C",
+        "dec": "18446744073709551516",
+        "unsigned": 18446744073709551516,
+        "signed": -100,
+        "bin": "0b1111111111111111111111111111111111111111111111111111111110011100",
+        "bytes_le": [
+          "9C",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF"
+        ],
+        "bytes_be": [
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "FF",
+          "9C"
+        ]
+      },
+      "duration_ms": 566.41
+    },
+    {
+      "timestamp": "2025-12-05T17:43:39.398927",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0b1010"
+      },
+      "port": 8765,
+      "result": {
+        "input": "0b1010",
+        "size": 64,
+        "value": 10,
+        "hex": "0x000000000000000A",
+        "dec": "10",
+        "unsigned": 10,
+        "signed": 10,
+        "bin": "0b0000000000000000000000000000000000000000000000000000000000001010",
+        "bytes_le": [
+          "0A",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00"
+        ],
+        "bytes_be": [
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "0A"
+        ]
+      },
+      "duration_ms": 541.95
+    },
+    {
+      "timestamp": "2025-12-05T17:43:39.950547",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0o777"
+      },
+      "port": 8765,
+      "result": {
+        "input": "0o777",
+        "size": 64,
+        "value": 511,
+        "hex": "0x00000000000001FF",
+        "dec": "511",
+        "unsigned": 511,
+        "signed": 511,
+        "bin": "0b0000000000000000000000000000000000000000000000000000000111111111",
+        "bytes_le": [
+          "FF",
+          "01",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00"
+        ],
+        "bytes_be": [
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "00",
+          "01",
+          "FF"
+        ]
+      },
+      "duration_ms": 549.35
+    },
+    {
+      "timestamp": "2025-12-05T17:43:40.504391",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0xFF",
+        "size": 8
+      },
+      "port": 8765,
+      "result": {
+        "input": "0xFF",
+        "size": 8,
+        "value": 255,
+        "hex": "0xFF",
+        "dec": "255",
+        "unsigned": 255,
+        "signed": -1,
+        "bin": "0b11111111",
+        "bytes_le": [
+          "FF"
+        ],
+        "bytes_be": [
+          "FF"
+        ]
+      },
+      "duration_ms": 552.08
+    },
+    {
+      "timestamp": "2025-12-05T17:43:41.131417",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0xFFFF",
+        "size": 16
+      },
+      "port": 8765,
+      "result": {
+        "input": "0xFFFF",
+        "size": 16,
+        "value": 65535,
+        "hex": "0xFFFF",
+        "dec": "65535",
+        "unsigned": 65535,
+        "signed": -1,
+        "bin": "0b1111111111111111",
+        "bytes_le": [
+          "FF",
+          "FF"
+        ],
+        "bytes_be": [
+          "FF",
+          "FF"
+        ]
+      },
+      "duration_ms": 623.58
+    },
+    {
+      "timestamp": "2025-12-05T17:43:41.712605",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "0xFFFFFFFF",
+        "size": 32
+      },
+      "port": 8765,
+      "result": {
+        "input": "0xFFFFFFFF",
+        "size": 32,
+        "value": 4294967295,
+        "hex": "0xFFFFFFFF",
+        "dec": "4294967295",
+        "unsigned": 4294967295,
+        "signed": -1,
+        "bin": "0b11111111111111111111111111111111",
+        "bytes_le": [
+          "FF",
+          "FF",
+          "FF",
+          "FF"
+        ],
+        "bytes_be": [
+          "FF",
+          "FF",
+          "FF",
+          "FF"
+        ]
+      },
+      "duration_ms": 579.97
+    },
+    {
+      "timestamp": "2025-12-05T17:43:42.281032",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": "invalid"
+      },
+      "port": 8765,
+      "result": {
+        "error": "parse failed"
+      },
+      "duration_ms": 565.94
+    },
+    {
+      "timestamp": "2025-12-05T17:43:42.854586",
+      "category": "core",
+      "tool": "convert_number",
+      "params": {
+        "text": ""
+      },
+      "port": 8765,
+      "result": {
+        "error": "empty text"
+      },
+      "duration_ms": 572.28
+    },
+    {
+      "timestamp": "2025-12-05T17:43:43.435804",
+      "category": "core",
+      "tool": "list_imports",
+      "params": {
+        "offset": 0,
+        "count": 20
+      },
+      "port": 8765,
+      "result": {
+        "total": 55,
+        "offset": 0,
+        "count": 20,
+        "items": [
+          {
+            "ea": "0x413E40",
+            "name": "__assert",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EB4",
+            "name": "__sigsetjmp",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E80",
+            "name": "__uClibc_main",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EB8",
+            "name": "alarm",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E4C",
+            "name": "atoi",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E78",
+            "name": "cJSON_Delete",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EAC",
+            "name": "cJSON_GetObjectItem",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EBC",
+            "name": "cJSON_Parse",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E38",
+            "name": "close",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EF8",
+            "name": "connect",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E48",
+            "name": "daemon",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E50",
+            "name": "exit",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E6C",
+            "name": "fclose",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EE4",
+            "name": "fgets",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E74",
+            "name": "fopen",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EA8",
+            "name": "fprintf",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E34",
+            "name": "free",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EB0",
+            "name": "get_internet_state_cached",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E60",
+            "name": "gethostbyname",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E7C",
+            "name": "gettimeofday",
+            "ordinal": null,
+            "module": ".dynsym"
+          }
+        ]
+      },
+      "duration_ms": 579.31
+    },
+    {
+      "timestamp": "2025-12-05T17:43:43.981031",
+      "category": "core",
+      "tool": "list_imports",
+      "params": {
+        "offset": 0,
+        "count": 5
+      },
+      "port": 8765,
+      "result": {
+        "total": 55,
+        "offset": 0,
+        "count": 5,
+        "items": [
+          {
+            "ea": "0x413E40",
+            "name": "__assert",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EB4",
+            "name": "__sigsetjmp",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E80",
+            "name": "__uClibc_main",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413EB8",
+            "name": "alarm",
+            "ordinal": null,
+            "module": ".dynsym"
+          },
+          {
+            "ea": "0x413E4C",
+            "name": "atoi",
+            "ordinal": null,
+            "module": ".dynsym"
+          }
+        ]
+      },
+      "duration_ms": 543.39
+    },
+    {
+      "timestamp": "2025-12-05T17:43:44.552725",
+      "category": "core",
+      "tool": "list_imports",
+      "params": {
+        "pattern": "kernel32",
+        "count": 10
+      },
+      "port": 8765,
+      "result": {
+        "total": 0,
+        "offset": 0,
+        "count": 0,
+        "items": []
+      },
+      "duration_ms": 569.79
+    },
+    {
+      "timestamp": "2025-12-05T17:43:45.114192",
+      "category": "core",
+      "tool": "list_exports",
+      "params": {
+        "offset": 0,
+        "count": 20
+      },
+      "port": 8765,
+      "result": {
+        "total": 9,
+        "offset": 0,
+        "count": 9,
+        "items": [
+          {
+            "ea": "0x400B44",
+            "name": ".init_proc",
+            "ordinal": 4197188
+          },
+          {
+            "ea": "0x400B90",
+            "name": "_ftext",
+            "ordinal": 4197264
+          },
+          {
+            "ea": "0x402BC8",
+            "name": "main",
+            "ordinal": 4205512
+          },
+          {
+            "ea": "0x402EC0",
+            "name": "__bswapsi2",
+            "ordinal": 4206272
+          },
+          {
+            "ea": "0x4032C0",
+            "name": ".term_proc",
+            "ordinal": 4207296
+          },
+          {
+            "ea": "0x413A50",
+            "name": "_fdata",
+            "ordinal": 4274768
+          },
+          {
+            "ea": "0x413A60",
+            "name": "__RLD_MAP",
+            "ordinal": 4274784
+          },
+          {
+            "ea": "0x413B70",
+            "name": "_fbss",
+            "ordinal": 4275056
+          },
+          {
+            "ea": "0x413B74",
+            "name": "cfg",
+            "ordinal": 4275060
+          }
+        ]
+      },
+      "duration_ms": 560.04
+    },
+    {
+      "timestamp": "2025-12-05T17:43:45.671380",
+      "category": "core",
+      "tool": "list_exports",
+      "params": {
+        "offset": 0,
+        "count": 5
+      },
+      "port": 8765,
+      "result": {
+        "total": 9,
+        "offset": 0,
+        "count": 5,
+        "items": [
+          {
+            "ea": "0x400B44",
+            "name": ".init_proc",
+            "ordinal": 4197188
+          },
+          {
+            "ea": "0x400B90",
+            "name": "_ftext",
+            "ordinal": 4197264
+          },
+          {
+            "ea": "0x402BC8",
+            "name": "main",
+            "ordinal": 4205512
+          },
+          {
+            "ea": "0x402EC0",
+            "name": "__bswapsi2",
+            "ordinal": 4206272
+          },
+          {
+            "ea": "0x4032C0",
+            "name": ".term_proc",
+            "ordinal": 4207296
+          }
+        ]
+      },
+      "duration_ms": 555.09
+    },
+    {
+      "timestamp": "2025-12-05T17:43:46.214215",
+      "category": "core",
+      "tool": "list_segments",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "total": 23,
+        "items": [
+          {
+            "name": "LOAD",
+            "start_ea": "0x400000",
+            "end_ea": "0x400148",
+            "size": 328,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": "REGINFO",
+            "start_ea": "0x400148",
+            "end_ea": "0x400160",
+            "size": 24,
+            "perm": "r--",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x400160",
+            "end_ea": "0x400B44",
+            "size": 2532,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".init",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90",
+            "size": 76,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".text",
+            "start_ea": "0x400B90",
+            "end_ea": "0x402F50",
+            "size": 9152,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".MIPS.stubs",
+            "start_ea": "0x402F50",
+            "end_ea": "0x4032C0",
+            "size": 880,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".fini",
+            "start_ea": "0x4032C0",
+            "end_ea": "0x40330C",
+            "size": 76,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x40330C",
+            "end_ea": "0x403310",
+            "size": 4,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".rodata",
+            "start_ea": "0x403310",
+            "end_ea": "0x403A30",
+            "size": 1824,
+            "perm": "r--",
+            "class": "CONST",
+            "bitness": 32
+          },
+          {
+            "name": ".eh_frame",
+            "start_ea": "0x403A30",
+            "end_ea": "0x403A34",
+            "size": 4,
+            "perm": "r--",
+            "class": "CONST",
+            "bitness": 32
+          },
+          {
+            "name": ".ctors",
+            "start_ea": "0x413A34",
+            "end_ea": "0x413A3C",
+            "size": 8,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".dtors",
+            "start_ea": "0x413A3C",
+            "end_ea": "0x413A44",
+            "size": 8,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413A44",
+            "end_ea": "0x413A50",
+            "size": 12,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".data",
+            "start_ea": "0x413A50",
+            "end_ea": "0x413A60",
+            "size": 16,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".rld_map",
+            "start_ea": "0x413A60",
+            "end_ea": "0x413A64",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413A64",
+            "end_ea": "0x413A70",
+            "size": 12,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".got",
+            "start_ea": "0x413A70",
+            "end_ea": "0x413B6C",
+            "size": 252,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".sdata",
+            "start_ea": "0x413B6C",
+            "end_ea": "0x413B70",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".sbss",
+            "start_ea": "0x413B70",
+            "end_ea": "0x413B7C",
+            "size": 12,
+            "perm": "rw-",
+            "class": "BSS",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413B7C",
+            "end_ea": "0x413B80",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".bss",
+            "start_ea": "0x413B80",
+            "end_ea": "0x413E30",
+            "size": 688,
+            "perm": "rw-",
+            "class": "BSS",
+            "bitness": 32
+          },
+          {
+            "name": ".prgend",
+            "start_ea": "0x413E30",
+            "end_ea": "0x413E31",
+            "size": 1,
+            "perm": "---",
+            "class": null,
+            "bitness": 32
+          },
+          {
+            "name": "extern",
+            "start_ea": "0x413E34",
+            "end_ea": "0x413F10",
+            "size": 220,
+            "perm": "---",
+            "class": null,
+            "bitness": 32
+          }
+        ]
+      },
+      "duration_ms": 540.7
+    },
+    {
+      "timestamp": "2025-12-05T17:43:46.750294",
+      "category": "core",
+      "tool": "list_segments",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "total": 23,
+        "items": [
+          {
+            "name": "LOAD",
+            "start_ea": "0x400000",
+            "end_ea": "0x400148",
+            "size": 328,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": "REGINFO",
+            "start_ea": "0x400148",
+            "end_ea": "0x400160",
+            "size": 24,
+            "perm": "r--",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x400160",
+            "end_ea": "0x400B44",
+            "size": 2532,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".init",
+            "start_ea": "0x400B44",
+            "end_ea": "0x400B90",
+            "size": 76,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".text",
+            "start_ea": "0x400B90",
+            "end_ea": "0x402F50",
+            "size": 9152,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".MIPS.stubs",
+            "start_ea": "0x402F50",
+            "end_ea": "0x4032C0",
+            "size": 880,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".fini",
+            "start_ea": "0x4032C0",
+            "end_ea": "0x40330C",
+            "size": 76,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x40330C",
+            "end_ea": "0x403310",
+            "size": 4,
+            "perm": "r-x",
+            "class": "CODE",
+            "bitness": 32
+          },
+          {
+            "name": ".rodata",
+            "start_ea": "0x403310",
+            "end_ea": "0x403A30",
+            "size": 1824,
+            "perm": "r--",
+            "class": "CONST",
+            "bitness": 32
+          },
+          {
+            "name": ".eh_frame",
+            "start_ea": "0x403A30",
+            "end_ea": "0x403A34",
+            "size": 4,
+            "perm": "r--",
+            "class": "CONST",
+            "bitness": 32
+          },
+          {
+            "name": ".ctors",
+            "start_ea": "0x413A34",
+            "end_ea": "0x413A3C",
+            "size": 8,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".dtors",
+            "start_ea": "0x413A3C",
+            "end_ea": "0x413A44",
+            "size": 8,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413A44",
+            "end_ea": "0x413A50",
+            "size": 12,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".data",
+            "start_ea": "0x413A50",
+            "end_ea": "0x413A60",
+            "size": 16,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".rld_map",
+            "start_ea": "0x413A60",
+            "end_ea": "0x413A64",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413A64",
+            "end_ea": "0x413A70",
+            "size": 12,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".got",
+            "start_ea": "0x413A70",
+            "end_ea": "0x413B6C",
+            "size": 252,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".sdata",
+            "start_ea": "0x413B6C",
+            "end_ea": "0x413B70",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".sbss",
+            "start_ea": "0x413B70",
+            "end_ea": "0x413B7C",
+            "size": 12,
+            "perm": "rw-",
+            "class": "BSS",
+            "bitness": 32
+          },
+          {
+            "name": "LOAD",
+            "start_ea": "0x413B7C",
+            "end_ea": "0x413B80",
+            "size": 4,
+            "perm": "rw-",
+            "class": "DATA",
+            "bitness": 32
+          },
+          {
+            "name": ".bss",
+            "start_ea": "0x413B80",
+            "end_ea": "0x413E30",
+            "size": 688,
+            "perm": "rw-",
+            "class": "BSS",
+            "bitness": 32
+          },
+          {
+            "name": ".prgend",
+            "start_ea": "0x413E30",
+            "end_ea": "0x413E31",
+            "size": 1,
+            "perm": "---",
+            "class": null,
+            "bitness": 32
+          },
+          {
+            "name": "extern",
+            "start_ea": "0x413E34",
+            "end_ea": "0x413F10",
+            "size": 220,
+            "perm": "---",
+            "class": null,
+            "bitness": 32
+          }
+        ]
+      },
+      "duration_ms": 534.27
+    },
+    {
+      "timestamp": "2025-12-05T17:43:47.357303",
+      "category": "core",
+      "tool": "get_cursor",
+      "params": {},
+      "port": 8765,
+      "result": {
+        "ea": "0x402BF0",
+        "ea_int": 4205552,
+        "function": {
+          "name": "main",
+          "start_ea": "0x402BC8",
+          "end_ea": "0x402EC0"
+        },
+        "selection": null
+      },
+      "duration_ms": 605.78
     }
   ]
 }
