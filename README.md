@@ -13,7 +13,7 @@
 * Subsequent instances automatically register with the coordinator; no need to share files or manually configure ports
 * Unified access / aggregation of instance tools via a modular **proxy** (MCP clients can start it via command/args)
 
-## Architecture (v0.2.0 Refactored)
+## Architecture
 
 The project uses a modular architecture:
 
@@ -40,7 +40,6 @@ The project uses a modular architecture:
 * **Decorator Chain Pattern**: `@tool` + `@idaread`/`@idawrite` for clean API definitions
 * **Batch Operations**: Most tools accept lists for batch processing
 * **MCP Resources**: REST-like `ida://` URI patterns for read-only data access
-* **Thread Safety**: All IDA SDK calls run on the main thread via `execute_sync`
 * **Multi-instance Support**: Coordinator on port 11337 manages multiple IDA instances
 * **IDA 8.x/9.x Compatible**: Compatibility layer handles API differences
 
