@@ -176,7 +176,7 @@ IDA-MCP/
 1. Copy `ida_mcp.py` + `ida_mcp` folder to IDA's `plugins/`.
 2. Open target binary, wait for analysis to complete.
 3. Trigger plugin via menu / shortcut: First launch will:
-   * Select free port (starting from 8765) to run SSE service `http://127.0.0.1:<port>/mcp/`
+   * Select free port (starting from 9000) to run SSE service `http://127.0.0.1:<port>/mcp/`
    * If 11337 is free → start coordinator; otherwise register with existing coordinator
 4. Trigger plugin again = stop and unregister instance.
 

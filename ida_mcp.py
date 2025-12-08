@@ -6,7 +6,7 @@
 
 核心特性:
     1. 启动/关闭采用“切换式”触发(再次运行插件即关闭)。
-    2. 自动选择空闲端口 (从 8765 开始向上扫描), SSE 路径固定为 ``/mcp``。
+    2. 自动选择空闲端口 (从 9000 开始向上扫描), SSE 路径固定为 ``/mcp``。
     3. 首个成功启动的实例会在 ``127.0.0.1:11337`` 上创建一个 **内存型协调器(coordinator)**。
     4. 后续实例向协调器注册, 仅在内存维护实例列表, 不落盘 (避免文件锁 / 清理问题)。
     5. 工具最小化: 仅保留 ``list_functions`` 与 ``instances`` (实例列表)。
@@ -26,7 +26,7 @@
 端口选择策略
 --------------------
 * 若设置环境变量 ``IDA_MCP_PORT`` 且合法, 则使用该端口 (不再扫描)。
-* 否则从 ``DEFAULT_PORT (=8765)`` 起向上扫描 (最大 50 次)。
+* 否则从 ``DEFAULT_PORT (=9000)`` 起向上扫描 (最大 50 次)。
 * 允许多个 IDA 实例并行, 避免端口冲突。
 
 环境变量 (可选)
@@ -184,11 +184,14 @@ def _error(msg: str):
 
 def _find_free_port(preferred: int, max_scan: int = 50) -> int:
     """端口扫描: 从 preferred 起向上尝试绑定, 返回第一个可用端口;
-    若全部失败则返回 preferred (保底)。"""
+    若全部失败则返回 preferred (保底)。
+    
+    注意: 默认端口选择 9000 以避开 Windows Hyper-V 保留端口范围 (8709-8808)。
+    不使用 SO_REUSEADDR, 因为在 Windows 上它的行为类似 SO_REUSEPORT。
+    """
     for i in range(max_scan):
         p = preferred + i
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             try:
                 s.bind(("127.0.0.1", p))
             except OSError:
