@@ -22,7 +22,7 @@ HTTP 接口
 ```
 {
     "pid": 1234,
-    "port": 9000,
+    "port": 10000,
     "input_file": "/path/to/bin",
     "idb": "/path/to/db.i64",
     "started": 1730000000.123,   # 启动时间戳
@@ -204,8 +204,8 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                         self._send(404, {"error": "No instances to select from"})
                         return
                     
-                    # Prioritize 9000, then earliest started
-                    sorted_instances = sorted(_instances, key=lambda x: (x.get('port') != 9000, x.get('started', float('inf'))))
+                    # Prioritize 10000, then earliest started
+                    sorted_instances = sorted(_instances, key=lambda x: (x.get('port') != 10000, x.get('started', float('inf'))))
                     _current_instance_port = sorted_instances[0].get('port')
                 else:
                     if not any(e.get('port') == port for e in _instances):

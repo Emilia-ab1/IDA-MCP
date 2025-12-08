@@ -35,8 +35,8 @@ from typing import Optional
 
 __version__ = "0.2.0"
 
-# 导出默认端口 (选择 9000 以避开 Windows Hyper-V 保留端口范围 8709-8808)
-DEFAULT_PORT = 9000
+# 导出默认端口 (选择 10000 以避开 Windows Hyper-V 保留端口范围)
+DEFAULT_PORT = 10000
 
 # 导出装饰器
 from .rpc import tool, resource, unsafe, get_tools, get_resources, is_unsafe

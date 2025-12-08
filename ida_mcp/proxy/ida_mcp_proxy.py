@@ -133,7 +133,7 @@ def list_instances() -> list:
     return get_instances()
 
 
-@server.tool(description="Select default IDA instance by port. If port omitted, auto-selects (prefer 9000). Returns {selected_port} or {error}.")
+@server.tool(description="Select default IDA instance by port. If port omitted, auto-selects (prefer 10000). Returns {selected_port} or {error}.")
 def select_instance(
     port: Annotated[Optional[int], Field(description="Target port; omit for auto-select")] = None
 ) -> dict:
