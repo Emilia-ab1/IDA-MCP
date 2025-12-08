@@ -77,8 +77,6 @@ def create_mcp_server(
     返回:
         配置好所有工具的 FastMCP 实例
     """
-    import json
-    import functools
     from fastmcp import FastMCP
     
     if name is None:
@@ -88,20 +86,6 @@ def create_mcp_server(
         name=name,
         instructions="通过 MCP 工具访问 IDA 反汇编/分析数据。支持批量操作和 ida:// URI 资源访问。"
     )
-    
-    def _json_wrapper(fn):
-        """包装工具函数，将 dict/list 返回值转换为 JSON 字符串。
-        
-        这样可以避免 FastMCP 自动添加 structuredContent 字段，节省 token。
-        """
-        @functools.wraps(fn)
-        def wrapper(*args, **kwargs):
-            result = fn(*args, **kwargs)
-            # 将结构化数据转换为 JSON 字符串
-            if isinstance(result, (dict, list)):
-                return json.dumps(result, ensure_ascii=False)
-            return result
-        return wrapper
     
     # 注册所有工具
     tools = get_tools()
@@ -115,11 +99,14 @@ def create_mcp_server(
         doc = fn.__doc__ or fn_name
         description = doc.split('\n')[0].strip() if doc else fn_name
         
-        # 包装函数，返回 JSON 字符串以避免 structuredContent
-        wrapped_fn = _json_wrapper(fn)
+        # 获取原始函数 (解开装饰器)
+        original_fn = fn
+        while hasattr(original_fn, '__wrapped__'):
+            original_fn = original_fn.__wrapped__
         
         # 使用 FastMCP 的装饰器注册
-        mcp.tool(description=description)(wrapped_fn)
+        # 直接注册包装后的函数，保持参数签名
+        mcp.tool(description=description)(fn)
     
     # 注册所有资源
     resources = get_resources()
