@@ -161,12 +161,13 @@ IDA-MCP/
       _state.py           # State management and port validation
       proxy_core.py       # Core forwarding tools
       proxy_analysis.py   # Analysis forwarding tools
-      proxy_modify.py     # Modification forwarding tools
       proxy_memory.py     # Memory forwarding tools
       proxy_types.py      # Type forwarding tools
+      proxy_modify.py     # Modification forwarding tools
+      proxy_stack.py      # Stack frame forwarding tools
       proxy_debug.py      # Debug forwarding tools
   mcp.json                # MCP client configuration
-  README.md
+  README.md               # README
   requirements.txt        # fastmcp dependencies
 ```
 
