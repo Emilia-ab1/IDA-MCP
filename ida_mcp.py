@@ -78,12 +78,8 @@ import traceback
 import socket
 import time
 
-try:  # IDA imports (only available inside IDA)
-    import idaapi  # type: ignore
-    import ida_kernwin  # type: ignore
-except Exception:  # pragma: no cover - outside IDA
-    idaapi = None  # type: ignore
-    ida_kernwin = None  # type: ignore
+import idaapi  # type: ignore
+import ida_kernwin  # type: ignore
 
 from ida_mcp import create_mcp_server, DEFAULT_PORT, registry
 
@@ -358,7 +354,43 @@ def start_server_async(host: str, port: int):
             # 使用 warning 日志级别并关闭 access log, 避免输出无意义的 CTRL+C 提示。
             config = uvicorn.Config(app, host=host, port=port, log_level="warning", access_log=False)
             _uv_server = uvicorn.Server(config)
-            _uv_server.run()
+            # 不使用 uvicorn.Server.run()（其内部会创建/管理事件循环），
+            # 我们在此线程内显式创建 loop 并安装异常处理器，以抑制
+            # Windows 下常见的 WinError 10054 “远程主机强迫关闭连接”噪音。
+            import asyncio
+
+            def _exception_handler(loop, context):  # type: ignore[no-untyped-def]
+                exc = context.get("exception")
+                if exc is not None:
+                    winerr = getattr(exc, "winerror", None)
+                    if winerr == 10054 and isinstance(exc, (ConnectionResetError, OSError)):
+                        return
+                msg = str(context.get("message") or "")
+                if "10054" in msg and "ConnectionResetError" in msg:
+                    return
+                loop.default_exception_handler(context)
+
+            loop = asyncio.new_event_loop()
+            try:
+                asyncio.set_event_loop(loop)
+                loop.set_exception_handler(_exception_handler)
+                if hasattr(_uv_server, "serve"):
+                    loop.run_until_complete(_uv_server.serve())  # type: ignore[attr-defined]
+                else:  # pragma: no cover
+                    _uv_server.run()
+            finally:
+                try:
+                    loop.run_until_complete(loop.shutdown_asyncgens())
+                except Exception:
+                    pass
+                try:
+                    loop.run_until_complete(loop.shutdown_default_executor())
+                except Exception:
+                    pass
+                try:
+                    loop.close()
+                except Exception:
+                    pass
         except Exception as e:  # pragma: no cover
             _error(f"Server crashed: {e}")
             traceback.print_exc()
