@@ -144,8 +144,11 @@ def get_coordinator_port() -> int:
 
 
 def get_coordinator_url() -> str:
-    """获取协调器 URL。"""
+    """获取协调器连接 URL（0.0.0.0 转换为 127.0.0.1）。"""
     host = get_coordinator_host()
+    # 0.0.0.0 只能用于监听，不能作为连接目标
+    if host == "0.0.0.0":
+        host = "127.0.0.1"
     port = get_coordinator_port()
     return f"http://{host}:{port}"
 

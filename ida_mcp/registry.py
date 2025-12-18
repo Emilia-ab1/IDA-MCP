@@ -75,16 +75,19 @@ try:
         get_coordinator_port,
         get_request_timeout,
         is_debug_enabled as _config_debug,
+        get_ida_host,
     )
     COORD_HOST = get_coordinator_host()
     COORD_PORT = get_coordinator_port()
     REQUEST_TIMEOUT = get_request_timeout()
     DEBUG_ENABLED = _config_debug()
+    IDA_HOST = get_ida_host()
 except Exception:
     COORD_HOST = "127.0.0.1"
     COORD_PORT = 11337
     REQUEST_TIMEOUT = 30
     DEBUG_ENABLED = False
+    IDA_HOST = "127.0.0.1"
 
 DEBUG_MAX_LEN = 1000
 
@@ -267,8 +270,12 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
             try:
                 from fastmcp import Client  # type: ignore
                 import asyncio
+                # 获取实例 host，0.0.0.0 转换为 127.0.0.1（本地回环）
+                instance_host = target.get('host', '127.0.0.1')
+                if instance_host == "0.0.0.0":
+                    instance_host = "127.0.0.1"
                 async def _do():
-                    async with Client(f"http://127.0.0.1:{port}/mcp/", timeout=REQUEST_TIMEOUT) as c:  # type: ignore
+                    async with Client(f"http://{instance_host}:{port}/mcp/", timeout=REQUEST_TIMEOUT) as c:  # type: ignore
                         resp = await c.call_tool(tool, params)
                         # Extract data from response content (JSON text)
                         # fastmcp returns data in resp.content[0].text as JSON string
@@ -374,8 +381,10 @@ def _log_info(msg: str):  # pragma: no cover
         pass
 
 def _coordinator_alive() -> bool:
+    # 0.0.0.0 不能作为连接目标，转换为 127.0.0.1
+    target_host = "127.0.0.1" if COORD_HOST == "0.0.0.0" else COORD_HOST
     try:
-        with socket.create_connection((COORD_HOST, COORD_PORT), timeout=0.3):
+        with socket.create_connection((target_host, COORD_PORT), timeout=0.3):
             return True
     except OSError:
         return False
@@ -407,12 +416,17 @@ def init_and_register(port: int, input_file: str | None, idb_path: str | None):
     payload = {
         'pid': _self_pid,
         'port': port,
+        'host': IDA_HOST,  # 实例监听地址，用于远程访问
         'input_file': input_file,
         'idb': idb_path,
         'started': time.time(),
         'python': sys.version.split()[0],
     }
-    _post_json('/register', payload)
+    # 如果是协调器，直接操作内存；否则通过 HTTP 注册
+    if _is_coordinator:
+        _register_local(payload)
+    else:
+        _post_json('/register', payload)
     atexit.register(deregister)
 
 def is_coordinator() -> bool:
@@ -423,19 +437,35 @@ def is_coordinator() -> bool:
     return _is_coordinator
 
 def _post_json(path: str, obj: Any):
+    """通过 HTTP POST 发送 JSON 到协调器（用于非协调器进程）。"""
+    # 0.0.0.0 不能作为连接目标，转换为 127.0.0.1
+    target_host = "127.0.0.1" if COORD_HOST == "0.0.0.0" else COORD_HOST
     data = json.dumps(obj).encode('utf-8')
-    req = urllib.request.Request(f'http://{COORD_HOST}:{COORD_PORT}{path}', data=data, method='POST', headers={'Content-Type': 'application/json'})
+    req = urllib.request.Request(f'http://{target_host}:{COORD_PORT}{path}', data=data, method='POST', headers={'Content-Type': 'application/json'})
     try:
         urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT)
     except Exception:
         pass
 
+
+def _register_local(payload: dict):
+    """本地注册实例（协调器进程直接操作内存）。"""
+    with _lock:
+        pid = payload.get('pid')
+        existing = [e for e in _instances if e.get('pid') != pid]
+        _instances.clear()
+        _instances.extend(existing)
+        _instances.append(payload)
+    _debug_log('REGISTER_LOCAL', pid=payload.get('pid'), port=payload.get('port'))
+
 def get_instances() -> List[Dict[str, Any]]:
     if _is_coordinator:
         with _lock:
             return list(_instances)
+    # 0.0.0.0 不能作为连接目标，转换为 127.0.0.1
+    target_host = "127.0.0.1" if COORD_HOST == "0.0.0.0" else COORD_HOST
     try:
-        with urllib.request.urlopen(f'http://{COORD_HOST}:{COORD_PORT}/instances', timeout=REQUEST_TIMEOUT) as resp:  # type: ignore
+        with urllib.request.urlopen(f'http://{target_host}:{COORD_PORT}/instances', timeout=REQUEST_TIMEOUT) as resp:  # type: ignore
             raw = resp.read()
             data = json.loads(raw.decode('utf-8') or '[]')
             if isinstance(data, list):
@@ -448,8 +478,10 @@ def deregister():  # pragma: no cover
     _post_json('/deregister', {'pid': _self_pid})
 
 def call_tool(pid: int | None = None, port: int | None = None, tool: str = '', params: dict | None = None) -> dict:
+    # 0.0.0.0 不能作为连接目标，转换为 127.0.0.1
+    target_host = "127.0.0.1" if COORD_HOST == "0.0.0.0" else COORD_HOST
     body = json.dumps({"pid": pid, "port": port, "tool": tool, "params": params or {}}).encode('utf-8')
-    req = urllib.request.Request(f'http://{COORD_HOST}:{COORD_PORT}/call', data=body, method='POST', headers={'Content-Type': 'application/json'})
+    req = urllib.request.Request(f'http://{target_host}:{COORD_PORT}/call', data=body, method='POST', headers={'Content-Type': 'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:  # type: ignore
             raw = resp.read()
