@@ -179,9 +179,14 @@ def _error(msg: str):
     _log("ERROR", msg)
 
 
-def _find_free_port(preferred: int, max_scan: int = 50) -> int:
+def _find_free_port(preferred: int, host: str = "127.0.0.1", max_scan: int = 50) -> int:
     """端口扫描: 从 preferred 起向上尝试绑定, 返回第一个可用端口;
     若全部失败则返回 preferred (保底)。
+    
+    参数:
+        preferred: 起始端口号
+        host: 要绑定的地址（必须与实际监听地址一致）
+        max_scan: 最大扫描次数
     
     注意: 默认端口选择 9000 以避开 Windows Hyper-V 保留端口范围 (8709-8808)。
     不使用 SO_REUSEADDR, 因为在 Windows 上它的行为类似 SO_REUSEPORT。
@@ -190,7 +195,7 @@ def _find_free_port(preferred: int, max_scan: int = 50) -> int:
         p = preferred + i
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.bind(("127.0.0.1", p))
+                s.bind((host, p))
             except OSError:
                 continue
             return p
@@ -303,14 +308,15 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
             _info("Server running -> toggling to stop.")
             stop_server()
             return
-        # 端口选择: 优先使用环境变量; 否则自动扫描以支持多实例。
+        # Host 选择: 优先环境变量，其次 config.conf，最后默认值
+        host = os.getenv("IDA_MCP_HOST") or get_ida_host()
+        # 端口选择: 优先使用环境变量; 否则自动扫描以支持多实例
+        # 必须使用实际监听地址进行端口探测
         env_port = os.getenv("IDA_MCP_PORT")
         if env_port and env_port.isdigit():
             port = int(env_port)
         else:
-            port = _find_free_port(DEFAULT_PORT)
-        # Host 选择: 优先环境变量，其次 config.conf，最后默认值
-        host = os.getenv("IDA_MCP_HOST") or get_ida_host()
+            port = _find_free_port(DEFAULT_PORT, host)
         _info(f"Starting SSE server http://{host}:{port}/mcp/ (toggle to stop)")
         start_server_async(host, port)
 
