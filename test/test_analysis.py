@@ -25,7 +25,6 @@ pytestmark = pytest.mark.analysis
 class TestDecompile:
     """反编译测试。"""
     
-    @pytest.mark.hexrays
     def test_decompile_by_address(self, tool_caller, first_function_address):
         """测试按地址反编译。"""
         result = tool_caller("decompile", {"addr": hex(first_function_address)})
@@ -35,7 +34,6 @@ class TestDecompile:
         # 结果应该包含 decompiled 或 error
         assert "decompiled" in result[0] or "error" in result[0]
     
-    @pytest.mark.hexrays
     def test_decompile_by_name(self, tool_caller, first_function_name):
         """测试按名称反编译。"""
         result = tool_caller("decompile", {"addr": first_function_name})
@@ -43,7 +41,6 @@ class TestDecompile:
         assert isinstance(result, list)
         assert len(result) == 1
     
-    @pytest.mark.hexrays
     def test_decompile_batch(self, tool_caller, functions_cache):
         """测试批量反编译（逗号分隔）。"""
         if len(functions_cache) < 3:
@@ -56,7 +53,6 @@ class TestDecompile:
         assert isinstance(result, list)
         assert len(result) == 3
     
-    @pytest.mark.hexrays
     def test_decompile_invalid_address(self, tool_caller):
         """测试无效地址反编译。"""
         result = tool_caller("decompile", {"addr": "0xDEADBEEF"})
@@ -65,7 +61,6 @@ class TestDecompile:
         assert len(result) == 1
         assert "error" in result[0]
     
-    @pytest.mark.hexrays
     def test_decompile_main(self, tool_caller, main_function_address):
         """测试反编译 main 函数。"""
         result = tool_caller("decompile", {"addr": hex(main_function_address)})

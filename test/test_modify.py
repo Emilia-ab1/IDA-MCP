@@ -5,9 +5,9 @@
 2. 测试注释、重命名等修改操作
 3. 注意：这些测试会修改 IDB 数据库
 
-API 参数对应：
+Proxy 参数对应：
 - set_comment: items (List of {address, comment})
-- rename_function: function_address (str), new_name
+- rename_function: address (str), new_name
 - rename_local_variable: function_address (str), old_name, new_name
 - rename_global_variable: old_name, new_name
 - patch_bytes: items (List of {address, bytes})
@@ -92,9 +92,9 @@ class TestRenameFunction:
         addr_str = first_function['start_ea'].replace('0x', '').replace('0X', '')
         new_name = f"test_renamed_{addr_str}"
         
-        # API 参数: function_address (str), new_name
+        # Proxy 参数: address (str), new_name
         result = tool_caller("rename_function", {
-            "function_address": first_function["start_ea"],
+            "address": first_function["start_ea"],
             "new_name": new_name
         })
         
@@ -102,7 +102,7 @@ class TestRenameFunction:
             assert "changed" in result
             # 恢复原名
             tool_caller("rename_function", {
-                "function_address": first_function["start_ea"],
+                "address": first_function["start_ea"],
                 "new_name": old_name
             })
         else:
@@ -110,13 +110,13 @@ class TestRenameFunction:
             print(f"rename_function failed: {result}")
             # 可能是数据库状态问题，尝试通过函数名
             result2 = tool_caller("rename_function", {
-                "function_address": old_name,
+                "address": old_name,
                 "new_name": new_name
             })
             if "error" not in result2:
                 # 恢复原名
                 tool_caller("rename_function", {
-                    "function_address": new_name,
+                    "address": new_name,
                     "new_name": old_name
                 })
     
@@ -126,30 +126,30 @@ class TestRenameFunction:
         new_name = f"test_by_name_{old_name[:8]}"
         
         result = tool_caller("rename_function", {
-            "function_address": old_name,
+            "address": old_name,
             "new_name": new_name
         })
         
         # 恢复原名（无论成功与否都尝试）
         if "error" not in result:
             tool_caller("rename_function", {
-                "function_address": new_name,
+                "address": new_name,
                 "new_name": old_name
             })
     
     def test_rename_function_invalid_name(self, tool_caller, first_function):
         """测试使用无效名称（以数字开头）。"""
         result = tool_caller("rename_function", {
-            "function_address": first_function["start_ea"],
+            "address": first_function["start_ea"],
             "new_name": "123invalid"
         })
-        # API 验证 C 标识符，应该返回错误
+        # Proxy 转发到 API 验证 C 标识符，应该返回错误
         assert "error" in result
     
     def test_rename_function_empty_name(self, tool_caller, first_function):
         """测试空名称。"""
         result = tool_caller("rename_function", {
-            "function_address": first_function["start_ea"],
+            "address": first_function["start_ea"],
             "new_name": ""
         })
         assert "error" in result
@@ -158,7 +158,6 @@ class TestRenameFunction:
 class TestRenameLocalVariable:
     """重命名局部变量测试。"""
     
-    @pytest.mark.hexrays
     def test_rename_local_variable(self, tool_caller, first_function_address):
         """测试重命名局部变量。"""
         # API 参数: function_address (str), old_name, new_name

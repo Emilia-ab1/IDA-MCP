@@ -141,6 +141,8 @@ IDA-MCP/
   ida_mcp.py              # Plugin entry: start/stop SSE server + register coordinator
   ida_mcp/
     __init__.py           # Package initialization, auto-discovery, exports
+    config.py             # Configuration loader (config.conf parser)
+    config.conf           # User configuration file
     rpc.py                # @tool/@resource/@unsafe decorators
     sync.py               # @idaread/@idawrite thread sync
     utils.py              # Utility functions
@@ -154,7 +156,7 @@ IDA-MCP/
     api_debug.py          # Debugger API (unsafe)
     api_resources.py      # MCP Resources
     registry.py           # Coordinator / multi-instance registration
-    proxy/
+    proxy/                # stdio-based MCP proxy
       __init__.py         # Proxy module exports
       ida_mcp_proxy.py    # Main entry point (stdio MCP server)
       _http.py            # HTTP helpers for coordinator communication
@@ -166,7 +168,10 @@ IDA-MCP/
       proxy_modify.py     # Modification forwarding tools
       proxy_stack.py      # Stack frame forwarding tools
       proxy_debug.py      # Debug forwarding tools
-  mcp.json                # MCP client configuration
+    http/                 # HTTP-based MCP proxy (auto-started, reuses stdio proxy)
+      __init__.py         # HTTP module exports
+      http_server.py      # HTTP transport wrapper (reuses ida_mcp_proxy.server)
+  mcp.json                # MCP client configuration (both modes)
   README.md               # README
   requirements.txt        # fastmcp dependencies
 ```
@@ -182,46 +187,112 @@ IDA-MCP/
 
 ## Proxy Usage
 
-The proxy is a stdio-based MCP server that forwards requests to IDA instances via the coordinator.
+The proxy **simultaneously supports both transport modes** - choose whichever works best for your MCP client:
+
+### Transport Modes
+
+| Mode | Description | Configuration |
+|------|-------------|---------------|
+| **HTTP** (recommended) | Auto-started by coordinator, no subprocess needed | Only requires `url` |
+| **stdio** | MCP client launches subprocess | Requires `command` and `args` |
+
+Both modes are always available when the IDA plugin is running.
 
 **Proxy Tools:**
 
 | Category | Tools |
 |----------|-------|
 | Management | `check_connection`, `list_instances`, `select_instance` |
-| Core | `list_functions`, `get_metadata`, `list_strings`, `list_globals`, `list_local_types`, `get_entry_points` |
-| Analysis | `decompile`, `disasm`, `linear_disasm`, `xrefs_to`, `xrefs_from`, `get_function` |
+| Core | `list_functions`, `get_metadata`, `list_strings`, `list_globals`, `list_local_types`, `get_entry_points`, `get_function` |
+| Analysis | `decompile`, `disasm`, `linear_disassemble`, `xrefs_to`, `xrefs_from`, `find_bytes`, `get_basic_blocks` |
 | Modify | `set_comment`, `rename_function`, `rename_global_variable`, `rename_local_variable` |
-| Memory | `read_bytes`, `read_u32`, `read_u64`, `read_string` |
-| Types | `set_func_type`, `set_local_type`, `set_global_type`, `declare_type` |
-| Debug | `dbg_start`, `dbg_continue`, `dbg_step_into`, `dbg_step_over`, `dbg_regs`, `dbg_set_bp`, `dbg_del_bp`, ... |
+| Memory | `get_bytes`, `get_u8`, `get_u16`, `get_u32`, `get_u64`, `get_string` |
+| Types | `set_function_prototype`, `set_local_variable_type`, `set_global_variable_type`, `declare_type` |
+| Debug | `dbg_start`, `dbg_continue`, `dbg_step_into`, `dbg_step_over`, `dbg_regs`, `dbg_add_bp`, `dbg_delete_bp`, ... |
 
-you can use it on codex / claude code / langchain / cursor / vscode / etc that any mcp client.
+You can use it on Codex / Claude Code / LangChain / Cursor / VSCode / etc - any MCP client.
 
-**claude / cherry studio / cursor client example:**
+### Configuration File
+
+Edit `ida_mcp/config.conf` to customize settings:
+
+```ini
+# Coordinator settings
+# coordinator_host = "127.0.0.1"
+# coordinator_port = 11337
+
+# HTTP proxy settings
+# http_host = "127.0.0.1"  # Use 0.0.0.0 for remote access
+# http_port = 11338
+# http_path = "/mcp"
+
+# IDA instance settings
+# ida_default_port = 10000
+
+# General settings
+# request_timeout = 30
+# debug = false
+```
+
+### Method 1: HTTP Mode (Recommended)
+
+HTTP proxy auto-starts when IDA plugin loads. Client only needs URL - no subprocess required.
+
+**Claude / Cherry Studio / Cursor example:**
+
+```json
+{
+  "mcpServers": {
+    "ida-mcp": {
+      "url": "http://127.0.0.1:11338/mcp"
+    }
+  }
+}
+```
+
+**LangChain example:**
+
+```json
+{
+  "mcpServers": {
+    "ida-mcp": {
+      "transport": "streamable-http",
+      "url": "http://127.0.0.1:11338/mcp"
+    }
+  }
+}
+```
+
+**VSCode example:**
+
+```json
+{
+  "servers": {
+    "ida-mcp": {
+      "url": "http://127.0.0.1:11338/mcp"
+    }
+  }
+}
+```
+
+### Method 2: stdio Mode
+
+Client launches proxy as subprocess. Useful when HTTP is not available.
+
+**Claude / Cherry Studio / Cursor example:**
 
 ```json
 {
   "mcpServers": {
     "ida-mcp-proxy": {
       "command": "path of python (IDA's python)",
-      "args": ["path of ida_mcp/proxy/ida_mcp_proxy.py"],
-      "env": {},
-      "description": "stdio MCP proxy that forwards to running IDA SSE server."
+      "args": ["path of ida_mcp/proxy/ida_mcp_proxy.py"]
     }
   }
 }
 ```
 
-For claude, directly add the above configuration to the `claude_desktop_config.json` file in the installation directory.
-
-Cherry studio supports quick creation of mcp tools, import directly from json.
-
-For cursor, simply import via model tools.
-
-**vscode mcp configuration example:**
-
-⚠️Note: Using vscode copilot may result in your account being banned.
+**VSCode example:**
 
 ```json
 {
@@ -233,6 +304,8 @@ For cursor, simply import via model tools.
   }
 }
 ```
+
+⚠️ Note: Using VSCode Copilot may result in your account being banned.
 
 ## Dependencies
 

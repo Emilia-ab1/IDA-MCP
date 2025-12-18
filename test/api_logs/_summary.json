@@ -1,11 +1,28 @@
 {
-  "generated_at": "2025-12-05T17:43:47.770463",
-  "total_calls": 45,
-  "stats_by_category": {
-    "core": 45
+  "generated_at": "2025-12-18T12:12:36.490208",
+  "total_calls": 135,
+  "stats_by_transport": {
+    "stdio": {
+      "core": 5
+    },
+    "http": {
+      "analysis": 28,
+      "memory": 18,
+      "core": 31,
+      "modify": 21,
+      "stack": 10,
+      "types": 22
+    }
   },
   "files": [
-    "core.json",
-    "uri.json"
+    "http_analysis.json",
+    "http_core.json",
+    "http_memory.json",
+    "http_modify.json",
+    "http_stack.json",
+    "http_types.json",
+    "http_uri.json",
+    "stdio_core.json",
+    "stdio_uri.json"
   ]
 }

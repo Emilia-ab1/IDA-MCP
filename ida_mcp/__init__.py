@@ -35,8 +35,12 @@ from typing import Optional
 
 __version__ = "0.2.0"
 
-# 导出默认端口 (选择 10000 以避开 Windows Hyper-V 保留端口范围)
-DEFAULT_PORT = 10000
+# 从配置文件加载默认端口，若失败则使用默认值
+try:
+    from .config import get_ida_default_port
+    DEFAULT_PORT = get_ida_default_port()
+except Exception:
+    DEFAULT_PORT = 10000  # 选择 10000 以避开 Windows Hyper-V 保留端口范围
 
 # 导出装饰器
 from .rpc import tool, resource, unsafe, get_tools, get_resources, is_unsafe

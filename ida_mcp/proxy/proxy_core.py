@@ -54,7 +54,7 @@ def register_tools(server: Any) -> None:
         return forward("list_strings", params, port)
     
     @server.tool(description="List global variables. Params: offset, count, pattern (optional filter).")
-    def globals(
+    def list_globals(
         offset: Annotated[int, Field(description="Pagination offset")] = 0,
         count: Annotated[int, Field(description="Number of items")] = 100,
         pattern: Annotated[Optional[str], Field(description="Optional name filter")] = None,

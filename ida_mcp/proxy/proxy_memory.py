@@ -21,47 +21,51 @@ def register_tools(server: Any) -> None:
     """注册内存工具到服务器。"""
     
     @server.tool(description="Read memory bytes. Returns hex dump and byte array.")
-    def read_bytes(
-        address: Annotated[str, Field(description="Memory address")],
+    def get_bytes(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
         size: Annotated[int, Field(description="Bytes to read (1-4096)")] = 64,
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """读取内存字节。"""
-        return forward("get_bytes", {"addr": address, "size": size}, port)
+        return forward("get_bytes", {"addr": addr, "size": size}, port)
+    
+    @server.tool(description="Read 8-bit unsigned integer from address.")
+    def get_u8(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """读取 8 位无符号整数。"""
+        return forward("get_u8", {"addr": addr}, port)
+    
+    @server.tool(description="Read 16-bit unsigned integer from address.")
+    def get_u16(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """读取 16 位无符号整数。"""
+        return forward("get_u16", {"addr": addr}, port)
     
     @server.tool(description="Read 32-bit unsigned integer from address.")
-    def read_u32(
-        address: Annotated[str, Field(description="Memory address")],
+    def get_u32(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """读取 32 位无符号整数。"""
-        return forward("get_u32", {"addr": address}, port)
+        return forward("get_u32", {"addr": addr}, port)
     
     @server.tool(description="Read 64-bit unsigned integer from address.")
-    def read_u64(
-        address: Annotated[str, Field(description="Memory address")],
+    def get_u64(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """读取 64 位无符号整数。"""
-        return forward("get_u64", {"addr": address}, port)
+        return forward("get_u64", {"addr": addr}, port)
     
     @server.tool(description="Read null-terminated string from address.")
-    def read_string(
-        address: Annotated[str, Field(description="Memory address")],
+    def get_string(
+        addr: Annotated[str, Field(description="Memory address(es), comma-separated")],
         max_len: Annotated[int, Field(description="Maximum length")] = 256,
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """读取字符串。"""
-        return forward("get_string", {"addr": address, "max_len": max_len}, port)
-    
-    @server.tool(description="Batch read memory regions.")
-    def read_memory(
-        address: Annotated[str, Field(description="Memory address")],
-        size: Annotated[int, Field(description="Bytes to read")] = 64,
-        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
-    ) -> Any:
-        """批量读取内存。"""
-        return forward("read_memory_bytes", {
-            "regions": [{"address": address, "size": size}]
-        }, port)
-
+        return forward("get_string", {"addr": addr, "max_len": max_len}, port)

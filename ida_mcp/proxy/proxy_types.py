@@ -21,19 +21,19 @@ def register_tools(server: Any) -> None:
     """注册类型工具到服务器。"""
     
     @server.tool(description="Set function prototype/signature.")
-    def set_func_type(
-        address: Annotated[str, Field(description="Function address")],
+    def set_function_prototype(
+        function_address: Annotated[str, Field(description="Function address")],
         prototype: Annotated[str, Field(description="C-style function prototype")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """设置函数原型。"""
         return forward("set_function_prototype", {
-            "function_address": address,
+            "function_address": function_address,
             "prototype": prototype
         }, port)
     
     @server.tool(description="Set type of a local variable.")
-    def set_local_type(
+    def set_local_variable_type(
         function_address: Annotated[str, Field(description="Function containing the variable")],
         variable_name: Annotated[str, Field(description="Variable name")],
         new_type: Annotated[str, Field(description="C-style type declaration")],
@@ -47,7 +47,7 @@ def register_tools(server: Any) -> None:
         }, port)
     
     @server.tool(description="Set type of a global variable.")
-    def set_global_type(
+    def set_global_variable_type(
         variable_name: Annotated[str, Field(description="Global variable name")],
         new_type: Annotated[str, Field(description="C-style type declaration")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,

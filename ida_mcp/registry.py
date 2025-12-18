@@ -68,10 +68,24 @@ import atexit
 import sys
 import ida_kernwin  # type: ignore
 
-COORD_HOST = "127.0.0.1"
-COORD_PORT = 11337
-REQUEST_TIMEOUT = 30  # seconds
-DEBUG_ENABLED = False
+# 从配置文件加载，若失败则使用默认值
+try:
+    from .config import (
+        get_coordinator_host,
+        get_coordinator_port,
+        get_request_timeout,
+        is_debug_enabled as _config_debug,
+    )
+    COORD_HOST = get_coordinator_host()
+    COORD_PORT = get_coordinator_port()
+    REQUEST_TIMEOUT = get_request_timeout()
+    DEBUG_ENABLED = _config_debug()
+except Exception:
+    COORD_HOST = "127.0.0.1"
+    COORD_PORT = 11337
+    REQUEST_TIMEOUT = 30
+    DEBUG_ENABLED = False
+
 DEBUG_MAX_LEN = 1000
 
 _instances: List[Dict[str, Any]] = []
@@ -310,6 +324,54 @@ def _start_coordinator():  # pragma: no cover
             pass
     _server_thread = threading.Thread(target=run, name="IDA-MCP-Registry", daemon=True)
     _server_thread.start()
+    
+    # 根据配置启动 HTTP 代理
+    _try_start_http_proxy()
+
+
+def _try_start_http_proxy():  # pragma: no cover
+    """启动 HTTP MCP 代理（始终启动，同时支持 stdio 和 HTTP 两种连接方式）。"""
+    try:
+        from .config import get_http_host, get_http_port, get_http_path
+        from .http import start_http_proxy, get_http_url
+        
+        host = get_http_host()
+        port = get_http_port()
+        path = get_http_path()
+        
+        if start_http_proxy(host, port, path):
+            url = get_http_url()
+            _log_info(f"HTTP MCP proxy started at {url}")
+        else:
+            _log_info("Failed to start HTTP MCP proxy")
+    except Exception as e:
+        # HTTP 模块不可用时静默忽略
+        _log_info(f"HTTP proxy not started: {e}")
+
+
+def _log_info(msg: str):  # pragma: no cover
+    """输出日志到 IDA 消息窗口或控制台。"""
+    ts = time.strftime('%H:%M:%S', time.localtime())
+    line = f"[IDA-MCP][INFO][{ts}] {msg}\n"
+    try:
+        if hasattr(ida_kernwin, 'execute_sync') and hasattr(ida_kernwin, 'msg'):
+            def _emit():
+                try:
+                    ida_kernwin.msg(line)
+                except Exception:
+                    print(line, end='')
+                return 0
+            try:
+                ida_kernwin.execute_sync(_emit, ida_kernwin.MFF_READ)
+            except Exception:
+                try:
+                    ida_kernwin.msg(line)
+                except Exception:
+                    print(line, end='')
+        else:
+            print(line, end='')
+    except Exception:
+        pass
 
 def _coordinator_alive() -> bool:
     try:

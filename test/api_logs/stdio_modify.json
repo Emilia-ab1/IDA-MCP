@@ -1,0 +1,474 @@
+{
+  "transport": "stdio",
+  "category": "modify",
+  "generated_at": "2025-12-18T11:52:35.101376",
+  "total_calls": 20,
+  "calls": [
+    {
+      "timestamp": "2025-12-18T11:51:47.201633",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x400efc",
+            "comment": "Test comment from pytest"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "old": null,
+          "new": "Test comment from pytest",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 627.83
+    },
+    {
+      "timestamp": "2025-12-18T11:51:47.840094",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x400EFC",
+            "comment": "Batch comment 0"
+          },
+          {
+            "address": "0x400F50",
+            "comment": "Batch comment 1"
+          },
+          {
+            "address": "0x401234",
+            "comment": "Batch comment 2"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "old": "Test comment from pytest",
+          "new": "Batch comment 0",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x400F50",
+          "old": null,
+          "new": "Batch comment 1",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x401234",
+          "old": null,
+          "new": "Batch comment 2",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 627.45
+    },
+    {
+      "timestamp": "2025-12-18T11:51:48.459623",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x400efc",
+            "comment": "To be cleared"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "old": "Batch comment 0",
+          "new": "To be cleared",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 620.69
+    },
+    {
+      "timestamp": "2025-12-18T11:51:49.093291",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x400efc",
+            "comment": ""
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "old": "To be cleared",
+          "new": null,
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 630.61
+    },
+    {
+      "timestamp": "2025-12-18T11:51:49.735427",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "set_comment",
+      "params": {
+        "items": [
+          {
+            "address": "0x400EFC",
+            "comment": "Comment A"
+          },
+          {
+            "address": "0x400F50",
+            "comment": "Comment B"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "old": null,
+          "new": "Comment A",
+          "changed": true,
+          "error": null
+        },
+        {
+          "address": "0x400F50",
+          "old": "Batch comment 1",
+          "new": "Comment B",
+          "changed": true,
+          "error": null
+        }
+      ],
+      "duration_ms": 640.11
+    },
+    {
+      "timestamp": "2025-12-18T11:51:50.362082",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x400EFC",
+        "new_name": "test_renamed_400EFC"
+      },
+      "port": 10001,
+      "result": {
+        "start_ea": "0x400EFC",
+        "old_name": ".init_proc",
+        "new_name": "test_renamed_400EFC",
+        "changed": true
+      },
+      "duration_ms": 625.99
+    },
+    {
+      "timestamp": "2025-12-18T11:51:51.000102",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x400EFC",
+        "new_name": ".init_proc"
+      },
+      "port": 10001,
+      "result": {
+        "error": "new_name not a valid C identifier"
+      },
+      "duration_ms": 644.26
+    },
+    {
+      "timestamp": "2025-12-18T11:51:51.679469",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": ".init_proc",
+        "new_name": "test_by_name_.init_pr"
+      },
+      "port": 10001,
+      "result": {
+        "error": "new_name not a valid C identifier"
+      },
+      "duration_ms": 673.82
+    },
+    {
+      "timestamp": "2025-12-18T11:51:52.399409",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x400EFC",
+        "new_name": "123invalid"
+      },
+      "port": 10001,
+      "result": {
+        "error": "new_name not a valid C identifier"
+      },
+      "duration_ms": 713.93
+    },
+    {
+      "timestamp": "2025-12-18T11:51:53.060991",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_function",
+      "params": {
+        "function_address": "0x400EFC",
+        "new_name": ""
+      },
+      "port": 10001,
+      "result": {
+        "error": "empty new_name"
+      },
+      "duration_ms": 653.71
+    },
+    {
+      "timestamp": "2025-12-18T11:51:53.683535",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_local_variable",
+      "params": {
+        "function_address": "0x400efc",
+        "old_name": "v1",
+        "new_name": "test_var"
+      },
+      "port": 10001,
+      "result": {
+        "error": "local variable not found"
+      },
+      "duration_ms": 632.76
+    },
+    {
+      "timestamp": "2025-12-18T11:51:54.946961",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "aLibLdMuslMipse",
+        "new_name": "test_global_400174"
+      },
+      "port": 10001,
+      "result": {
+        "ea": "0x400174",
+        "old_name": "aLibLdMuslMipse",
+        "new_name": "test_global_400174",
+        "changed": true
+      },
+      "duration_ms": 621.65
+    },
+    {
+      "timestamp": "2025-12-18T11:51:55.566238",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "test_global_400174",
+        "new_name": "aLibLdMuslMipse"
+      },
+      "port": 10001,
+      "result": {
+        "ea": "0x400174",
+        "old_name": "test_global_400174",
+        "new_name": "aLibLdMuslMipse",
+        "changed": true
+      },
+      "duration_ms": 618.22
+    },
+    {
+      "timestamp": "2025-12-18T11:51:56.199278",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "rename_global_variable",
+      "params": {
+        "old_name": "nonexistent_global_xyz123",
+        "new_name": "new_name"
+      },
+      "port": 10001,
+      "result": {
+        "error": "global not found"
+      },
+      "duration_ms": 633.09
+    },
+    {
+      "timestamp": "2025-12-18T11:51:57.437300",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": 4198140,
+            "bytes": [
+              144,
+              144,
+              144,
+              144
+            ]
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "size": 4,
+          "patched": 4,
+          "old_bytes": "E0 FF BD 27",
+          "new_bytes": "90 90 90 90",
+          "error": null
+        }
+      ],
+      "duration_ms": 618.6
+    },
+    {
+      "timestamp": "2025-12-18T11:51:58.056745",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": 4198140,
+            "bytes": [
+              224,
+              255,
+              189,
+              39
+            ]
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "size": 4,
+          "patched": 4,
+          "old_bytes": "90 90 90 90",
+          "new_bytes": "E0 FF BD 27",
+          "error": null
+        }
+      ],
+      "duration_ms": 620.57
+    },
+    {
+      "timestamp": "2025-12-18T11:51:59.319007",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": 4198140,
+            "bytes": "90 90"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "size": 2,
+          "patched": 2,
+          "old_bytes": "E0 FF",
+          "new_bytes": "90 90",
+          "error": null
+        }
+      ],
+      "duration_ms": 629.47
+    },
+    {
+      "timestamp": "2025-12-18T11:51:59.972044",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": 4198140,
+            "bytes": [
+              224,
+              255
+            ]
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "address": "0x400EFC",
+          "size": 2,
+          "patched": 2,
+          "old_bytes": "90 90",
+          "new_bytes": "E0 FF",
+          "error": null
+        }
+      ],
+      "duration_ms": 645.61
+    },
+    {
+      "timestamp": "2025-12-18T11:52:00.618018",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": "invalid",
+            "bytes": [
+              144
+            ]
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "invalid address",
+          "address": "invalid"
+        }
+      ],
+      "duration_ms": 648.14
+    },
+    {
+      "timestamp": "2025-12-18T11:52:01.240152",
+      "transport": "stdio",
+      "category": "modify",
+      "tool": "patch_bytes",
+      "params": {
+        "items": [
+          {
+            "address": 4198140,
+            "bytes": []
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "empty bytes",
+          "address": "0x400EFC"
+        }
+      ],
+      "duration_ms": 621.82
+    }
+  ]
+}

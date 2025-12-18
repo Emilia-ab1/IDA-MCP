@@ -6,10 +6,10 @@
 3. 测试变量类型设置
 4. 测试结构体列表和详情
 
-API 参数对应：
+Proxy 参数对应：
 - declare_type: decl
-- set_function_prototype: function_address (int), prototype
-- set_local_variable_type: function_address (int), variable_name, new_type
+- set_function_prototype: function_address (str), prototype
+- set_local_variable_type: function_address (str), variable_name, new_type
 - set_global_variable_type: variable_name, new_type
 - list_structs: pattern (可选)
 - get_struct_info: name
@@ -92,9 +92,9 @@ class TestSetFunctionPrototype:
     
     def test_set_function_prototype(self, tool_caller, first_function_address):
         """测试设置函数原型。"""
-        # API 参数: function_address (int), prototype
+        # Proxy 参数: function_address (str), prototype
         result = tool_caller("set_function_prototype", {
-            "function_address": first_function_address,
+            "function_address": hex(first_function_address),
             "prototype": "int __cdecl func(int a, int b)"
         })
         
@@ -104,7 +104,7 @@ class TestSetFunctionPrototype:
     def test_set_function_prototype_invalid_address(self, tool_caller):
         """测试无效地址。"""
         result = tool_caller("set_function_prototype", {
-            "function_address": 0xDEADBEEF,
+            "function_address": hex(0xDEADBEEF),
             "prototype": "int func(void)"
         })
         assert "error" in result
@@ -112,7 +112,7 @@ class TestSetFunctionPrototype:
     def test_set_function_prototype_empty(self, tool_caller, first_function_address):
         """测试空原型。"""
         result = tool_caller("set_function_prototype", {
-            "function_address": first_function_address,
+            "function_address": hex(first_function_address),
             "prototype": ""
         })
         assert "error" in result
@@ -120,7 +120,7 @@ class TestSetFunctionPrototype:
     def test_set_function_prototype_invalid_syntax(self, tool_caller, first_function_address):
         """测试无效原型语法。"""
         result = tool_caller("set_function_prototype", {
-            "function_address": first_function_address,
+            "function_address": hex(first_function_address),
             "prototype": "invalid prototype syntax"
         })
         assert "error" in result
@@ -129,12 +129,11 @@ class TestSetFunctionPrototype:
 class TestSetLocalVariableType:
     """设置局部变量类型测试。"""
     
-    @pytest.mark.hexrays
     def test_set_local_variable_type(self, tool_caller, first_function_address):
         """测试设置局部变量类型。"""
-        # API 参数: function_address (int), variable_name, new_type
+        # Proxy 参数: function_address (str), variable_name, new_type
         result = tool_caller("set_local_variable_type", {
-            "function_address": first_function_address,
+            "function_address": hex(first_function_address),
             "variable_name": "v1",
             "new_type": "int"
         })
@@ -142,11 +141,10 @@ class TestSetLocalVariableType:
         # 可能成功或失败（取决于是否有该变量）
         assert isinstance(result, dict)
     
-    @pytest.mark.hexrays
     def test_set_local_variable_type_pointer(self, tool_caller, first_function_address):
         """测试设置指针类型。"""
         result = tool_caller("set_local_variable_type", {
-            "function_address": first_function_address,
+            "function_address": hex(first_function_address),
             "variable_name": "v1",
             "new_type": "char*"
         })

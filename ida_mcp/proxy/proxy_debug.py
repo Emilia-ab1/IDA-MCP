@@ -55,22 +55,13 @@ def register_tools(server: Any) -> None:
         """单步跳过。"""
         return forward("dbg_step_over", {}, port)
     
-    @server.tool(description="Step into/over. into=True for step into, False for step over.")
-    def dbg_step(
-        into: Annotated[bool, Field(description="True=step into, False=step over")] = True,
-        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
-    ) -> Any:
-        """单步执行。"""
-        tool = "dbg_step_into" if into else "dbg_step_over"
-        return forward(tool, {}, port)
-    
     @server.tool(description="Run to address.")
     def dbg_run_to(
-        address: Annotated[str, Field(description="Target address")],
+        addr: Annotated[str, Field(description="Target address")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """运行到指定地址。"""
-        return forward("dbg_run_to", {"addr": address}, port)
+        return forward("dbg_run_to", {"addr": addr}, port)
     
     @server.tool(description="Get all CPU registers.")
     def dbg_regs(
@@ -80,53 +71,57 @@ def register_tools(server: Any) -> None:
         return forward("dbg_regs", {}, port)
     
     @server.tool(description="Get call stack.")
-    def dbg_stack(
+    def dbg_callstack(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """获取调用栈。"""
         return forward("dbg_callstack", {}, port)
     
     @server.tool(description="List all breakpoints.")
-    def dbg_list_breakpoints(
+    def dbg_list_bps(
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """列出断点。"""
         return forward("dbg_list_bps", {}, port)
     
-    @server.tool(description="Set breakpoint at address.")
-    def dbg_set_bp(
-        address: Annotated[str, Field(description="Breakpoint address")],
+    @server.tool(description="Add breakpoint at address.")
+    def dbg_add_bp(
+        addr: Annotated[str, Field(description="Breakpoint address(es), comma-separated")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """设置断点。"""
-        return forward("dbg_add_bp", {"addr": address}, port)
+        return forward("dbg_add_bp", {"addr": addr}, port)
     
     @server.tool(description="Delete breakpoint at address.")
-    def dbg_del_bp(
-        address: Annotated[str, Field(description="Breakpoint address")],
+    def dbg_delete_bp(
+        addr: Annotated[str, Field(description="Breakpoint address(es), comma-separated")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """删除断点。"""
-        return forward("dbg_delete_bp", {"addr": address}, port)
+        return forward("dbg_delete_bp", {"addr": addr}, port)
     
     @server.tool(description="Enable or disable breakpoint.")
     def dbg_enable_bp(
-        address: Annotated[str, Field(description="Breakpoint address")],
-        enable: Annotated[bool, Field(description="True to enable, False to disable")] = True,
+        items: Annotated[list, Field(description="List of {address, enable} objects")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """启用/禁用断点。"""
-        return forward("dbg_enable_bp", {
-            "items": [{"address": address, "enable": enable}]
-        }, port)
+        return forward("dbg_enable_bp", {"items": items}, port)
     
-    @server.tool(description="Set or delete breakpoint. action='set' or 'delete'.")
-    def dbg_breakpoint(
-        address: Annotated[str, Field(description="Breakpoint address")],
-        action: Annotated[str, Field(description="'set' or 'delete'")] = "set",
+    @server.tool(description="Read memory in debugger.")
+    def dbg_read_mem(
+        addr: Annotated[str, Field(description="Memory address")],
+        size: Annotated[int, Field(description="Bytes to read")] = 64,
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
-        """管理断点。"""
-        tool = "dbg_add_bp" if action == "set" else "dbg_delete_bp"
-        return forward(tool, {"addr": address}, port)
-
+        """调试器读取内存。"""
+        return forward("dbg_read_mem", {"addr": addr, "size": size}, port)
+    
+    @server.tool(description="Write memory in debugger.")
+    def dbg_write_mem(
+        addr: Annotated[str, Field(description="Memory address")],
+        data: Annotated[str, Field(description="Hex string to write")],
+        port: Annotated[Optional[int], Field(description="Instance port override")] = None,
+    ) -> Any:
+        """调试器写入内存。"""
+        return forward("dbg_write_mem", {"addr": addr, "data": data}, port)

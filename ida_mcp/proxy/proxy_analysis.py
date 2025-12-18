@@ -37,13 +37,13 @@ def register_tools(server: Any) -> None:
         return forward("disasm", {"addr": addr}, port)
     
     @server.tool(description="Linear disassembly from address. Returns raw instructions.")
-    def linear_disasm(
-        addr: Annotated[str, Field(description="Start address")],
+    def linear_disassemble(
+        start_address: Annotated[str, Field(description="Start address")],
         count: Annotated[int, Field(description="Number of instructions")] = 20,
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:
         """线性反汇编。"""
-        return forward("linear_disassemble", {"start_address": addr, "count": count}, port)
+        return forward("linear_disassemble", {"start_address": start_address, "count": count}, port)
     
     @server.tool(description="Get cross-references TO address(es). addr comma-separated for batch.")
     def xrefs_to(
@@ -73,8 +73,8 @@ def register_tools(server: Any) -> None:
             "field_name": field_name
         }, port)
     
-    @server.tool(description="Lookup function by name or address.")
-    def lookup_function(
+    @server.tool(description="Find function by name or address.")
+    def get_function(
         query: Annotated[str, Field(description="Function name or address")],
         port: Annotated[Optional[int], Field(description="Instance port override")] = None,
     ) -> Any:

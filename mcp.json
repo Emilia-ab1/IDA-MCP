@@ -1,12 +1,14 @@
 {
   "mcpServers": {
-    "ida-mcp-proxy": {
-      "command": "path of python",
-      "args": ["path of ida_mcp_proxy.py"],
+    "ida-mcp (http)": {
+      "url": "http://127.0.0.1:11338/mcp",
+      "description": "HTTP MCP - auto-started when IDA plugin loads. No subprocess needed."
+    },
+    "ida-mcp-proxy (stdio)": {
+      "command": "python",
+      "args": ["ida_mcp/proxy/ida_mcp_proxy.py"],
       "env": {},
-      "description": "Process MCP proxy that forwards to running IDA SSE server."
+      "description": "stdio MCP - requires MCP client to launch subprocess."
     }
   }
 }
-
-

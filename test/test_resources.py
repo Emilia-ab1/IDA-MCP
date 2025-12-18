@@ -3,12 +3,15 @@
 测试逻辑：
 1. 通过 FastMCP 客户端访问各种 ida:// URI 资源
 2. 验证资源返回格式
-3. 记录测试结果到 api_logs/uri.json
+3. 记录测试结果到 api_logs/ 目录
+   - stdio 模式: stdio_uri.json
+   - http 模式: http_uri.json
 
 运行方式：
-    pytest -m resources          # 只运行 resources 模块测试
-    pytest test_resources.py     # 运行此文件所有测试
-    pytest test_resources.py -v  # 详细输出
+    pytest -m resources           # 只运行 resources 模块测试
+    pytest test_resources.py      # 运行此文件所有测试
+    pytest test_resources.py -v   # 详细输出
+    pytest --transport=http       # 只测试 HTTP 模式
 
 依赖：
     pip install fastmcp pytest
@@ -32,11 +35,19 @@ pytestmark = pytest.mark.resources
 DEFAULT_HOST = "127.0.0.1"
 REQUEST_TIMEOUT = 30
 
+# HTTP 代理配置
+HTTP_PROXY_HOST = "127.0.0.1"
+HTTP_PROXY_PORT = 11338
+HTTP_PROXY_PATH = "/mcp"
+
 # 日志目录
 _LOG_DIR = os.path.join(os.path.dirname(__file__), "api_logs")
 
-# URI 调用日志
-_uri_call_log: List[Dict[str, Any]] = []
+# URI 调用日志 (按传输模式分开)
+_uri_call_logs: Dict[str, List[Dict[str, Any]]] = {
+    "stdio": [],
+    "http": [],
+}
 
 
 # ============================================================================
@@ -44,6 +55,7 @@ _uri_call_log: List[Dict[str, Any]] = []
 # ============================================================================
 
 def _log_uri_call(
+    transport: str,
     uri: str,
     port: int,
     result: Any,
@@ -52,8 +64,9 @@ def _log_uri_call(
     error: Optional[str] = None
 ) -> None:
     """记录 URI 资源访问。"""
-    _uri_call_log.append({
+    _uri_call_logs[transport].append({
         "timestamp": datetime.now().isoformat(),
+        "transport": transport,
         "uri": uri,
         "port": port,
         "success": success,
@@ -82,21 +95,27 @@ def _truncate_result(result: Any, max_items: int = 5, max_str_len: int = 500) ->
 
 
 def _save_uri_log() -> None:
-    """保存 URI 日志到 uri.json。"""
-    if not _uri_call_log:
-        return
-    
+    """保存 URI 日志到 {transport}_uri.json。"""
     try:
         os.makedirs(_LOG_DIR, exist_ok=True)
+    except Exception:
+        return
+    
+    total_all = 0
+    
+    for transport, calls in _uri_call_logs.items():
+        if not calls:
+            continue
         
         # 统计
-        total = len(_uri_call_log)
-        success_count = sum(1 for c in _uri_call_log if c["success"])
+        total = len(calls)
+        total_all += total
+        success_count = sum(1 for c in calls if c["success"])
         failed_count = total - success_count
         
         # 按 URI 分组统计
         uri_stats: Dict[str, Dict[str, Any]] = {}
-        for call in _uri_call_log:
+        for call in calls:
             uri = call["uri"]
             if uri not in uri_stats:
                 uri_stats[uri] = {"total": 0, "success": 0, "failed": 0, "avg_ms": 0, "durations": []}
@@ -113,38 +132,52 @@ def _save_uri_log() -> None:
                 stats["avg_ms"] = round(sum(stats["durations"]) / len(stats["durations"]), 2)
             del stats["durations"]
         
-        log_file = os.path.join(_LOG_DIR, "uri.json")
-        with open(log_file, "w", encoding="utf-8") as f:
-            json.dump({
-                "category": "uri_resources",
-                "generated_at": datetime.now().isoformat(),
-                "summary": {
-                    "total_calls": total,
-                    "success": success_count,
-                    "failed": failed_count,
-                    "success_rate": f"{success_count / total * 100:.1f}%" if total > 0 else "N/A",
-                },
-                "uri_stats": uri_stats,
-                "calls": _uri_call_log,
-            }, f, indent=2, ensure_ascii=False, default=str)
-        
-        print(f"\n[URI Log] Saved {total} calls to {log_file}")
-        print(f"[URI Log] Success: {success_count}, Failed: {failed_count}")
-    except Exception as e:
-        print(f"\n[URI Log] Failed to save: {e}")
+        # 文件名格式: {transport}_uri.json
+        log_file = os.path.join(_LOG_DIR, f"{transport}_uri.json")
+        try:
+            with open(log_file, "w", encoding="utf-8") as f:
+                json.dump({
+                    "transport": transport,
+                    "category": "uri_resources",
+                    "generated_at": datetime.now().isoformat(),
+                    "summary": {
+                        "total_calls": total,
+                        "success": success_count,
+                        "failed": failed_count,
+                        "success_rate": f"{success_count / total * 100:.1f}%" if total > 0 else "N/A",
+                    },
+                    "uri_stats": uri_stats,
+                    "calls": calls,
+                }, f, indent=2, ensure_ascii=False, default=str)
+            
+            print(f"\n[URI Log] {transport}: Saved {total} calls to {log_file}")
+            print(f"[URI Log] {transport}: Success: {success_count}, Failed: {failed_count}")
+        except Exception as e:
+            print(f"\n[URI Log] {transport}: Failed to save: {e}")
 
 
 # ============================================================================
 # 资源访问函数
 # ============================================================================
 
-async def _read_resource_async(uri: str, port: int) -> Dict[str, Any]:
-    """通过 FastMCP 客户端异步读取资源。"""
+async def _read_resource_async(uri: str, port: int, transport: str = "stdio") -> Dict[str, Any]:
+    """通过 FastMCP 客户端异步读取资源。
+    
+    Args:
+        uri: 资源 URI
+        port: IDA 实例端口
+        transport: 传输模式 ("stdio" 或 "http")
+    
+    注意：Resources 只在 IDA 实例中定义，proxy 不支持 resources。
+    因此无论是 stdio 还是 http 模式，resource 测试都直接连接到 IDA 实例。
+    """
     start_time = time.perf_counter()
     
     try:
         from fastmcp import Client
         
+        # Resources 只存在于 IDA 实例中，直接连接到实例
+        # (proxy 只转发 tools，不支持 resources)
         mcp_url = f"http://{DEFAULT_HOST}:{port}/mcp/"
         
         async with Client(mcp_url, timeout=REQUEST_TIMEOUT) as client:
@@ -173,28 +206,32 @@ async def _read_resource_async(uri: str, port: int) -> Dict[str, Any]:
             else:
                 data = result
             
-            _log_uri_call(uri, port, data, duration_ms, success=True)
+            _log_uri_call(transport, uri, port, data, duration_ms, success=True)
             return {"uri": uri, "data": data}
     
     except Exception as e:
         duration_ms = (time.perf_counter() - start_time) * 1000
         error_msg = str(e)
-        _log_uri_call(uri, port, None, duration_ms, success=False, error=error_msg)
+        _log_uri_call(transport, uri, port, None, duration_ms, success=False, error=error_msg)
         return {"uri": uri, "error": error_msg}
 
 
-def read_resource(uri: str, port: int) -> Dict[str, Any]:
+def read_resource(uri: str, port: int, transport: str = "stdio") -> Dict[str, Any]:
     """同步读取资源。"""
-    return asyncio.run(_read_resource_async(uri, port))
+    return asyncio.run(_read_resource_async(uri, port, transport))
 
 
-async def _list_resources_async(port: int) -> Dict[str, Any]:
-    """列出所有可用资源。"""
+async def _list_resources_async(port: int, transport: str = "stdio") -> Dict[str, Any]:
+    """列出所有可用资源。
+    
+    注意：Resources 只在 IDA 实例中定义，直接连接到实例。
+    """
     start_time = time.perf_counter()
     
     try:
         from fastmcp import Client
         
+        # Resources 只存在于 IDA 实例中
         mcp_url = f"http://{DEFAULT_HOST}:{port}/mcp/"
         
         async with Client(mcp_url, timeout=REQUEST_TIMEOUT) as client:
@@ -227,19 +264,19 @@ async def _list_resources_async(port: int) -> Dict[str, Any]:
                 "total": len(resources) + len(templates),
             }
             
-            _log_uri_call("resources/list", port, data, duration_ms, success=True)
+            _log_uri_call(transport, "resources/list", port, data, duration_ms, success=True)
             return data
     
     except Exception as e:
         duration_ms = (time.perf_counter() - start_time) * 1000
         error_msg = str(e)
-        _log_uri_call("resources/list", port, None, duration_ms, success=False, error=error_msg)
+        _log_uri_call(transport, "resources/list", port, None, duration_ms, success=False, error=error_msg)
         return {"error": error_msg}
 
 
-def list_resources(port: int) -> Dict[str, Any]:
+def list_resources(port: int, transport: str = "stdio") -> Dict[str, Any]:
     """同步列出资源。"""
-    return asyncio.run(_list_resources_async(port))
+    return asyncio.run(_list_resources_async(port, transport))
 
 
 # ============================================================================
@@ -251,15 +288,29 @@ atexit.register(_save_uri_log)
 
 
 # ============================================================================
+# Transport mode fixture
+# ============================================================================
+
+@pytest.fixture
+def resource_transport(request):
+    """获取当前资源测试的传输模式。"""
+    transport = request.config.getoption("--transport", "stdio")
+    if transport == "both":
+        # 默认使用 stdio，如果需要同时测试两种模式需要参数化
+        transport = "stdio"
+    return transport
+
+
+# ============================================================================
 # 测试类
 # ============================================================================
 
 class TestResourceDiscovery:
     """资源发现测试。"""
     
-    def test_list_resources(self, instance_port):
+    def test_list_resources(self, instance_port, resource_transport):
         """测试列出可用资源 (resources/list)。"""
-        result = list_resources(instance_port)
+        result = list_resources(instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot list resources: {result['error']}")
@@ -272,9 +323,9 @@ class TestResourceDiscovery:
 class TestMetadataResource:
     """IDB 元数据资源测试。"""
     
-    def test_idb_metadata(self, instance_port):
+    def test_idb_metadata(self, instance_port, resource_transport):
         """测试 ida://idb/metadata 资源。"""
-        result = read_resource("ida://idb/metadata", instance_port)
+        result = read_resource("ida://idb/metadata", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read metadata: {result['error']}")
@@ -290,9 +341,9 @@ class TestMetadataResource:
 class TestFunctionsResource:
     """函数资源测试。"""
     
-    def test_functions_list(self, instance_port):
+    def test_functions_list(self, instance_port, resource_transport):
         """测试 ida://functions 资源。"""
-        result = read_resource("ida://functions", instance_port)
+        result = read_resource("ida://functions", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read functions: {result['error']}")
@@ -301,9 +352,9 @@ class TestFunctionsResource:
         # 应该返回列表
         assert data is None or isinstance(data, list)
     
-    def test_functions_pattern(self, instance_port):
+    def test_functions_pattern(self, instance_port, resource_transport):
         """测试 ida://functions/{pattern} 资源。"""
-        result = read_resource("ida://functions/main*", instance_port)
+        result = read_resource("ida://functions/main*", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read functions pattern: {result['error']}")
@@ -311,10 +362,10 @@ class TestFunctionsResource:
         data = result.get("data")
         assert data is None or isinstance(data, list)
     
-    def test_function_by_address(self, instance_port, first_function_address):
+    def test_function_by_address(self, instance_port, first_function_address, resource_transport):
         """测试 ida://function/{addr} 资源。"""
         addr_hex = f"0x{first_function_address:x}"
-        result = read_resource(f"ida://function/{addr_hex}", instance_port)
+        result = read_resource(f"ida://function/{addr_hex}", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read function: {result['error']}")
@@ -327,9 +378,9 @@ class TestFunctionsResource:
 class TestStringsResource:
     """字符串资源测试。"""
     
-    def test_strings_list(self, instance_port):
+    def test_strings_list(self, instance_port, resource_transport):
         """测试 ida://strings 资源。"""
-        result = read_resource("ida://strings", instance_port)
+        result = read_resource("ida://strings", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read strings: {result['error']}")
@@ -337,9 +388,9 @@ class TestStringsResource:
         data = result.get("data")
         assert data is None or isinstance(data, list)
     
-    def test_strings_pattern(self, instance_port):
+    def test_strings_pattern(self, instance_port, resource_transport):
         """测试 ida://strings/{pattern} 资源。"""
-        result = read_resource("ida://strings/hello", instance_port)
+        result = read_resource("ida://strings/hello", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read strings pattern: {result['error']}")
@@ -351,9 +402,9 @@ class TestStringsResource:
 class TestGlobalsResource:
     """全局变量资源测试。"""
     
-    def test_globals_list(self, instance_port):
+    def test_globals_list(self, instance_port, resource_transport):
         """测试 ida://globals 资源。"""
-        result = read_resource("ida://globals", instance_port)
+        result = read_resource("ida://globals", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read globals: {result['error']}")
@@ -361,9 +412,9 @@ class TestGlobalsResource:
         data = result.get("data")
         assert data is None or isinstance(data, list)
     
-    def test_globals_pattern(self, instance_port):
+    def test_globals_pattern(self, instance_port, resource_transport):
         """测试 ida://globals/{pattern} 资源。"""
-        result = read_resource("ida://globals/g_*", instance_port)
+        result = read_resource("ida://globals/g_*", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read globals pattern: {result['error']}")
@@ -375,9 +426,9 @@ class TestGlobalsResource:
 class TestTypesResource:
     """类型资源测试。"""
     
-    def test_types_list(self, instance_port):
+    def test_types_list(self, instance_port, resource_transport):
         """测试 ida://types 资源。"""
-        result = read_resource("ida://types", instance_port)
+        result = read_resource("ida://types", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read types: {result['error']}")
@@ -390,9 +441,9 @@ class TestTypesResource:
 class TestSegmentsResource:
     """段资源测试。"""
     
-    def test_segments_list(self, instance_port):
+    def test_segments_list(self, instance_port, resource_transport):
         """测试 ida://segments 资源。"""
-        result = read_resource("ida://segments", instance_port)
+        result = read_resource("ida://segments", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read segments: {result['error']}")
@@ -404,9 +455,9 @@ class TestSegmentsResource:
 class TestImportsExportsResource:
     """导入导出资源测试。"""
     
-    def test_imports_list(self, instance_port):
+    def test_imports_list(self, instance_port, resource_transport):
         """测试 ida://imports 资源。"""
-        result = read_resource("ida://imports", instance_port)
+        result = read_resource("ida://imports", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read imports: {result['error']}")
@@ -414,9 +465,9 @@ class TestImportsExportsResource:
         data = result.get("data")
         assert data is None or isinstance(data, list)
     
-    def test_exports_list(self, instance_port):
+    def test_exports_list(self, instance_port, resource_transport):
         """测试 ida://exports 资源。"""
-        result = read_resource("ida://exports", instance_port)
+        result = read_resource("ida://exports", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read exports: {result['error']}")
@@ -428,10 +479,10 @@ class TestImportsExportsResource:
 class TestXrefsResource:
     """交叉引用资源测试。"""
     
-    def test_xrefs_to(self, instance_port, first_function_address):
+    def test_xrefs_to(self, instance_port, first_function_address, resource_transport):
         """测试 ida://xrefs/to/{addr} 资源。"""
         addr_hex = f"0x{first_function_address:x}"
-        result = read_resource(f"ida://xrefs/to/{addr_hex}", instance_port)
+        result = read_resource(f"ida://xrefs/to/{addr_hex}", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read xrefs: {result['error']}")
@@ -440,10 +491,10 @@ class TestXrefsResource:
         if isinstance(data, dict):
             assert "error" in data or "xrefs" in data or "address" in data
     
-    def test_xrefs_from(self, instance_port, first_function_address):
+    def test_xrefs_from(self, instance_port, first_function_address, resource_transport):
         """测试 ida://xrefs/from/{addr} 资源。"""
         addr_hex = f"0x{first_function_address:x}"
-        result = read_resource(f"ida://xrefs/from/{addr_hex}", instance_port)
+        result = read_resource(f"ida://xrefs/from/{addr_hex}", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read xrefs: {result['error']}")
@@ -456,10 +507,10 @@ class TestXrefsResource:
 class TestMemoryResource:
     """内存资源测试。"""
     
-    def test_memory_read(self, instance_port, first_function_address):
+    def test_memory_read(self, instance_port, first_function_address, resource_transport):
         """测试 ida://memory/{addr} 资源。"""
         addr_hex = f"0x{first_function_address:x}"
-        result = read_resource(f"ida://memory/{addr_hex}", instance_port)
+        result = read_resource(f"ida://memory/{addr_hex}", instance_port, resource_transport)
         
         if "error" in result:
             pytest.skip(f"Cannot read memory: {result['error']}")
@@ -472,16 +523,16 @@ class TestMemoryResource:
 class TestInvalidResource:
     """无效资源测试。"""
     
-    def test_invalid_uri(self, instance_port):
+    def test_invalid_uri(self, instance_port, resource_transport):
         """测试无效资源 URI。"""
-        result = read_resource("ida://nonexistent/invalid", instance_port)
+        result = read_resource("ida://nonexistent/invalid", instance_port, resource_transport)
         
         # 应该返回错误或空结果
         assert "error" in result or result.get("data") is None or result.get("data") == {}
     
-    def test_invalid_address(self, instance_port):
+    def test_invalid_address(self, instance_port, resource_transport):
         """测试无效地址。"""
-        result = read_resource("ida://function/invalid_addr", instance_port)
+        result = read_resource("ida://function/invalid_addr", instance_port, resource_transport)
         
         # 应该返回错误
         data = result.get("data", {})

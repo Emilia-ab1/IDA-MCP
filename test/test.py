@@ -4,7 +4,6 @@
 使用方法:
     python test/test.py                 # 运行全部测试（不含 debug）
     python test/test.py --all           # 运行全部测试（含 debug）
-    python test/test.py --quick         # 快速测试（不含 slow/debug/hexrays）
     
     # 按模块运行:
     python test/test.py --core          # Core 模块（元数据、函数、导入导出等）
@@ -16,14 +15,20 @@
     python test/test.py --debug         # Debug 模块（调试器，需手动配置）
     python test/test.py --resources     # Resources 模块（MCP 资源）
     
+    # 传输模式:
+    python test/test.py --transport=stdio    # 只测试 stdio 模式
+    python test/test.py --transport=http     # 只测试 HTTP 模式
+    python test/test.py --transport=both     # 测试两种模式（默认）
+    
     # 组合使用:
-    python test/test.py --core --analysis   # 运行 core 和 analysis
-    python test/test.py --hexrays           # 只运行需要 Hex-Rays 的测试
+    python test/test.py --core --analysis    # 运行 core 和 analysis
+    python test/test.py --transport=http --analysis  # HTTP 模式下运行 analysis
     
     # 直接使用 pytest:
     pytest -m core                      # 只运行 core 模块
     pytest -m "core or analysis"        # 运行 core 和 analysis
     pytest -m "not debug"               # 排除 debug 模块
+    pytest --transport=http             # 只测试 HTTP 模式
     pytest test/test_core.py            # 运行指定文件
 """
 import sys
@@ -50,6 +55,19 @@ def check_coordinator() -> bool:
             data = json.loads(resp.read().decode('utf-8'))
             instances = data if isinstance(data, list) else []
             return len(instances) > 0
+    except Exception:
+        return False
+
+
+def check_http_proxy() -> bool:
+    """检查 HTTP 代理是否可用。"""
+    import socket
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(1)
+        result = sock.connect_ex(("127.0.0.1", 11338))
+        sock.close()
+        return result == 0
     except Exception:
         return False
 
@@ -87,29 +105,35 @@ def run_tests(args: list | None = None):
     # 收集要运行的模块
     selected_modules: list[str] = []
     run_all = False
-    quick_mode = False
-    hexrays_only = False
+    transport_mode = "both"  # 默认测试两种模式
     remaining_args: list[str] = []
     
     if args:
         for arg in args:
             if arg == "--all":
                 run_all = True
-            elif arg == "--quick":
-                quick_mode = True
-            elif arg == "--hexrays":
-                hexrays_only = True
+            elif arg.startswith("--transport="):
+                transport_mode = arg.split("=", 1)[1]
             elif arg.startswith("--") and arg[2:] in MODULES:
                 selected_modules.append(arg[2:])
             else:
                 remaining_args.append(arg)
     
+    # 添加 transport 参数
+    pytest_args.extend([f"--transport={transport_mode}"])
+    
+    # 检查 HTTP 代理（如果需要）
+    if transport_mode in ("http", "both"):
+        if not check_http_proxy():
+            print("WARNING: HTTP proxy not available at 127.0.0.1:11338")
+            if transport_mode == "http":
+                print("Please check config.conf and restart IDA plugin.")
+                return 1
+            else:
+                print("HTTP tests will be skipped.")
+    
     # 构建 marker 表达式
-    if hexrays_only:
-        pytest_args.extend(["-m", "hexrays"])
-    elif quick_mode:
-        pytest_args.extend(["-m", "not slow and not debug and not hexrays"])
-    elif selected_modules:
+    if selected_modules:
         # 运行指定模块
         marker_expr = " or ".join(selected_modules)
         pytest_args.extend(["-m", marker_expr])
@@ -121,6 +145,7 @@ def run_tests(args: list | None = None):
     pytest_args.extend(remaining_args)
     
     # 显示将要运行的测试
+    print(f"Transport mode: {transport_mode}")
     print(f"Running: pytest {' '.join(pytest_args[1:])}")
     print()
     

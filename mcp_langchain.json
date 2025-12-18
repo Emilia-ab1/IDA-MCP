@@ -1,12 +1,13 @@
 {
-    "mcpServers": {
-      "ida-mcp-proxy": {
-        "transport": "stdio",
-        "command": "path of python",
-        "args": ["path of ida_mcp_proxy.py"]
-      }
+  "mcpServers": {
+    "ida-mcp (http)": {
+      "transport": "streamable-http",
+      "url": "http://127.0.0.1:11338/mcp"
+    },
+    "ida-mcp-proxy (stdio)": {
+      "transport": "stdio",
+      "command": "python",
+      "args": ["ida_mcp/proxy/ida_mcp_proxy.py"]
     }
+  }
 }
-  
-  
-  

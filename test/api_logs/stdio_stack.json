@@ -1,0 +1,802 @@
+{
+  "transport": "stdio",
+  "category": "stack",
+  "generated_at": "2025-12-18T11:52:35.105208",
+  "total_calls": 10,
+  "calls": [
+    {
+      "timestamp": "2025-12-18T11:52:13.848971",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": "0x400efc"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "query": "0x400efc",
+          "name": "test_renamed_400EFC",
+          "start_ea": "0x400EFC",
+          "error": null,
+          "variables": [
+            {
+              "name": "var_s0",
+              "offset": 24,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s4",
+              "offset": 28,
+              "size": 4,
+              "type": "_DWORD"
+            }
+          ],
+          "method": "ida_frame"
+        }
+      ],
+      "duration_ms": 662.13
+    },
+    {
+      "timestamp": "2025-12-18T11:52:14.508726",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": ".init_proc"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "not found",
+          "query": ".init_proc"
+        }
+      ],
+      "duration_ms": 664.71
+    },
+    {
+      "timestamp": "2025-12-18T11:52:15.141576",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": "0xDEADBEEF"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "function not found",
+          "query": "0xDEADBEEF"
+        }
+      ],
+      "duration_ms": 625.36
+    },
+    {
+      "timestamp": "2025-12-18T11:52:15.789585",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": "0x400EFC,0x400F50"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "query": "0x400EFC",
+          "name": "test_renamed_400EFC",
+          "start_ea": "0x400EFC",
+          "error": null,
+          "variables": [
+            {
+              "name": "var_s0",
+              "offset": 24,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s4",
+              "offset": 28,
+              "size": 4,
+              "type": "_DWORD"
+            }
+          ],
+          "method": "ida_frame"
+        },
+        {
+          "query": "0x400F50",
+          "name": "main",
+          "start_ea": "0x400F50",
+          "error": null,
+          "variables": [
+            {
+              "name": "a1",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a2",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a3",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v6",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v7",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v8",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "p_sub_4013A8",
+              "type": "int (*)()",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v10",
+              "type": "_BYTE[128]",
+              "size": 128,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v11",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v12",
+              "type": "_BYTE[32]",
+              "size": 32,
+              "location": "stack",
+              "offset": null
+            }
+          ],
+          "method": "hexrays",
+          "frame_structure": [
+            {
+              "name": "var_BC",
+              "offset": 24,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_B8",
+              "offset": 28,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "p_sub_4013A8",
+              "offset": 32,
+              "size": 4,
+              "type": "int (*)()"
+            },
+            {
+              "name": "var_B0",
+              "offset": 36,
+              "size": 128,
+              "type": "_BYTE[128]"
+            },
+            {
+              "name": "var_30",
+              "offset": 164,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_28",
+              "offset": 172,
+              "size": 1,
+              "type": "_BYTE"
+            },
+            {
+              "name": "var_8",
+              "offset": 204,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s0",
+              "offset": 212,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s4",
+              "offset": 216,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s8",
+              "offset": 220,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_sC",
+              "offset": 224,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s10",
+              "offset": 228,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s14",
+              "offset": 232,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s18",
+              "offset": 236,
+              "size": 4,
+              "type": "_DWORD"
+            }
+          ]
+        }
+      ],
+      "duration_ms": 643.93
+    },
+    {
+      "timestamp": "2025-12-18T11:52:16.528486",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": "0x400f50"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "query": "0x400f50",
+          "name": "main",
+          "start_ea": "0x400F50",
+          "error": null,
+          "variables": [
+            {
+              "name": "a1",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a2",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a3",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v6",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v7",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v8",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "p_sub_4013A8",
+              "type": "int (*)()",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v10",
+              "type": "_BYTE[128]",
+              "size": 128,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v11",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v12",
+              "type": "_BYTE[32]",
+              "size": 32,
+              "location": "stack",
+              "offset": null
+            }
+          ],
+          "method": "hexrays",
+          "frame_structure": [
+            {
+              "name": "var_BC",
+              "offset": 24,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_B8",
+              "offset": 28,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "p_sub_4013A8",
+              "offset": 32,
+              "size": 4,
+              "type": "int (*)()"
+            },
+            {
+              "name": "var_B0",
+              "offset": 36,
+              "size": 128,
+              "type": "_BYTE[128]"
+            },
+            {
+              "name": "var_30",
+              "offset": 164,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_28",
+              "offset": 172,
+              "size": 1,
+              "type": "_BYTE"
+            },
+            {
+              "name": "var_8",
+              "offset": 204,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s0",
+              "offset": 212,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s4",
+              "offset": 216,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s8",
+              "offset": 220,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_sC",
+              "offset": 224,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s10",
+              "offset": 228,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s14",
+              "offset": 232,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s18",
+              "offset": 236,
+              "size": 4,
+              "type": "_DWORD"
+            }
+          ]
+        }
+      ],
+      "duration_ms": 736.43
+    },
+    {
+      "timestamp": "2025-12-18T11:52:17.206047",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "stack_frame",
+      "params": {
+        "addr": "0x400F50"
+      },
+      "port": 10001,
+      "result": [
+        {
+          "query": "0x400F50",
+          "name": "main",
+          "start_ea": "0x400F50",
+          "error": null,
+          "variables": [
+            {
+              "name": "a1",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a2",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "a3",
+              "type": "char **",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v6",
+              "type": "int",
+              "size": 4,
+              "location": "register"
+            },
+            {
+              "name": "v7",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v8",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "p_sub_4013A8",
+              "type": "int (*)()",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v10",
+              "type": "_BYTE[128]",
+              "size": 128,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v11",
+              "type": "int",
+              "size": 4,
+              "location": "stack",
+              "offset": null
+            },
+            {
+              "name": "v12",
+              "type": "_BYTE[32]",
+              "size": 32,
+              "location": "stack",
+              "offset": null
+            }
+          ],
+          "method": "hexrays",
+          "frame_structure": [
+            {
+              "name": "var_BC",
+              "offset": 24,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_B8",
+              "offset": 28,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "p_sub_4013A8",
+              "offset": 32,
+              "size": 4,
+              "type": "int (*)()"
+            },
+            {
+              "name": "var_B0",
+              "offset": 36,
+              "size": 128,
+              "type": "_BYTE[128]"
+            },
+            {
+              "name": "var_30",
+              "offset": 164,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_28",
+              "offset": 172,
+              "size": 1,
+              "type": "_BYTE"
+            },
+            {
+              "name": "var_8",
+              "offset": 204,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s0",
+              "offset": 212,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s4",
+              "offset": 216,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s8",
+              "offset": 220,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_sC",
+              "offset": 224,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s10",
+              "offset": 228,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s14",
+              "offset": 232,
+              "size": 4,
+              "type": "_DWORD"
+            },
+            {
+              "name": "var_s18",
+              "offset": 236,
+              "size": 4,
+              "type": "_DWORD"
+            }
+          ]
+        }
+      ],
+      "duration_ms": 675.19
+    },
+    {
+      "timestamp": "2025-12-18T11:52:17.932502",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "declare_stack",
+      "params": {
+        "items": [
+          {
+            "function_address": "0x400efc",
+            "offset": -8,
+            "name": "test_local",
+            "type": "int",
+            "size": 4
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "no stack frame",
+          "item": {
+            "function_address": "0x400efc",
+            "offset": -8,
+            "name": "test_local",
+            "type": "int",
+            "size": 4
+          }
+        }
+      ],
+      "duration_ms": 726.88
+    },
+    {
+      "timestamp": "2025-12-18T11:52:18.594446",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "declare_stack",
+      "params": {
+        "items": [
+          {
+            "function_address": "0x400efc",
+            "offset": -16,
+            "name": "test_local2",
+            "size": 4
+          },
+          {
+            "function_address": "0x400efc",
+            "offset": -24,
+            "name": "test_local3",
+            "size": 8
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "no stack frame",
+          "item": {
+            "function_address": "0x400efc",
+            "offset": -16,
+            "name": "test_local2",
+            "size": 4
+          }
+        },
+        {
+          "error": "no stack frame",
+          "item": {
+            "function_address": "0x400efc",
+            "offset": -24,
+            "name": "test_local3",
+            "size": 8
+          }
+        }
+      ],
+      "duration_ms": 654.58
+    },
+    {
+      "timestamp": "2025-12-18T11:52:19.236111",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "declare_stack",
+      "params": {
+        "items": [
+          {
+            "function_address": "0x400efc",
+            "offset": -128,
+            "name": "to_be_deleted",
+            "size": 4
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "no stack frame",
+          "item": {
+            "function_address": "0x400efc",
+            "offset": -128,
+            "name": "to_be_deleted",
+            "size": 4
+          }
+        }
+      ],
+      "duration_ms": 641.0
+    },
+    {
+      "timestamp": "2025-12-18T11:52:19.861889",
+      "transport": "stdio",
+      "category": "stack",
+      "tool": "delete_stack",
+      "params": {
+        "items": [
+          {
+            "function_address": "0x400efc",
+            "name": "to_be_deleted"
+          }
+        ]
+      },
+      "port": 10001,
+      "result": [
+        {
+          "error": "no stack frame",
+          "item": {
+            "function_address": "0x400efc",
+            "name": "to_be_deleted"
+          }
+        }
+      ],
+      "duration_ms": 634.61
+    }
+  ]
+}
