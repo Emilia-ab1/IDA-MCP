@@ -135,24 +135,24 @@ def _save_uri_log() -> None:
         # 文件名格式: {transport}_uri.json
         log_file = os.path.join(_LOG_DIR, f"{transport}_uri.json")
         try:
-            with open(log_file, "w", encoding="utf-8") as f:
-                json.dump({
+        with open(log_file, "w", encoding="utf-8") as f:
+            json.dump({
                     "transport": transport,
-                    "category": "uri_resources",
-                    "generated_at": datetime.now().isoformat(),
-                    "summary": {
-                        "total_calls": total,
-                        "success": success_count,
-                        "failed": failed_count,
-                        "success_rate": f"{success_count / total * 100:.1f}%" if total > 0 else "N/A",
-                    },
-                    "uri_stats": uri_stats,
+                "category": "uri_resources",
+                "generated_at": datetime.now().isoformat(),
+                "summary": {
+                    "total_calls": total,
+                    "success": success_count,
+                    "failed": failed_count,
+                    "success_rate": f"{success_count / total * 100:.1f}%" if total > 0 else "N/A",
+                },
+                "uri_stats": uri_stats,
                     "calls": calls,
-                }, f, indent=2, ensure_ascii=False, default=str)
-            
+            }, f, indent=2, ensure_ascii=False, default=str)
+        
             print(f"\n[URI Log] {transport}: Saved {total} calls to {log_file}")
             print(f"[URI Log] {transport}: Success: {success_count}, Failed: {failed_count}")
-        except Exception as e:
+    except Exception as e:
             print(f"\n[URI Log] {transport}: Failed to save: {e}")
 
 

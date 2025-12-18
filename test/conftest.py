@@ -180,15 +180,15 @@ def _save_api_log() -> None:
         
         total_calls += len(calls)
         stats_by_transport[transport] = {}
-        
-        # 按分类组织
-        categorized: Dict[str, List[Dict[str, Any]]] = {}
+    
+    # 按分类组织
+    categorized: Dict[str, List[Dict[str, Any]]] = {}
         for call in calls:
-            category = call.get("category", "other")
-            if category not in categorized:
-                categorized[category] = []
-            categorized[category].append(call)
-        
+        category = call.get("category", "other")
+        if category not in categorized:
+            categorized[category] = []
+        categorized[category].append(call)
+    
         # 保存各分类文件
         for category, cat_calls in categorized.items():
             # 文件名格式: {transport}_{category}.json
@@ -196,21 +196,21 @@ def _save_api_log() -> None:
             log_file = os.path.join(_LOG_DIR, filename)
             
             try:
-                with open(log_file, "w", encoding="utf-8") as f:
-                    json.dump({
+            with open(log_file, "w", encoding="utf-8") as f:
+                json.dump({
                         "transport": transport,
-                        "category": category,
-                        "generated_at": datetime.now().isoformat(),
+                    "category": category,
+                    "generated_at": datetime.now().isoformat(),
                         "total_calls": len(cat_calls),
                         "calls": cat_calls,
-                    }, f, indent=2, ensure_ascii=False, default=str)
+                }, f, indent=2, ensure_ascii=False, default=str)
                 
                 all_files.append(filename)
                 stats_by_transport[transport][category] = len(cat_calls)
             except Exception:
                 pass
-    
-    # 保存汇总文件
+        
+        # 保存汇总文件
     try:
         # 检查是否存在 uri.json（由 test_resources.py 生成）
         for prefix in ["stdio_", "http_", ""]:
@@ -452,7 +452,7 @@ def tool_caller(request, instance_port):
         def caller(tool_name: str, params: Optional[dict] = None) -> Any:
             return call_tool_http(tool_name, params or {}, instance_port)
     else:
-        def caller(tool_name: str, params: Optional[dict] = None) -> Any:
+    def caller(tool_name: str, params: Optional[dict] = None) -> Any:
             return call_tool_stdio(tool_name, params or {}, instance_port)
     
     return caller

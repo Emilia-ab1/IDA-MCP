@@ -82,6 +82,7 @@ import idaapi  # type: ignore
 import ida_kernwin  # type: ignore
 
 from ida_mcp import create_mcp_server, DEFAULT_PORT, registry
+from ida_mcp.config import get_ida_host, get_coordinator_host, get_coordinator_port
 
 _server_thread: threading.Thread | None = None  # 后台 uvicorn 线程 (运行 FastMCP ASGI 服务)
 _uv_server = None  # type: ignore               # uvicorn.Server 实例引用, 用于优雅关闭 (should_exit)
@@ -222,7 +223,7 @@ def _register_with_coordinator(port: int):
         # 若本实例成为协调器, 追加一条提示日志 (用户需求)
         try:
             if getattr(registry, 'is_coordinator', lambda: False)():  # type: ignore[attr-defined]
-                _info("This instance is COORDINATOR (registry listening on 127.0.0.1:11337)")
+                _info(f"This instance is COORDINATOR (registry listening on {get_coordinator_host()}:{get_coordinator_port()})")
         except Exception:
             pass
     except Exception as e:  # pragma: no cover
@@ -308,7 +309,8 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
             port = int(env_port)
         else:
             port = _find_free_port(DEFAULT_PORT)
-        host = os.getenv("IDA_MCP_HOST", "127.0.0.1")
+        # Host 选择: 优先环境变量，其次 config.conf，最后默认值
+        host = os.getenv("IDA_MCP_HOST") or get_ida_host()
         _info(f"Starting SSE server http://{host}:{port}/mcp/ (toggle to stop)")
         start_server_async(host, port)
 

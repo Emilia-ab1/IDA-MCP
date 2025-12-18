@@ -14,6 +14,7 @@ HTTP 代理配置:
     - http_path: MCP 端点路径 (默认 /mcp)
 
 IDA 实例配置:
+    - ida_host: IDA 实例 SSE 服务器监听地址 (默认 127.0.0.1)
     - ida_default_port: IDA 实例 MCP 端口起始值 (默认 10000)
 
 通用配置:
@@ -41,6 +42,7 @@ _DEFAULT_CONFIG = {
     "http_path": "/mcp",
     
     # IDA 实例配置
+    "ida_host": "127.0.0.1",
     "ida_default_port": 10000,
     
     # 通用配置
@@ -181,6 +183,12 @@ def get_http_url() -> str:
 # ============================================================================
 # IDA 实例配置访问函数
 # ============================================================================
+
+def get_ida_host() -> str:
+    """获取 IDA 实例 SSE 服务器监听地址。"""
+    config = load_config()
+    return str(config.get("ida_host", "127.0.0.1"))
+
 
 def get_ida_default_port() -> int:
     """获取 IDA 实例默认端口起始值。"""
