@@ -4,6 +4,10 @@
 
 配置项
 ====================
+传输方式开关:
+    - enable_stdio: 是否启用 stdio 模式 (默认 true)
+    - enable_http: 是否启用 HTTP 代理模式 (默认 true)
+
 协调器配置:
     - coordinator_host: 协调器监听地址 (默认 127.0.0.1)
     - coordinator_port: 协调器端口 (默认 11337)
@@ -14,7 +18,7 @@ HTTP 代理配置:
     - http_path: MCP 端点路径 (默认 /mcp)
 
 IDA 实例配置:
-    - ida_host: IDA 实例 SSE 服务器监听地址 (默认 127.0.0.1)
+    - ida_host: IDA 实例 MCP 服务器监听地址 (默认 127.0.0.1)
     - ida_default_port: IDA 实例 MCP 端口起始值 (默认 10000)
 
 通用配置:
@@ -32,6 +36,10 @@ _CONFIG_FILE = os.path.join(_CONFIG_DIR, "config.conf")
 
 # 默认配置
 _DEFAULT_CONFIG = {
+    # 传输方式开关
+    "enable_stdio": False,   # 是否启用 stdio 模式（协调器）
+    "enable_http": True,    # 是否启用 HTTP 代理模式
+    
     # 协调器配置
     "coordinator_host": "127.0.0.1",
     "coordinator_port": 11337,
@@ -188,7 +196,7 @@ def get_http_url() -> str:
 # ============================================================================
 
 def get_ida_host() -> str:
-    """获取 IDA 实例 SSE 服务器监听地址。"""
+    """获取 IDA 实例 MCP 服务器监听地址。"""
     config = load_config()
     return str(config.get("ida_host", "127.0.0.1"))
 
@@ -213,3 +221,19 @@ def is_debug_enabled() -> bool:
     """是否启用调试日志。"""
     config = load_config()
     return bool(config.get("debug", False))
+
+
+# ============================================================================
+# 传输方式开关
+# ============================================================================
+
+def is_stdio_enabled() -> bool:
+    """是否启用 stdio 模式（协调器）。"""
+    config = load_config()
+    return bool(config.get("enable_stdio", True))
+
+
+def is_http_enabled() -> bool:
+    """是否启用 HTTP 代理模式。"""
+    config = load_config()
+    return bool(config.get("enable_http", True))

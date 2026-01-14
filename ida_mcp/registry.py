@@ -338,9 +338,14 @@ def _start_coordinator():  # pragma: no cover
 
 
 def _try_start_http_proxy():  # pragma: no cover
-    """启动 HTTP MCP 代理（始终启动，同时支持 stdio 和 HTTP 两种连接方式）。"""
+    """根据配置启动 HTTP MCP 代理。"""
     try:
-        from .config import get_http_host, get_http_port, get_http_path
+        from .config import get_http_host, get_http_port, get_http_path, is_http_enabled
+        
+        # 检查是否启用 HTTP 模式
+        if not is_http_enabled():
+            return
+        
         from .http import start_http_proxy, get_http_url
         
         host = get_http_host()
@@ -398,10 +403,18 @@ def init_and_register(port: int, input_file: str | None, idb_path: str | None):
         input_file: 输入文件路径 (可能为 None)
         idb_path: IDB 路径 (可能为 None)
     逻辑:
-        1. 尝试连接 11337; 若失败则尝试 bind -> 成为协调器并启动 HTTP 服务。
-        2. 构造实例 payload 并 POST /register。
-        3. 注册 atexit 钩子, 确保正常退出时自动注销。
+        1. 检查是否有传输方式启用，至少需要 enable_stdio 或 enable_http 其一
+        2. 尝试连接 11337; 若失败则尝试 bind -> 成为协调器并启动 HTTP 服务
+        3. 构造实例 payload 并 POST /register
+        4. 注册 atexit 钩子, 确保正常退出时自动注销
     """
+    from .config import is_stdio_enabled, is_http_enabled
+    
+    # 如果两种传输方式都禁用，则不启动协调器
+    if not is_stdio_enabled() and not is_http_enabled():
+        _log_info("Both stdio and HTTP modes are disabled, coordinator not started")
+        return
+    
     global _is_coordinator
     if not _coordinator_alive():
         try:

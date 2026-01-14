@@ -1,12 +1,12 @@
-"""IDA Pro MCP 插件 (SSE + 多实例协调器注册)
+"""IDA Pro MCP 插件 (HTTP + 多实例协调器注册)
 
 功能综述
 ====================
-本插件为每个启动的 IDA 实例提供一个最小化 **FastMCP SSE** 服务, 暴露逆向分析能力给支持 MCP 的外部客户端。
+本插件为每个启动的 IDA 实例提供一个最小化 **FastMCP HTTP** 服务, 暴露逆向分析能力给支持 MCP 的外部客户端。
 
 核心特性:
-    1. 启动/关闭采用“切换式”触发(再次运行插件即关闭)。
-    2. 自动选择空闲端口 (从 10000 开始向上扫描), SSE 路径固定为 ``/mcp``。
+    1. 启动/关闭采用"切换式"触发(再次运行插件即关闭)。
+    2. 自动选择空闲端口 (从 10000 开始向上扫描), MCP 路径固定为 ``/mcp``。
     3. 首个成功启动的实例会在 ``127.0.0.1:11337`` 上创建一个 **内存型协调器(coordinator)**。
     4. 后续实例向协调器注册, 仅在内存维护实例列表, 不落盘 (避免文件锁 / 清理问题)。
     5. 工具最小化: 仅保留 ``list_functions`` 与 ``instances`` (实例列表)。
@@ -14,7 +14,7 @@
 
 运行时架构
 --------------------
-``IDA 实例 (N 个)`` → 各自运行 uvicorn FastMCP (SSE) → 向协调器登记元信息(pid, port, input_file 等)。
+``IDA 实例 (N 个)`` → 各自运行 uvicorn FastMCP (HTTP) → 向协调器登记元信息(pid, port, input_file 等)。
 ``协调器`` 负责: 记录活跃实例; 接收代理或其他客户端的 /call 请求并转发至目标实例。
 
 线程与生命周期
@@ -82,7 +82,10 @@ import idaapi  # type: ignore
 import ida_kernwin  # type: ignore
 
 from ida_mcp import create_mcp_server, DEFAULT_PORT, registry
-from ida_mcp.config import get_ida_host, get_coordinator_host, get_coordinator_port
+from ida_mcp.config import (
+    get_ida_host, get_coordinator_host, get_coordinator_port,
+    is_stdio_enabled, is_http_enabled
+)
 
 _server_thread: threading.Thread | None = None  # 后台 uvicorn 线程 (运行 FastMCP ASGI 服务)
 _uv_server = None  # type: ignore               # uvicorn.Server 实例引用, 用于优雅关闭 (should_exit)
@@ -207,7 +210,7 @@ def _register_with_coordinator(port: int):
     """向协调器注册当前实例元信息。
 
     参数:
-        port: 当前实例 FastMCP SSE 监听端口。
+        port: 当前实例 FastMCP HTTP 监听端口。
     说明:
         * 首个实例若发现协调器端口空闲会由 registry 内部启动协调器。
         * 注册内容包括: pid / port / 输入文件路径 / idb 路径 / Python 版本等。
@@ -286,7 +289,7 @@ def PLUGIN_ENTRY():  # IDA looks for this symbol
 
 class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
     flags = 0
-    comment = "FastMCP SSE server for IDA"
+    comment = "FastMCP HTTP server for IDA"
     help = "Expose IDA features through Model Context Protocol"
     wanted_name = "IDA-MCP"
     wanted_hotkey = ""
@@ -308,6 +311,19 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
             _info("Server running -> toggling to stop.")
             stop_server()
             return
+        # 检查传输方式配置
+        stdio_enabled = is_stdio_enabled()
+        http_enabled = is_http_enabled()
+        if not stdio_enabled and not http_enabled:
+            _warn("Both stdio and HTTP modes are disabled in config.conf. No server started.")
+            return
+        # 显示启用的传输方式
+        modes = []
+        if stdio_enabled:
+            modes.append("stdio")
+        if http_enabled:
+            modes.append("HTTP")
+        _info(f"Transport modes enabled: {', '.join(modes)}")
         # Host 选择: 优先环境变量，其次 config.conf，最后默认值
         host = os.getenv("IDA_MCP_HOST") or get_ida_host()
         # 端口选择: 优先使用环境变量; 否则自动扫描以支持多实例
@@ -317,7 +333,7 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
             port = int(env_port)
         else:
             port = _find_free_port(DEFAULT_PORT, host)
-        _info(f"Starting SSE server http://{host}:{port}/mcp/ (toggle to stop)")
+        _info(f"Starting MCP server at http://{host}:{port}/mcp/ (toggle to stop)")
         start_server_async(host, port)
 
     def term(self):  # type: ignore
@@ -352,7 +368,7 @@ def start_server_async(host: str, port: int):
                 except Exception:
                     pass  # 策略设置失败时不影响后续逻辑，最多产生原有控制台提示
             server = create_mcp_server()
-            # 构建 ASGI 应用 (包含 SSE 端点), 挂载路径 '/mcp'
+            # 构建 ASGI 应用 (Streamable HTTP), 挂载路径 '/mcp'
             app = server.http_app(path="/mcp")  # type: ignore[attr-defined]
             # 在导入 uvicorn 之前再次确保过滤器生效
             import warnings as _w
