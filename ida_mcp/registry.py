@@ -69,29 +69,26 @@ import atexit
 import sys
 import ida_kernwin  # type: ignore
 
-# 内部通信固定使用本地回环地址
+# 所有内部组件（协调器、IDA 实例）固定使用 127.0.0.1
+# 外部访问统一通过 HTTP 代理 (11338)
 LOCALHOST = "127.0.0.1"
+COORD_HOST = "127.0.0.1"
+IDA_HOST = "127.0.0.1"
 
-# 从配置文件加载，若失败则使用默认值
+# 从配置文件加载可配置项
 try:
     from .config import (
-        get_coordinator_host,
         get_coordinator_port,
         get_request_timeout,
         is_debug_enabled as _config_debug,
-        get_ida_host,
     )
-    COORD_HOST = get_coordinator_host()  # 监听地址（可配置为 0.0.0.0 等）
     COORD_PORT = get_coordinator_port()
     REQUEST_TIMEOUT = get_request_timeout()
     DEBUG_ENABLED = _config_debug()
-    IDA_HOST = get_ida_host()  # 实例监听地址
 except Exception:
-    COORD_HOST = "127.0.0.1"
     COORD_PORT = 11337
     REQUEST_TIMEOUT = 30
     DEBUG_ENABLED = False
-    IDA_HOST = "127.0.0.1"
 
 DEBUG_MAX_LEN = 1000
 
@@ -270,13 +267,26 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 return
             t0 = time.time()
             _debug_log('CALL_BEGIN', tool=tool, target_port=port, pid=target.get('pid'), params_keys=list((params or {}).keys()))
-            # Forward the tool call over SSE MCP (JSON-RPC) using fastmcp Client dynamically.
+            # Forward the tool call over HTTP MCP (JSON-RPC) using fastmcp Client dynamically.
             # 内部通信固定使用 127.0.0.1（协调器与实例在同一台机器上）
+            mcp_url = f"http://{LOCALHOST}:{port}/mcp/"
+            
+            # 先验证端口是否可连接
+            try:
+                with socket.create_connection((LOCALHOST, port), timeout=1.0):
+                    pass  # 端口可连接
+            except (ConnectionRefusedError, OSError, socket.timeout) as e:
+                err_msg = f"Port {port} not reachable: {type(e).__name__}: {e}"
+                _log_info(f"[PRE_CHECK_FAIL] {err_msg}")
+                self._send(500, {"error": err_msg})
+                return
+            
             try:
                 from fastmcp import Client  # type: ignore
                 import asyncio
+                
                 async def _do():
-                    async with Client(f"http://{LOCALHOST}:{port}/mcp/", timeout=REQUEST_TIMEOUT) as c:  # type: ignore
+                    async with Client(mcp_url, timeout=REQUEST_TIMEOUT) as c:  # type: ignore
                         resp = await c.call_tool(tool, params)
                         # Extract data from response content (JSON text)
                         # fastmcp returns data in resp.content[0].text as JSON string
@@ -304,7 +314,9 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                                 return x
                             data = norm(resp.data)
                         return {"tool": tool, "data": data}
+                
                 result = asyncio.run(_do())
+                
                 dt_ms = int((time.time() - t0) * 1000)
                 # Attempt to estimate response size
                 try:
@@ -314,9 +326,14 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 _debug_log('CALL_OK', tool=tool, target_port=port, elapsed_ms=dt_ms, resp_size=resp_size)
                 self._send(200, result)
             except Exception as e:  # pragma: no cover
+                import traceback
                 dt_ms = int((time.time() - t0) * 1000)
-                _debug_log('CALL_FAIL', tool=tool, target_port=port, elapsed_ms=dt_ms, error=str(e))
-                self._send(500, {"error": f"call failed: {e}"})
+                err_detail = f"{type(e).__name__}: {e}"
+                tb = traceback.format_exc()
+                _debug_log('CALL_FAIL', tool=tool, target_port=port, elapsed_ms=dt_ms, error=err_detail, traceback=tb)
+                # 输出到 IDA 控制台便于诊断
+                _log_info(f"[CALL_FAIL] url={mcp_url} tool={tool}: {err_detail}")
+                self._send(500, {"error": f"call failed ({mcp_url}): {err_detail}"})
         else:
             self._send(404, {"error": "not found"})
 

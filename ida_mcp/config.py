@@ -8,8 +8,7 @@
     - enable_stdio: 是否启用 stdio 模式 (默认 true)
     - enable_http: 是否启用 HTTP 代理模式 (默认 true)
 
-协调器配置:
-    - coordinator_host: 协调器监听地址 (默认 127.0.0.1)
+协调器配置 (内部组件，地址固定为 127.0.0.1):
     - coordinator_port: 协调器端口 (默认 11337)
 
 HTTP 代理配置:
@@ -17,8 +16,7 @@ HTTP 代理配置:
     - http_port: HTTP 代理端口 (默认 11338)
     - http_path: MCP 端点路径 (默认 /mcp)
 
-IDA 实例配置:
-    - ida_host: IDA 实例 MCP 服务器监听地址 (默认 127.0.0.1)
+IDA 实例配置 (内部组件，地址固定为 127.0.0.1):
     - ida_default_port: IDA 实例 MCP 端口起始值 (默认 10000)
 
 通用配置:
@@ -40,8 +38,7 @@ _DEFAULT_CONFIG = {
     "enable_stdio": False,   # 是否启用 stdio 模式（协调器）
     "enable_http": True,    # 是否启用 HTTP 代理模式
     
-    # 协调器配置
-    "coordinator_host": "127.0.0.1",
+    # 协调器配置（地址固定为 127.0.0.1，仅端口可配置）
     "coordinator_port": 11337,
     
     # HTTP 代理配置
@@ -49,8 +46,7 @@ _DEFAULT_CONFIG = {
     "http_port": 11338,
     "http_path": "/mcp",
     
-    # IDA 实例配置
-    "ida_host": "127.0.0.1",
+    # IDA 实例配置（地址固定为 127.0.0.1，仅端口可配置）
     "ida_default_port": 10000,
     
     # 通用配置
@@ -139,10 +135,13 @@ def load_config(reload: bool = False) -> Dict[str, Any]:
 # 协调器配置访问函数
 # ============================================================================
 
+# 协调器是纯内部组件，地址固定为 127.0.0.1
+_COORDINATOR_HOST = "127.0.0.1"
+
+
 def get_coordinator_host() -> str:
-    """获取协调器监听地址。"""
-    config = load_config()
-    return str(config.get("coordinator_host", "127.0.0.1"))
+    """获取协调器监听地址（固定为 127.0.0.1，不可配置）。"""
+    return _COORDINATOR_HOST
 
 
 def get_coordinator_port() -> int:
@@ -152,13 +151,8 @@ def get_coordinator_port() -> int:
 
 
 def get_coordinator_url() -> str:
-    """获取协调器连接 URL（0.0.0.0 转换为 127.0.0.1）。"""
-    host = get_coordinator_host()
-    # 0.0.0.0 只能用于监听，不能作为连接目标
-    if host == "0.0.0.0":
-        host = "127.0.0.1"
-    port = get_coordinator_port()
-    return f"http://{host}:{port}"
+    """获取协调器连接 URL。"""
+    return f"http://{_COORDINATOR_HOST}:{get_coordinator_port()}"
 
 
 # ============================================================================
@@ -195,10 +189,13 @@ def get_http_url() -> str:
 # IDA 实例配置访问函数
 # ============================================================================
 
+# IDA 实例是内部组件，地址固定为 127.0.0.1
+_IDA_HOST = "127.0.0.1"
+
+
 def get_ida_host() -> str:
-    """获取 IDA 实例 MCP 服务器监听地址。"""
-    config = load_config()
-    return str(config.get("ida_host", "127.0.0.1"))
+    """获取 IDA 实例 MCP 服务器监听地址（固定为 127.0.0.1，不可配置）。"""
+    return _IDA_HOST
 
 
 def get_ida_default_port() -> int:
