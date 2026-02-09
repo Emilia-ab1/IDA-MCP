@@ -1,6 +1,6 @@
 # IDA-MCP
 
-![logo](ida-mcp.png)
+<img src="ida-mcp.png" width="50%">
 
 [![MCP Badge](https://lobehub.com/badge/mcp/captain-ai-hub-ida-mcp)](https://lobehub.com/mcp/captain-ai-hub-ida-mcp)
 
@@ -322,3 +322,4 @@ It's not about having many tools, but about having precise ones; the power of th
 ## Future Plans
 
 Add UI interface, support internal model calls, add multi-agent A2A automated reverse engineering functionality after langchain officially updates to 1.0.0.
+
