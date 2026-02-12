@@ -298,6 +298,13 @@ class IDAMCPPlugin(idaapi.plugin_t if idaapi else object):  # type: ignore
         if idaapi is None:
             _warn("Outside IDA environment; plugin inactive.")
             return idaapi.PLUGIN_SKIP if idaapi else 0
+        
+        # 全局启用批处理模式，抑制所有警告对话框（警告仍会显示在控制台）
+        try:
+            idaapi.cvar.batch = 1
+        except Exception:
+            pass
+        
         # 不自动启动, 等待用户菜单/快捷方式显式触发。
         _info("Plugin initialized and ready (not auto-starting).")
         return idaapi.PLUGIN_KEEP  # type: ignore

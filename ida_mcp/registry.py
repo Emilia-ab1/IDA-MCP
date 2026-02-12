@@ -329,11 +329,26 @@ class _Handler(http.server.BaseHTTPRequestHandler):  # pragma: no cover
                 import traceback
                 dt_ms = int((time.time() - t0) * 1000)
                 err_detail = f"{type(e).__name__}: {e}"
-                tb = traceback.format_exc()
-                _debug_log('CALL_FAIL', tool=tool, target_port=port, elapsed_ms=dt_ms, error=err_detail, traceback=tb)
-                # 输出到 IDA 控制台便于诊断
-                _log_info(f"[CALL_FAIL] url={mcp_url} tool={tool}: {err_detail}")
-                self._send(500, {"error": f"call failed ({mcp_url}): {err_detail}"})
+                
+                # 客户端断开连接时静默处理，不输出大量日志
+                is_disconnect = any(x in err_detail for x in [
+                    'BrokenResourceError', 'ConnectionAbortedError', 'ReadTimeout',
+                    'ConnectionResetError', 'BrokenPipeError'
+                ])
+                
+                if is_disconnect:
+                    _debug_log('CLIENT_DISCONNECT', tool=tool, target_port=port, elapsed_ms=dt_ms)
+                else:
+                    tb = traceback.format_exc()
+                    _debug_log('CALL_FAIL', tool=tool, target_port=port, elapsed_ms=dt_ms, error=err_detail, traceback=tb)
+                    # 输出到 IDA 控制台便于诊断
+                    _log_info(f"[CALL_FAIL] url={mcp_url} tool={tool}: {err_detail}")
+                
+                # 尝试发送错误响应，忽略连接已断开的情况
+                try:
+                    self._send(500, {"error": f"call failed ({mcp_url}): {err_detail}"})
+                except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError, OSError):
+                    pass  # 客户端已断开，忽略
         else:
             self._send(404, {"error": "not found"})
 
